@@ -3,6 +3,7 @@
 """
 from django.utils import timezone
 from django.test import TestCase
+from .models import Test
 from .models import Testsuite
 from .models import TestsuiteName
 from .models import TestsuiteKeySet
@@ -56,11 +57,8 @@ class TestsuiteTestCase(TestCase):
         self.assertTrue(testsuite.timestamp == testsuite1.timestamp)
         self.assertTrue(testsuite == testsuite1)
 
-
     def test_create_method(self):
         """ Test creating a testsuite. """
-
-        start_time = timezone.now()
 
         keys = (TestKey.get_or_create("key1", "value1")[0],
                 TestKey.get_or_create("key2", "value2")[0])
@@ -68,4 +66,4 @@ class TestsuiteTestCase(TestCase):
         test1 = Test.get_or_create(testsuite, "test_name1")
         test2 = Test.get_or_create(testsuite, "test_name2")
 
-        ##
+        self.assertTrue(test1.timestamp >= test2.timestamp)

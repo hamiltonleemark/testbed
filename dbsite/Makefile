@@ -1,4 +1,4 @@
-include ../standard_defs.mk
+include ../defs.mk
 include defs.mk
 
 test::
