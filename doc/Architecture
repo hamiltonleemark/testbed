@@ -1,0 +1,7 @@
+
+
+Django
+
+Changes from default configuration
+Time zone support is enabled. To learn more
+https://docs.djangoproject.com/en/1.8/topics/i18n/timezones/
