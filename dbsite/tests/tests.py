@@ -44,7 +44,7 @@ class TestsuiteTestCase(TestCase):
 
         keys = (TestKey.get_or_create("key1", "value1")[0],
                 TestKey.get_or_create("key2", "value2")[0])
-        testsuite = Testsuite.get_or_create("default", "testsuite_name", keys)
+        testsuite = Testsuite.get_or_create("testsuite_name", "default", keys)
 
         ##
         # Making sure auto assignment of current time for the timestamp field

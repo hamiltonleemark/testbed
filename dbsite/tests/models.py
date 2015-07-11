@@ -29,16 +29,24 @@ class TestKey(models.Model):
     @staticmethod
     def get_or_create(key, value):
         """ Create a single test key objects. """
-        (obj, _) = Key.objects.get_or_create(value=key)
-        return TestKey.objects.get_or_create(key=obj, value=value)
+        (key, _) = Key.objects.get_or_create(value=key)
+        return TestKey.objects.get_or_create(key=key, value=value)
 
 
 class Test(models.Model):
     """ A single test consisting of one or more results. """
-    name = models.ForeignKey(Key, related_name="name")
-    keys = models.ManyToManyField(TestKey, through="TestKeySet")
     testsuite = models.ForeignKey("Testsuite", null=True, blank=True,
                                   default=None)
+    name = models.ForeignKey(Key, related_name="name")
+    keys = models.ManyToManyField(TestKey, through="TestKeySet")
+
+    @staticmethod
+    def get_or_create(testsuite_name, keys, value):
+        """ Create a single test key objects. """
+        (testsuite, _) = Testsuite.objects.get_or_create(testsuite_name=testsuite_name)
+        (key, _) = Key.objects.get_or_create(value=key)
+        return TestKey.objects.get_or_create(key=key, value=value)
+
 
 
 class TestFile(models.Model):
