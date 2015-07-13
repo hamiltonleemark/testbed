@@ -4,26 +4,28 @@ CLI for testbd.
 """
 import os
 import sys
+import logging
+import argparse
+
+LOGGER = logging.getLogger(__name__)
 
 
-def argparse():
-    """ Generate arg parser. """
- 
-    import cmd_parser
-    cmd_parser.argparse()
-
+def main():
+    """ main entry point. """
+    from testbed.core import commands
+    arg_parser = commands.main()
+    args = arg_parser.parse_args()
 
 if __name__ == "__main__":
-    os.environ.setdefault("TESTBED_SETTINGS", "testdb.settings") 
-
+    # \todo figure out how this works when we install tbd.
     try:
-        from testbed.core import commands
-    except ImportError:
-         dir_name_path = os.path.join(os.path.dirname(__file__),
-                                      os.path.pardir, "lib")
-         print "MARK: dir 1", dir_name_path
-         print "MARK: dir 2", os.path.abspath(dir_name_path)
-         sys.path.append(os.path.abspath(dir_name_path))
-         import testbed
-         from testbed.core import commands
-    commands.argparser()
+        testbed_dir = os.environ["TESTBED"]
+    except KeyError:
+        cur_dir = os.path.abspath(os.path.join("..", __file__))
+        testbed_dir = os.path.dirname(cur_dir)
+    LOGGER.debug("appending %s to path" % testbed_dir)
+    sys.path.append(testbed_dir)
+        
+    sys.exit(main())
+                       
+

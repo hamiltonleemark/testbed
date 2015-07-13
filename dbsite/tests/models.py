@@ -41,12 +41,29 @@ class Test(models.Model):
     keys = models.ManyToManyField(TestKey, through="TestKeySet")
 
     @staticmethod
-    def get_or_create(testsuite_name, keys, value):
-        """ Create a single test key objects. """
-        (testsuite, _) = Testsuite.objects.get_or_create(testsuite_name=testsuite_name)
-        (key, _) = Key.objects.get_or_create(value=key)
-        return TestKey.objects.get_or_create(key=key, value=value)
+    def get_or_create(testsuite, name, keys):
+        """ Get current or create new objects.
+        @param testkeys Must be an instance of TestKey.
+        """
 
+        (name, _) = Key.objects.get_or_create(value=name)
+
+        ##
+        # Look for test.
+        find = Test.objects.filter(testsuite=testsuite, name=name)
+        for key in keys:
+            find = find.filter(key=key)
+
+        if find.count() == 1:
+            return [item for item in find][0]
+        elif find.count() > 1:
+            raise Test.MultipleObjectsReturned("%s" % (name))
+
+        test = Test.objects.create(testsuite=testsuite, name=name)
+
+        for key in keys:
+            TestKeySet.objects.create(testsuite=testsuite, key=key)
+        return test
 
 
 class TestFile(models.Model):

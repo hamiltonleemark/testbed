@@ -63,7 +63,7 @@ class TestsuiteTestCase(TestCase):
         keys = (TestKey.get_or_create("key1", "value1")[0],
                 TestKey.get_or_create("key2", "value2")[0])
         testsuite = Testsuite.get_or_create("default", "testsuite_name1", keys)
-        test1 = Test.get_or_create(testsuite, "test_name1")
-        test2 = Test.get_or_create(testsuite, "test_name2")
+        test1 = Test.get_or_create(testsuite, "test_name1", keys)
+        test2 = Test.get_or_create(testsuite, "test_name2", keys)
 
         self.assertTrue(test1.timestamp >= test2.timestamp)
