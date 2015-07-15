@@ -15,7 +15,7 @@ formatter = logging.Formatter(testbed.settings.FMT)
 console.setFormatter(formatter)
 LOGGER = logging.getLogger("")
 LOGGER.addHandler(console)
-LOGGER.setLevel(logging.DEBUG)
+LOGGER.setLevel(logging.INFO)
 
 class VerbositySet(argparse.Action):
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
@@ -48,6 +48,10 @@ def onerror(name):
 def extensions_find(arg_parser):
     """ Look for command extensions. """
 
+    subparser = arg_parser.add_subparsers(title="subcommands",
+                                          description="Valid subcommands",
+                                          help="Each subcommands supports --help for additional information.")
+
     for package in testbed.settings.COMMANDS:
         LOGGER.debug("loading commands %s" % package)
         package = importlib.import_module(package)
@@ -58,8 +62,15 @@ def extensions_find(arg_parser):
                 continue
             LOGGER.debug("  loading commands from %s" % module)
             module = importlib.import_module(module)
-            module.argparser(arg_parser)
-            
+            try:
+                module.add_subparser(subparser)
+            except AttributeError, arg:
+                ##
+                # This means that the module is missing the add method.
+                # All modules identified in settings to extend CLI
+                # must have an add method
+                LOGGER.error("adding subparser for %s.%s" % (package, module))
+                LOGGER.exception(arg)
     
 
 def main():
