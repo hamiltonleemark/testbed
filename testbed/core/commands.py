@@ -1,13 +1,21 @@
 import sys
+import imp
+import inspect
+import os
 import logging
 import inspect
+import importlib
 import pkgutil
 import argparse
 import testbed.settings
 import testbed.core.logger
 
-
-LOGGER = testbed.core.logger.create(__name__)
+console = logging.StreamHandler()
+formatter = logging.Formatter(testbed.settings.FMT)
+console.setFormatter(formatter)
+LOGGER = logging.getLogger("")
+LOGGER.addHandler(console)
+LOGGER.setLevel(logging.DEBUG)
 
 class VerbositySet(argparse.Action):
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
@@ -16,7 +24,9 @@ class VerbositySet(argparse.Action):
 
     def __call__(self, parser, namespace, values, option_string=None):
         """ Called when verboaity. """
-        LOGGER.setLevel(logging.DEBUG)
+
+        LOGGER.setLevel(level=logging.DEBUG)
+
 
 
 def argparser():
@@ -25,14 +35,6 @@ def argparser():
     arg_parser.add_argument('--verbose', '-v', required=False, nargs='?',
                             action=VerbositySet, const=logging.DEBUG,
                             help="enable debug verbosity.")
-    arg_parser.add_argument('--extension', '-e', dest="extension",
-                            default=None, required=False, action='append',
-                            help="provide alternate location for "
-                                 "core functionality.")
-
-    print "MARK: what"
-    LOGGER.debug("debug")
-    LOGGER.error("error")
     return arg_parser
 
 
@@ -46,13 +48,18 @@ def onerror(name):
 def extensions_find(arg_parser):
     """ Look for command extensions. """
 
-    for pkg in testbed.settings.COMMANDS:
-        package = __import__(pkg)
-        for package in pkgutil.walk_packages(package.__path__,
-                                             package.__name__ + ".",
-                                             onerror=onerror):
-            _, package_name, _ = package
-            LOGGER.debug("checking %s for command extensions" % package_name)
+    for package in testbed.settings.COMMANDS:
+        LOGGER.debug("loading commands %s" % package)
+        package = importlib.import_module(package)
+        for _, module, ispkg in pkgutil.walk_packages(package.__path__,
+                                                    package.__name__ + ".",
+                                                    onerror=onerror):
+            if ispkg:
+                continue
+            LOGGER.debug("  loading commands from %s" % module)
+            module = importlib.import_module(module)
+            module.argparser(arg_parser)
+            
     
 
 def main():

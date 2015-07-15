@@ -4,7 +4,7 @@ import sys
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 COMMANDS = (
-  'libexec.commands',
+  'testbed.libexec.commands',
 )
 
 ##

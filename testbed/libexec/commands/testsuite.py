@@ -1,10 +1,13 @@
 import argparse
+
 def argparser(root_argparse):
     """ Create testsuite CLI commands. """
 
-    testsuite_parser = argparse.ArgumentParser()
-    sub_parser = argparse.ArgumentParser(help="sub-commands help",
-                                         dst="subparser_name")
-    sub_parser.arg_argument("testsuite", help = "Testsuite commands.")
+    subparser = root_argparse.add_subparsers(help="testsuite commands")
+    parser = subparser.add_parser("testsuite")
+    parser.add_argument("add", help="add a testsuite")
+    parser.add_argument("remove", help="remove a testsuite")
+
+    return root_argparse
     
     

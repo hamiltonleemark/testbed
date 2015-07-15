@@ -8,13 +8,15 @@ import logging
 import argparse
 
 
+LOGGER = logging.getLogger("")
+
+
 def main():
     """ main entry point. """
     from testbed.core import commands
 
     arg_parser = commands.main()
     args = arg_parser.parse_args()
-
 
 if __name__ == "__main__":
     # \todo figure out how this works when we install tbd.
