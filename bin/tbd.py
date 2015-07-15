@@ -16,6 +16,7 @@ def main():
     arg_parser = commands.main()
     args = arg_parser.parse_args()
 
+
 if __name__ == "__main__":
     # \todo figure out how this works when we install tbd.
     try:
@@ -27,5 +28,3 @@ if __name__ == "__main__":
     sys.path.append(testbed_dir)
         
     sys.exit(main())
-                       
-
