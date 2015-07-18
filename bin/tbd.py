@@ -7,7 +7,6 @@ import sys
 import logging
 import argparse
 
-
 LOGGER = logging.getLogger("")
 
 
@@ -17,6 +16,7 @@ def main():
 
     arg_parser = commands.main()
     args = arg_parser.parse_args()
+    commands.args_process(args)
 
 if __name__ == "__main__":
     # \todo figure out how this works when we install tbd.
@@ -34,4 +34,7 @@ if __name__ == "__main__":
             testbed_dir = installation
 
     sys.path.append(testbed_dir)
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except Exception, arg:
+        LOGGER.error(arg)

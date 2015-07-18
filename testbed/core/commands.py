@@ -33,23 +33,37 @@ LOGGER = logging.getLogger("")
 LOGGER.addHandler(console)
 LOGGER.setLevel(logging.INFO)
 
-class VerbositySet(argparse.Action):
-    def __init__(self, option_strings, dest, nargs=None, **kwargs):
-        super(VerbositySet, self).__init__(option_strings, dest, nargs,
-                                           **kwargs)
+def args_process(args):
+    """ Process any generic parameters. """
 
-    def __call__(self, parser, namespace, values, option_string=None):
-        """ Called when verboaity. """
-
+    if (args.verbose == 1):
+        LOGGER.setLevel(level=logging.INFO)
+        LOGGER.info("verbosity level set to INFO")
+    elif (args.verbose > 1):
         LOGGER.setLevel(level=logging.DEBUG)
+        LOGGER.info("verbosity level set to DEBUG")
 
+    LOGGER.debug(args)
 
+    args.func(args)
+
+#class VerbositySet(argparse.Action):
+    #def __init__(self, option_strings, dest, nargs=None, **kwargs):
+        #super(VerbositySet, self).__init__(option_strings, dest, nargs,
+                                           #**kwargs)
+#
+    #def __call__(self, parser, namespace, values, option_string=None):
+        #""" Called when verboaity. """
+#
+        #LOGGER.setLevel(level=logging.DEBUG)
+#
 
 def argparser():
     """ Create top level argument parser. """
-    arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('--verbose', '-v', required=False, nargs='?',
-                            action=VerbositySet, const=logging.DEBUG,
+    arg_parser = argparse.ArgumentParser(prog="tbd")
+    arg_parser.add_argument('--version', action="version",
+                            version="%(prog)s 0.0.1")
+    arg_parser.add_argument('--verbose', '-v', required=False, action="count",
                             help="enable debug verbosity.")
     return arg_parser
 
