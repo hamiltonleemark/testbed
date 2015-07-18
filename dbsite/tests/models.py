@@ -52,7 +52,7 @@ class Test(models.Model):
         # Look for test.
         find = Test.objects.filter(testsuite=testsuite, name=name)
         for key in keys:
-            find = find.filter(key=key)
+            find = find.filter(keys=key)
 
         if find.count() == 1:
             return [item for item in find][0]
@@ -62,7 +62,7 @@ class Test(models.Model):
         test = Test.objects.create(testsuite=testsuite, name=name)
 
         for key in keys:
-            TestKeySet.objects.create(testsuite=testsuite, key=key)
+            TestKeySet.objects.create(test=test, testkey=key)
         return test
 
 
@@ -75,8 +75,8 @@ class TestFile(models.Model):
 
 class TestKeySet(models.Model):
     """ Links a test to a set of keys. """
-    testkey = models.ForeignKey(TestKey)
     test = models.ForeignKey(Test)
+    testkey = models.ForeignKey(TestKey)
 
 
 class TestsuiteName(models.Model):

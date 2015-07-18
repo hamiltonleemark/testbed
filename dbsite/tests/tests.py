@@ -44,7 +44,7 @@ class TestsuiteTestCase(TestCase):
 
         keys = (TestKey.get_or_create("key1", "value1")[0],
                 TestKey.get_or_create("key2", "value2")[0])
-        testsuite = Testsuite.get_or_create("testsuite_name", "default", keys)
+        testsuite = Testsuite.get_or_create("default", "testsuite_name", keys)
 
         ##
         # Making sure auto assignment of current time for the timestamp field
@@ -66,4 +66,4 @@ class TestsuiteTestCase(TestCase):
         test1 = Test.get_or_create(testsuite, "test_name1", keys)
         test2 = Test.get_or_create(testsuite, "test_name2", keys)
 
-        self.assertTrue(test1.timestamp >= test2.timestamp)
+        self.assertTrue(test1.id != test2.id)

@@ -18,6 +18,7 @@ def main():
     args = arg_parser.parse_args()
     commands.args_process(args)
 
+
 if __name__ == "__main__":
     # \todo figure out how this works when we install tbd.
     try:

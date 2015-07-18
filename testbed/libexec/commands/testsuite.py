@@ -19,12 +19,15 @@ import sys
 import logging
 import testbed.core.commands
 
+from testbed.dbsite.tests import models
+
 LOGGER = logging.getLogger(__name__)
 
 
 def add_testsuite(args):
     """ Add a testsuite to the database. """
     LOGGER.info("adding testsuite %s", args.name)
+    testsuite = models.Testsuite.get_or_create(args.name)
 
 
 def add_subparser(subparser):
@@ -40,14 +43,12 @@ def add_subparser(subparser):
                                   help="Add a testsuite.")
     parser.set_defaults(func=add_testsuite)
     parser.add_argument("name", type=str, help="Name of the testsuite.")
-    parser.add_argument("--verbose", "-v", 
-                        help="Enable verbosity for testsuite commands")
 
     ##
     # Remove
     parser = subparser.add_parser("remove",
                                   description="Remove a testsuite.",
                                   help="Remove a testsuite.")
-    parser.add_argument("name", type=str, help="add a testsuite")
+    parser.add_argument("name", type=str, help="name of the testsuite.")
 
     return subparser
