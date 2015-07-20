@@ -14,13 +14,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Testdb.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+Provides general settings for testbed.
+"""
 import os
-import sys
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 COMMANDS = (
-  'testbed.libexec.commands',
+    'testbed.libexec.commands',
 )
 
 ##

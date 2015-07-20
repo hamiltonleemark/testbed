@@ -14,7 +14,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Testdb.  If not, see <http://www.gnu.org/licenses/>.
-import argparse
+"""
+CLI for tests.
+"""
+
 
 def add_subparser(subparser):
     """ Create testsuite CLI commands. """
@@ -23,5 +26,3 @@ def add_subparser(subparser):
     parser.add_argument("add", help="add a test")
 
     return subparser
-    
-

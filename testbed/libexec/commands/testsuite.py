@@ -14,12 +14,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Testdb.  If not, see <http://www.gnu.org/licenses/>.
-import argparse
-import sys
+"""
+CLI for testsuites.
+"""
 import logging
-import testbed.core.commands
-
-from testbed.dbsite.tests import models
+# from testbed.dbsite.tests import models
 
 LOGGER = logging.getLogger(__name__)
 
@@ -27,17 +26,17 @@ LOGGER = logging.getLogger(__name__)
 def add_testsuite(args):
     """ Add a testsuite to the database. """
     LOGGER.info("adding testsuite %s", args.name)
-    testsuite = models.Testsuite.get_or_create(args.name)
+    # testsuite = models.Testsuite.get_or_create(args.name)
 
 
 def add_subparser(subparser):
     """ Create testsuite CLI commands. """
 
-    parser = subparser.add_parser("testsuite")
+    parser = subparser.add_parser("testsuite", help=__doc__)
     subparser = parser.add_subparsers()
 
     ##
-    # Add 
+    # Add
     parser = subparser.add_parser("add",
                                   description="Add a testsuite",
                                   help="Add a testsuite.")

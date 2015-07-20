@@ -14,32 +14,41 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Testdb.  If not, see <http://www.gnu.org/licenses/>.
+"""
+Contains functionality common to extensions.
+"""
 import sys
-import imp
-import inspect
-import os
 import logging
-import inspect
 import importlib
 import pkgutil
 import argparse
+import traceback
 import testbed.settings
 import testbed.core.logger
 
-console = logging.StreamHandler()
-formatter = logging.Formatter(testbed.settings.FMT)
-console.setFormatter(formatter)
-LOGGER = logging.getLogger("")
-LOGGER.addHandler(console)
-LOGGER.setLevel(logging.INFO)
+
+def logger_create():
+    """ Create logger for tbd application. """
+    console = logging.StreamHandler()
+    formatter = logging.Formatter(testbed.settings.FMT)
+    console.setFormatter(formatter)
+    logger = logging.getLogger("")
+    logger.addHandler(console)
+    logger.setLevel(logging.INFO)
+
+    return logger
+
+
+LOGGER = logger_create()
+
 
 def args_process(args):
     """ Process any generic parameters. """
 
-    if (args.verbose == 1):
+    if args.verbose == 1:
         LOGGER.setLevel(level=logging.INFO)
         LOGGER.info("verbosity level set to INFO")
-    elif (args.verbose > 1):
+    elif args.verbose > 1:
         LOGGER.setLevel(level=logging.DEBUG)
         LOGGER.info("verbosity level set to DEBUG")
 
@@ -47,16 +56,6 @@ def args_process(args):
 
     args.func(args)
 
-#class VerbositySet(argparse.Action):
-    #def __init__(self, option_strings, dest, nargs=None, **kwargs):
-        #super(VerbositySet, self).__init__(option_strings, dest, nargs,
-                                           #**kwargs)
-#
-    #def __call__(self, parser, namespace, values, option_string=None):
-        #""" Called when verboaity. """
-#
-        #LOGGER.setLevel(level=logging.DEBUG)
-#
 
 def argparser():
     """ Create top level argument parser. """
@@ -70,27 +69,27 @@ def argparser():
 
 def onerror(name):
     """ Show module that fails to load. """
-    LOGGER.error("importing module %s" % name)
-    _, _, traceback = sys.exc_info()
-    print_tb(traceback)
+    LOGGER.error("importing module %s", name)
+    _, _, trback = sys.exc_info()
+    traceback.print_tb(trback)
 
 
 def extensions_find(arg_parser):
     """ Look for command extensions. """
 
-    subparser = arg_parser.add_subparsers(title="subcommands",
-                                          description="Valid subcommands",
-                                          help="Each subcommands supports --help for additional information.")
+    subparser = arg_parser.add_subparsers(
+        title="subcommands", description="Valid subcommands",
+        help="Each subcommands supports --help for additional information.")
 
     for package in testbed.settings.COMMANDS:
-        LOGGER.debug("loading commands %s" % package)
+        LOGGER.debug("loading commands %s", package)
         package = importlib.import_module(package)
         for _, module, ispkg in pkgutil.walk_packages(package.__path__,
-                                                    package.__name__ + ".",
-                                                    onerror=onerror):
+                                                      package.__name__ + ".",
+                                                      onerror=onerror):
             if ispkg:
                 continue
-            LOGGER.debug("  loading commands from %s" % module)
+            LOGGER.debug("  loading commands from %s", module)
             module = importlib.import_module(module)
             try:
                 module.add_subparser(subparser)
@@ -99,11 +98,12 @@ def extensions_find(arg_parser):
                 # This means that the module is missing the add method.
                 # All modules identified in settings to extend CLI
                 # must have an add method
-                LOGGER.error("adding subparser for %s.%s" % (package, module))
+                LOGGER.error("adding subparser for %s.%s", package, module)
                 LOGGER.exception(arg)
-    
+
 
 def main():
+    """ Entry point for parsing tbd arguments. """
     arg_parser = argparser()
     extensions_find(arg_parser)
     return arg_parser

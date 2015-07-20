@@ -16,8 +16,9 @@ pyflakes::
 .PHONY: pylint
 pylint::
 	pylint -j 2 --reports=n \
-	       --generated-members=objects,MultipleObjectsReturned,get_or_create \
-           $(PYTHON_FILES)
+	  --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
+	  --generated-members=objects,MultipleObjectsReturned,get_or_create \
+          $(PYTHON_FILES)
 
 .PHONY: pep8
 pep8::
