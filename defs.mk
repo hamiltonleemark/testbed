@@ -1,6 +1,14 @@
 SUBDEFS:=$(wildcard */defs.mk)
-$(foreach module,$(SUBDEFS),\
-    $(eval SUBDIR:=$(dir $(module))$(eval include $(module))))
+SUBMODULES:=$(foreach module,$(SUBDEFS),$(dir $(module)))
+
+.PHONY: subdirs $(SUBMODULES)
+$(SUBMODULES):
+	make -C $@ $(MAKECMDGOALS)
+
+subdirs: $(SUBMODULES)
+
+PYTHONPATH+=/home/mark/ws/personal/testbed
+
 
 .PHONY: help
 help::
@@ -9,19 +17,25 @@ help::
 	echo "pep8 - run pep8 on python files."
 
 .PHONY: pyflakes
-pyflakes::
-	pyflakes $(PYTHON_FILES)
+%.pyflakes:: %.py
+	pyflakes $<
+
+pyflakes:: $(PYTHON_FILES:%.py=%.pyflakes)
 
 
 .PHONY: pylint
-pylint::
-	pylint -j 2 --reports=n \
-	  --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
-	  --generated-members=objects,MultipleObjectsReturned,get_or_create \
-          $(PYTHON_FILES)
+%.pylint::
+	pylint --reports=n --disable=I0011 \
+          --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
+	  --generated-members=objects,MultipleObjectsReturned,get_or_create $*
+
+pylint:: $(addsuffix .pylint,$(PYTHON_FILES))
+
+
+%.pep8: %.py
+	pep8 $<
 
 .PHONY: pep8
-pep8::
-	pep8 $(PYTHON_FILES)
+pep8:: $(PYTHON_FILES:%.py=%.pep8)
 
-check: pylint pep8 pyflakes
+check:: pep8 pylint pyflakes subdirs

@@ -1,2 +1,1 @@
-include ../defs.mk
-PYTHON_FILES+=$(addprefix $(SUBDIR),`find . -name '*.py'`)
+PYTHON_FILES:=*.py core libexec

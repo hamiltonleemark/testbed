@@ -1,1 +1,1 @@
-PYTHON_FILES+=$(addprefix $(SUBDIR),./*.py)
+PYTHON_FILES:=*.py
