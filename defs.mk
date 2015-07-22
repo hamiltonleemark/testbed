@@ -38,4 +38,11 @@ pylint:: $(addsuffix .pylint,$(PYTHON_FILES))
 .PHONY: pep8
 pep8:: $(addsuffix .pep8,$(PYTHON_FILES))
 
-check:: pep8 pylint pyflakes subdirs
+
+%.python27:
+	python -m compileall $*
+
+.PHONY: python27
+python27:: $(addsuffix .python27,$(PYTHON_FILES))
+
+check:: pep8 pylint pyflakes subdirs compileall
