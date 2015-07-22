@@ -17,10 +17,10 @@ help::
 	echo "pep8 - run pep8 on python files."
 
 .PHONY: pyflakes
-%.pyflakes:: %.py
-	pyflakes $<
+%.pyflakes:: 
+	pyflakes $*
 
-pyflakes:: $(PYTHON_FILES:%.py=%.pyflakes)
+pyflakes:: $(addsuffix .pyflakes,$(PYTHON_FILES))
 
 
 .PHONY: pylint
