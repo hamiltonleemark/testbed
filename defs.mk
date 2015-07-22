@@ -32,10 +32,10 @@ pyflakes:: $(PYTHON_FILES:%.py=%.pyflakes)
 pylint:: $(addsuffix .pylint,$(PYTHON_FILES))
 
 
-%.pep8: %.py
-	pep8 $<
+%.pep8:
+	pep8 $*
 
 .PHONY: pep8
-pep8:: $(PYTHON_FILES:%.py=%.pep8)
+pep8:: $(addsuffix .pep8,$(PYTHON_FILES))
 
 check:: pep8 pylint pyflakes subdirs
