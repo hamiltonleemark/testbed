@@ -37,8 +37,10 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.core.management',
     'tests',
 )
+#    'django.contrib.sites',
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -75,10 +77,16 @@ WSGI_APPLICATION = 'dbsite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
+sqllite_path = os.path.abspath(os.path.join(BASE_DIR, 'db.sqlite3'))
+print "MARK: sqllite", sqllite_path
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        ##
+        # This must point to the sqllite database built from
+        # python ./manage.py init
+        'NAME': sqllite_path,
     }
 }
 

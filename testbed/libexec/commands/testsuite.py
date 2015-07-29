@@ -18,15 +18,29 @@
 CLI for testsuites.
 """
 import logging
-# from testbed.dbsite.tests import models
+import sys
 
 LOGGER = logging.getLogger(__name__)
 
 
 def add_testsuite(args):
     """ Add a testsuite to the database. """
+    print "MARK: add testsuite"
+    from testbed.dbsite.tests import models
+
     LOGGER.info("adding testsuite %s", args.name)
-    # testsuite = models.Testsuite.get_or_create(args.name)
+    name = models.TestsuiteName.objects.get_or_create(name=args.name)
+    #models.Testsuite.objects.get_or_create(name=name)
+
+
+def list_testsuite(args):
+    """ List testsuites based on search criteria. """
+    from dbsite.tests import models
+
+    LOGGER.info("listing testsuites %s", args.name)
+    for item in Testsuite.object.all():
+        print item
+
 
 
 def add_subparser(subparser):

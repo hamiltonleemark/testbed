@@ -1,0 +1,8 @@
+1. understand the django settings
+  # Quick-start development settings - unsuitable for production
+  # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
+2. Setup DEBUG and !DEBUG for production.
+  # SECURITY WARNING: don't run with debug turned on in production!
+  DEBUG = True
+
+

@@ -6,9 +6,6 @@ import os
 import sys
 import logging
 
-LOGGER = logging.getLogger("")
-
-
 def parse():
     """ main entry point. """
     from testbed.core import commands
@@ -18,7 +15,7 @@ def parse():
     commands.args_process(args)
 
 
-def main():
+def env_setup():
     """ Main entry point. """
     # \todo figure out how this works when we install tbd.
     try:
@@ -34,12 +31,17 @@ def main():
         else:
             testbed_dir = installation
 
+    # This path is necessary to load anything under testbed.
     sys.path.append(testbed_dir)
-    return parse()
 
 # pylint: disable=W0703
 if __name__ == "__main__":
     try:
-        sys.exit(main())
+        env_setup()
+        from testbed.core import testdb
+        testdb.init()
+
+        sys.exit(parse())
+
     except Exception, arg:
-        LOGGER.error(arg)
+        logging.exception(arg)
