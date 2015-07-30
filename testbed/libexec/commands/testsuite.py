@@ -26,17 +26,17 @@ LOGGER = logging.getLogger(__name__)
 def add_testsuite(args):
     """ Add a testsuite to the database. """
 
-    import tests.models
+    from testdb import models
 
     LOGGER.info("adding testsuite %s", args.name)
-    name = tests.models.TestsuiteName.objects.get_or_create(name=args.name)
-    tests.models.Testsuite.get_or_create("default", name, [])
+    name = models.TestsuiteName.objects.get_or_create(name=args.name)
+    models.Testsuite.get_or_create("default", name, [])
 
 
 def list_testsuite(args):
     """ List testsuites based on search criteria. """
 
-    from testdbsite.tests import models
+    from testdb import models
 
     LOGGER.info("listing testsuites")
     for item in models.Testsuite.objects.all():

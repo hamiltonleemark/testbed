@@ -38,7 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.core.management',
-    'tests',
+    'testdb',
 )
 #    'django.contrib.sites',
 
