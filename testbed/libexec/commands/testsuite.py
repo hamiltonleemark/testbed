@@ -26,7 +26,6 @@ LOGGER = logging.getLogger(__name__)
 def add_testsuite(args):
     """ Add a testsuite to the database. """
 
-    print "MARK: add testsuite", sys.path
     import tests.models as models
 
     LOGGER.info("adding testsuite %s", args.name)
