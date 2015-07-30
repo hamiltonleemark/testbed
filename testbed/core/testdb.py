@@ -12,10 +12,10 @@ def init(location="default"):
     @param log_dir Directory for storing log information.
     @param logical name of database to setup.
     """
-    os.environ["DJANGO_SETTINGS_MODULE"] = "dbsite.settings"
+
+    print "MARK: path", sys.path
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dbsite.settings")
     sys.path.append(testbed.settings.TEST_DBSITE_DIR)
-    print "MARK: path", sys.path
     import dbsite.settings
     from django.conf import settings
     django.setup()

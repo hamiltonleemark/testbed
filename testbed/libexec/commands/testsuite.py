@@ -26,19 +26,20 @@ LOGGER = logging.getLogger(__name__)
 def add_testsuite(args):
     """ Add a testsuite to the database. """
 
-    import tests.models as models
+    import tests.models
 
     LOGGER.info("adding testsuite %s", args.name)
-    name = models.TestsuiteName.objects.get_or_create(name=args.name)
-    models.Testsuite.get_or_create("default", name, [])
+    name = tests.models.TestsuiteName.objects.get_or_create(name=args.name)
+    tests.models.Testsuite.get_or_create("default", name, [])
 
 
 def list_testsuite(args):
     """ List testsuites based on search criteria. """
-    from dbsite.tests import models
 
-    LOGGER.info("listing testsuites %s", args.name)
-    for item in Testsuite.object.all():
+    from testdbsite.tests import models
+
+    LOGGER.info("listing testsuites")
+    for item in models.Testsuite.objects.all():
         print item
 
 
@@ -58,10 +59,9 @@ def add_subparser(subparser):
     parser.add_argument("name", type=str, help="Name of the testsuite.")
 
     ##
-    # Remove
-    parser = subparser.add_parser("remove",
-                                  description="Remove a testsuite.",
-                                  help="Remove a testsuite.")
-    parser.add_argument("name", type=str, help="name of the testsuite.")
-
+    # List
+    parser = subparser.add_parser("list",
+                                  description="List all of the testsuites.",
+                                  help="List testsuite.")
+    parser.set_defaults(func=list_testsuite)
     return subparser
