@@ -109,9 +109,11 @@ class Testsuite(models.Model):
         (context, _) = Context.objects.get_or_create(name=context)
         (name, _) = TestsuiteName.objects.get_or_create(name=name)
 
+        for item in Testsuite.objects.all():
+            print "MARK: ", item.id
         ##
         # Look for testsuite.
-        find = Testsuite.objects.filter(name=name, context=context)
+        find = Testsuite.objects.filter(context=context, name=name)
         for testkey in testkeys:
             find = find.filter(keys=testkey)
 

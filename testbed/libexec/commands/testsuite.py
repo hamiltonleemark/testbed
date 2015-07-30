@@ -25,12 +25,13 @@ LOGGER = logging.getLogger(__name__)
 
 def add_testsuite(args):
     """ Add a testsuite to the database. """
-    print "MARK: add testsuite"
-    from testbed.dbsite.tests import models
+
+    print "MARK: add testsuite", sys.path
+    import tests.models as models
 
     LOGGER.info("adding testsuite %s", args.name)
     name = models.TestsuiteName.objects.get_or_create(name=args.name)
-    #models.Testsuite.objects.get_or_create(name=name)
+    models.Testsuite.get_or_create("default", name, [])
 
 
 def list_testsuite(args):

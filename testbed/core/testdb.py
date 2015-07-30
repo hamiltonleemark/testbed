@@ -13,5 +13,7 @@ def init(location="default"):
     @param logical name of database to setup.
     """
     sys.path.append(os.path.join(testbed.settings.BASE_DIR, "dbsite"))
+    #sys.path.append(testbed.settings.BASE_DIR)
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dbsite.settings")
     from django.conf import settings
+    django.setup()
