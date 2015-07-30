@@ -14,22 +14,3 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Testdb.  If not, see <http://www.gnu.org/licenses/>.
-
-"""
-Provides general settings for testbed.
-"""
-import os
-
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-##
-#Location of the test database root directory.
-TEST_DBSITE_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "testdbsite"))
-
-PLUGINS = {
-    'testbed.libexec',
-}
-
-
-##
-# log formatting
-FMT = '%(asctime)s:%(name)s:%(levelname)s:%(message)s'

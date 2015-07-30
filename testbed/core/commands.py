@@ -81,13 +81,16 @@ def extensions_find(arg_parser):
         title="subcommands", description="Valid subcommands",
         help="Each subcommands supports --help for additional information.")
 
-    for package in testbed.settings.COMMANDS:
+    for package in testbed.settings.PLUGINS:
         LOGGER.debug("loading commands %s", package)
+
         package = importlib.import_module(package)
         for _, module, ispkg in pkgutil.walk_packages(package.__path__,
                                                       package.__name__ + ".",
                                                       onerror=onerror):
-            if ispkg:
+            ##
+            # only include commands from commands.py files.
+            if ispkg and not module.endswith("commands"):
                 continue
             LOGGER.debug("  loading commands from %s", module)
             module = importlib.import_module(module)
