@@ -112,13 +112,13 @@ class Testsuite(models.Model):
         return "%s.%s" % (self.context, self.name)
 
     @staticmethod
-    def filter(value):
+    def filter(contains):
         """ Filter testsuite against a single string. """
-        if not value:
+        if not contains:
             return Testsuite.objects.all()
-        return models.Testsuite.objects.filter(
-            Q(context__contains=filter) |
-            Q(name__contains=filter))
+        return Testsuite.objects.filter(
+            models.Q(context__name__contains=contains) |
+            models.Q(name__name__contains=contains))
 
     @staticmethod
     def get_or_create(context, name, testkeys):

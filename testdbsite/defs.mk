@@ -1,1 +1,1 @@
-PYTHON_FILES+=$(addprefix $(SUBDIR),tests/*.py)
+PYTHON_FILES+=$(addprefix $(SUBDIR),testdb/*.py)
