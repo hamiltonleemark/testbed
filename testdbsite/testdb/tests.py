@@ -3,13 +3,13 @@
 """
 from django.utils import timezone
 from django.test import TestCase
-from .models import Test
-from .models import Testsuite
-from .models import TestsuiteName
-from .models import TestsuiteKeySet
-from .models import Key
-from .models import TestKey
-from .models import Context
+from models import Test
+from models import Testsuite
+from models import TestsuiteName
+from models import TestsuiteKeySet
+from models import Key
+from models import TestKey
+from models import Context
 
 
 class TestsuiteTestCase(TestCase):

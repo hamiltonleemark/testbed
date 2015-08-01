@@ -1,7 +1,7 @@
 SUBDEFS:=$(wildcard */defs.mk)
 SUBMODULES:=$(foreach module,$(SUBDEFS),$(dir $(module)))
 ROOT=$(shell git rev-parse --show-toplevel)
-PYTHONPATH:=$(ROOT)
+PYTHONPATH:=$(ROOT):$(ROOT)/testdbsite
 
 .PHONY: help
 help::
@@ -44,4 +44,7 @@ pep8:: $(addsuffix .pep8,$(PYTHON_FILES))
 .PHONY: python27
 python27:: $(addsuffix .python27,$(PYTHON_FILES))
 
-check:: pep8 pylint pyflakes subdirs python27
+.PHONY: test
+test::
+
+check:: pep8 pylint subdirs python27 test

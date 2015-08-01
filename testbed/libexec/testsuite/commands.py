@@ -18,7 +18,6 @@
 CLI for testsuites.
 """
 import logging
-import sys
 
 LOGGER = logging.getLogger(__name__)
 
@@ -29,19 +28,17 @@ def add_testsuite(args):
     from testdb import models
 
     LOGGER.info("adding testsuite %s", args.name)
-    name = models.TestsuiteName.objects.get_or_create(name=args.name)
-    models.Testsuite.get_or_create("default", name, [])
+    models.Testsuite.get_or_create(args.context, args.name, [])
 
 
 def list_testsuite(args):
     """ List testsuites based on search criteria. """
 
     from testdb import models
-
     LOGGER.info("listing testsuites")
-    for item in models.Testsuite.objects.all():
-        print item
-
+    testsuites = models.Testsuite.filter(args.filter)
+    for testsuite in testsuites:
+        print testsuite
 
 
 def add_subparser(subparser):
@@ -57,11 +54,14 @@ def add_subparser(subparser):
                                   help="Add a testsuite.")
     parser.set_defaults(func=add_testsuite)
     parser.add_argument("name", type=str, help="Name of the testsuite.")
+    parser.add_argument("--context", default="default", type=str,
+                        help="Testsuite context.")
 
     ##
     # List
     parser = subparser.add_parser("list",
                                   description="List all of the testsuites.",
                                   help="List testsuite.")
+    parser.add_argument("--filter", type=str, help="Filter testsuites")
     parser.set_defaults(func=list_testsuite)
     return subparser

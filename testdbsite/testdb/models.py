@@ -83,6 +83,10 @@ class TestsuiteName(models.Model):
     """ Name of testsuite."""
     name = models.CharField(max_length=128, unique=True)
 
+    def __str__(self):
+        """ Return testsuite name. """
+        return str(self.name)
+
 
 class Context(models.Model):
     """ A testsuite resides in an arbitrary context.
@@ -92,6 +96,9 @@ class Context(models.Model):
     name = models.CharField(max_length=128, null=True, blank=True,
                             default=None)
 
+    def __str__(self):
+        return self.name
+
 
 class Testsuite(models.Model):
     """ A Testsuite holds a set of tests. """
@@ -99,6 +106,19 @@ class Testsuite(models.Model):
     name = models.ForeignKey(TestsuiteName)
     timestamp = models.DateTimeField(default=timezone.now)
     keys = models.ManyToManyField(TestKey, through="TestsuiteKeySet")
+
+    def __str__(self):
+        """ User representation. """
+        return "%s.%s" % (self.context, self.name)
+
+    @staticmethod
+    def filter(value):
+        """ Filter testsuite against a single string. """
+        if not value:
+            return Testsuite.objects.all()
+        return models.Testsuite.objects.filter(
+            Q(context__contains=filter) |
+            Q(name__contains=filter))
 
     @staticmethod
     def get_or_create(context, name, testkeys):
@@ -109,8 +129,6 @@ class Testsuite(models.Model):
         (context, _) = Context.objects.get_or_create(name=context)
         (name, _) = TestsuiteName.objects.get_or_create(name=name)
 
-        for item in Testsuite.objects.all():
-            print "MARK: ", item.id
         ##
         # Look for testsuite.
         find = Testsuite.objects.filter(context=context, name=name)

@@ -53,12 +53,12 @@ def args_process(args):
         LOGGER.info("verbosity level set to DEBUG")
 
     LOGGER.debug(args)
-
     args.func(args)
 
 
 def argparser():
     """ Create top level argument parser. """
+
     arg_parser = argparse.ArgumentParser(prog="tbd")
     arg_parser.add_argument('--version', action="version",
                             version="%(prog)s 0.0.1")
@@ -90,7 +90,7 @@ def extensions_find(arg_parser):
                                                       onerror=onerror):
             ##
             # only include commands from commands.py files.
-            if ispkg and not module.endswith("commands"):
+            if ispkg or not module.endswith("commands"):
                 continue
             LOGGER.debug("  loading commands from %s", module)
             module = importlib.import_module(module)

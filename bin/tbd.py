@@ -6,13 +6,15 @@ import os
 import sys
 import logging
 
+
 def parse():
     """ main entry point. """
+    print "MARK parse"
     from testbed.core import commands
 
     arg_parser = commands.main()
     args = arg_parser.parse_args()
-    commands.args_process(args)
+    return commands.args_process(args)
 
 
 def env_setup():
