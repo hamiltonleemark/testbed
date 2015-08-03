@@ -69,12 +69,11 @@ class TestsuiteTestCase(TestCase):
         items = [item for item in testsuites]
         self.assertTrue(len(items) == 2)
         names = [item.name.name for item in items]
-        self.assertTrue("bob1" in names)
-        self.assertTrue("bob2" in names)
+        self.assertTrue(any("bob1" in name for name in names))
+        self.assertTrue(any("bob2" in name for name in names))
 
         testsuites = Testsuite.filter("testplan2")
-        items = [item for item in testsuites]
-        self.assertTrue(len(items) == 2)
-        names = [item.name.name for item in items]
-        self.assertTrue("bob2" in names)
-        self.assertTrue("ken1" in names)
+        names = [item.name.name for item in testsuites]
+        self.assertTrue(len(names) == 2)
+        self.assertTrue(any("bob2" in name for name in names))
+        self.assertTrue(any("ken1" in name for name in names))
