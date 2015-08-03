@@ -4,5 +4,14 @@
 2. Setup DEBUG and !DEBUG for production.
   # SECURITY WARNING: don't run with debug turned on in production!
   DEBUG = True
+3. First goal
+   create testplan context for 2 testsuites with 2 tests on 2 branches.
+   Create nose, nose2 and pytest plugins to store pass fail results.
+   create tool to extract testsuites and test from testsuies into 
+   database.
+   Create global database
+4. Create push and pull database.
+5. Second goal
+   Support MongoDB 
 
 
