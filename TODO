@@ -10,8 +10,7 @@
    create tool to extract testsuites and test from testsuies into 
    database.
    Create global database
+   web pages that are extensible to show testsuite and test results.
 4. Create push and pull database.
 5. Second goal
    Support MongoDB 
-
-
