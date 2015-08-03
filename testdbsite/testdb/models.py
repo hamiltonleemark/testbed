@@ -9,6 +9,10 @@ class Key(models.Model):
     """ Key refers to a generic way to retrieve a value."""
     value = models.CharField(max_length=128, unique=True)
 
+    def __str__(self):
+        """ Return testsuite name. """
+        return str(self.value)
+
 
 class Result(models.Model):
     """ Define a single result. """
@@ -32,13 +36,37 @@ class TestKey(models.Model):
         (key, _) = Key.objects.get_or_create(value=key)
         return TestKey.objects.get_or_create(key=key, value=value)
 
+class TestName(models.Model):
+    """ Name of testsuite."""
+    name = models.CharField(max_length=128, unique=True)
+
+    def __str__(self):
+        """ Return testsuite name. """
+        return str(self.name)
+
 
 class Test(models.Model):
     """ A single test consisting of one or more results. """
     testsuite = models.ForeignKey("Testsuite", null=True, blank=True,
                                   default=None)
-    name = models.ForeignKey(Key, related_name="name")
+    name = models.ForeignKey(TestName)
     keys = models.ManyToManyField(TestKey, through="TestKeySet")
+
+    def __str__(self):
+        """ User representation. """
+        return "%s.%s" % (self.testsuite.name, self.name)
+
+    @staticmethod
+    def filter(contains):
+        """ Filter testsuite against a single string. """
+
+        if not contains:
+            return Test.objects.all()
+
+        return Test.objects.filter(
+            models.Q(testsuite__context__name__contains=contains) |
+            models.Q(testsuite__name__name__contains=contains) |
+            models.Q(name__name__contains=contains))
 
     @staticmethod
     def get_or_create(testsuite, name, keys):
@@ -46,7 +74,7 @@ class Test(models.Model):
         @param testkeys Must be an instance of TestKey.
         """
 
-        (name, _) = Key.objects.get_or_create(value=name)
+        (name, _) = TestName.objects.get_or_create(name=name)
 
         ##
         # Look for test.

@@ -11,6 +11,11 @@
    database.
    Create global database
    web pages that are extensible to show testsuite and test results.
+   Need to address adding testkey to a test.
+   Address testsuitekey to a testsuite.
+   Create testkey
+   Create strict concept.
+   Create apt-get and yum package.
 4. Create push and pull database.
 5. Second goal
    Support MongoDB 
