@@ -9,17 +9,19 @@ https://docs.djangoproject.com/en/1.8/topics/i18n/timezones/
 
 
 View Structure
+testplan attribute -> branch -> master
 
                                                Date -> 02Feb     01Feb
-                                               build-> 10001     10000
+                     testplan attribute ->     build-> 10001     10000
                                                rel-2.1.0 
  Test metrics        passed
                      failed
                      skipped
                      Total
-| --------- testplan ----------------------- | |----- Test failure Summary --|
+| --------- testplan attribute ------------- | |----- Test failure Summary --|
 testsuite.name, testsuite.key, testsuite.key     0
                 OS             Configuration
-testsuite1,     Ubuntu14.04    simple
-testsuite1,     Redhat 7.0     complex
+testsuite1      Ubuntu14.04    simple
+testsuite1      Redhat7.0      complex
+testsuite2      Ubuntu14.04    complex
 

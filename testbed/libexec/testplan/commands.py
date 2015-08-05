@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Testdb.  If not, see <http://www.gnu.org/licenses/>.
 """
-CLI for testsuites.
+CLI for creating testplan.
 """
 import logging
 
@@ -27,7 +27,7 @@ def add_testsuite(args):
 
     from testdb import models
 
-    LOGGER.info("adding testsuite %s", args.name)
+    LOGGER.info("adding testsuite to testplan %s", args.name)
     models.Testsuite.get_or_create(args.context, args.name, [])
 
 
@@ -41,29 +41,38 @@ def list_testsuite(args):
         print testsuite
 
 
-def add_key(args):
+def key_create(args):
     """ Add a key to a testsuite. """
 
     from testdb import models
 
-    LOGGER.info("adding testsuite %s", args.name)
-    models.Testsuite.get_or_create(args.context, args.testsuite, [])
-    
+    LOGGER.info("create testsuite key %s", args.name)
+    models.Key.objects.get_or_create(value=args.name)
+
+
+def key_add(args):
+    """ Add a key to a testsuite. """
+
+    from testdb import models
+
+    LOGGER.info("add value to testsuite key %s", args.key)
+    models.TestKey.get_or_create(key=args.key, value=args.value)
 
 
 def add_subparser(subparser):
     """ Create testsuite CLI commands. """
 
-    parser = subparser.add_parser("testsuite", help=__doc__)
-    parser.add_argument("--context", default="default", type=str,
-                        help="Testsuite context.")
+    parser = subparser.add_parser("testplan", help=__doc__)
+    parser.add_argument("--context", default="testplan.default", type=str,
+                        help="Specify a different context.")
     subparser = parser.add_subparsers()
 
     ##
     # Add
-    parser = subparser.add_parser("add",
-                                  description="Add a testsuite",
-                                  help="Add a testsuite.")
+    parser = subparser.add_parser(
+        "add",
+        description="Add a testsuite to the testplan",
+        help="Add a testsuite.")
     parser.set_defaults(func=add_testsuite)
     parser.add_argument("name", type=str, help="Name of the testsuite.")
 
@@ -71,7 +80,7 @@ def add_subparser(subparser):
     # List
     parser = subparser.add_parser("list",
                                   description="List all of the testsuites.",
-                                  help="List testsuite.")
+                                  help="List testsuite")
     parser.add_argument("--filter", type=str, help="Filter testsuites")
     parser.set_defaults(func=list_testsuite)
 
@@ -81,13 +90,30 @@ def add_subparser(subparser):
     parser = subparser.add_parser("key",
                                   help="APIs for manipulating testsuite keys")
     subparser = parser.add_subparsers()
+    parser = subparser.add_parser(
+        "create",
+        description="CLI for creating testsuite keys",
+        help="Create a testsuite key.")
+    parser.add_argument("name", type=str, help="Name of the key.")
+    parser.add_argument(
+        "--strict", default=False, action="store_true",
+        help="Testsuite key values must strictly match an existing value "\
+             "otherwise any new values will be acceptabed")
+    parser.set_defaults(func=key_create)
+
     parser = subparser.add_parser("add",
                                   description="Add a testsuite key",
-                                  help="Add a testsuite key.")
-    parser.set_defaults(func=add_key)
-    parser.add_argument("testsuite", type=str, help="Name of the testsuite.")
-    parser.add_argument("key", type=str, help="Name of the key.")
-    parser.add_argument("value", type=str, help="Key's value.")
+                                  help="Add a testsuite key")
+    parser.add_argument("key", type=str, help="Name of the key")
+    parser.add_argument("value", type=str, help="Key's value")
+    parser.set_defaults(func=key_add)
+
+    ##
+    # List
+    parser = subparser.add_parser("list", description="List test keys",
+                                  help="List testsuite")
+    parser.add_argument("--filter", type=str, help="Filter test keys")
+    parser.set_defaults(func=key_list)
 
     ##
     # List
