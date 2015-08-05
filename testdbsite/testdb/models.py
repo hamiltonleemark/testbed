@@ -52,6 +52,7 @@ class TestKey(models.Model):
         (key, _) = Key.objects.get_or_create(value=key)
         return TestKey.objects.get_or_create(key=key, value=value)
 
+
 class TestName(models.Model):
     """ Name of testsuite."""
     name = models.CharField(max_length=128, unique=True)
@@ -67,6 +68,7 @@ class Test(models.Model):
                                   default=None)
     name = models.ForeignKey(TestName)
     keys = models.ManyToManyField(TestKey, through="TestKeySet")
+    status = models.IntegerField(default=0, blank=True, null=True)
 
     def __str__(self):
         """ User representation. """

@@ -67,7 +67,3 @@ def add_subparser(subparser):
     parser.add_argument("--filter", type=str, help="Filter testsuites")
     parser.set_defaults(func=list_test)
     return subparser
-
-
-
-    return subparser

@@ -2,7 +2,6 @@
 import os
 import sys
 
-print "MARK: sys", sys.path
 
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dbsite.settings")

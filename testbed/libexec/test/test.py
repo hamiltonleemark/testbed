@@ -50,10 +50,10 @@ class TestTestCase(TestCase):
         args.func(args)
 
         names = [item.name.name for item in Testsuite.filter("testsuite1")]
-        self.assertTrue(len(names)== 1)
+        self.assertTrue(len(names) == 1)
 
         names = [item.name.name for item in Test.filter("testsuite1")]
-        self.assertTrue(len(names)== 2)
+        self.assertTrue(len(names) == 2)
 
         self.assertTrue(any("test1" in name for name in names))
         self.assertTrue(any("test2" in name for name in names))
