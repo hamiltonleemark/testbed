@@ -7,6 +7,8 @@ import django.utils.timezone
 
 class Migration(migrations.Migration):
 
+    replaces = [(b'testdb', '0001_initial'), (b'testdb', '0002_test_status')]
+
     dependencies = [
     ]
 
@@ -106,7 +108,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='testsuite',
             name='keys',
-            field=models.ManyToManyField(to='testdb.TestKey', through='testdb.TestsuiteKeySet'),
+            field=models.ManyToManyField(to=b'testdb.TestKey', through='testdb.TestsuiteKeySet'),
         ),
         migrations.AddField(
             model_name='testsuite',
@@ -126,7 +128,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='test',
             name='keys',
-            field=models.ManyToManyField(to='testdb.TestKey', through='testdb.TestKeySet'),
+            field=models.ManyToManyField(to=b'testdb.TestKey', through='testdb.TestKeySet'),
         ),
         migrations.AddField(
             model_name='test',
@@ -142,5 +144,10 @@ class Migration(migrations.Migration):
             model_name='result',
             name='test',
             field=models.ForeignKey(default=None, blank=True, to='testdb.Test', null=True),
+        ),
+        migrations.AddField(
+            model_name='test',
+            name='status',
+            field=models.IntegerField(default=0, null=True, blank=True),
         ),
     ]
