@@ -52,6 +52,17 @@ class TestKey(models.Model):
         (key, _) = Key.objects.get_or_create(value=key)
         return TestKey.objects.get_or_create(key=key, value=value)
 
+    @staticmethod
+    def filter(contains):
+        """ Filter testsuite against a single string. """
+
+        if not contains:
+            return TestKey.objects.all()
+
+        return TestKey.objects.filter(
+            models.Q(key__value__contains=contains) |
+            models.Q(value__contains=contains))
+
 
 class TestName(models.Model):
     """ Name of testsuite."""
@@ -123,6 +134,7 @@ class TestKeySet(models.Model):
     """ Links a test to a set of keys. """
     test = models.ForeignKey(Test)
     testkey = models.ForeignKey(TestKey)
+
 
 
 class TestsuiteName(models.Model):
