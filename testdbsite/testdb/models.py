@@ -178,10 +178,12 @@ class Testsuite(models.Model):
             models.Q(name__name__contains=contains))
 
     @staticmethod
-    def get_or_create(context, name, testkeys):
+    def get_or_create(context, name, testkeys=None):
         """ Get current or create new objects.
         @param testkeys Must be an instance of TestKey.
         """
+        if not testkeys:
+            testkeys = []
 
         (context, _) = Context.objects.get_or_create(name=context)
         (name, _) = TestsuiteName.objects.get_or_create(name=name)

@@ -27,8 +27,10 @@ def add_testsuite(args):
 
     from testdb import models
 
-    LOGGER.info("adding testsuite to testplan %s", args.name)
-    models.Testsuite.get_or_create(args.context, args.name, [])
+    LOGGER.info("adding testsuite to testplan %s", args.testsuite)
+    testsuite = models.Testsuite.get_or_create(args.context, args.testsuite)
+    (name, _) = models.TestName.objects.get_or_create(name=args.test)
+    models.Test.objects.get_or_create(testsuite=testsuite, name=name)
 
 
 def list_testsuite(args):
@@ -38,7 +40,8 @@ def list_testsuite(args):
     LOGGER.info("listing testsuites")
     testsuites = models.Testsuite.filter(args.filter)
     for testsuite in testsuites:
-        print testsuite
+        for test in testsuite.test_set.all():
+            print testsuite, test
 
 
 def key_create(args):
@@ -84,7 +87,8 @@ def add_subparser(subparser):
         description="Add a testsuite to the testplan",
         help="Add a testsuite.")
     parser.set_defaults(func=add_testsuite)
-    parser.add_argument("name", type=str, help="Name of the testsuite.")
+    parser.add_argument("testsuite", type=str, help="Name of the testsuite.")
+    parser.add_argument("test", type=str, help="Name of the test.")
 
     ##
     # List
