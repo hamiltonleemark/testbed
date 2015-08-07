@@ -50,7 +50,7 @@ class TestsuiteTestCase(TestCase):
         self.assertTrue("mark" in names)
 
         context = [item.context.name for item in Testsuite.objects.all()]
-        self.assertTrue("default" in context)
+        self.assertTrue("testplan.default" in context)
 
     def test_context_add(self):
         """ Add a testsuite by context. """
@@ -63,7 +63,7 @@ class TestsuiteTestCase(TestCase):
         names = [item.name.name for item in Testsuite.objects.all()]
         self.assertTrue("testsuite1" in names)
         context = [item.context.name for item in Testsuite.objects.all()]
-        self.assertTrue("testplan" in context)
+        self.assertTrue(any("testplan" in item for item in context))
 
     def test_list_filter(self):
         """ Add a testsuite by context. """
