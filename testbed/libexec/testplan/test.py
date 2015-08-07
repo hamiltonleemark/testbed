@@ -39,10 +39,10 @@ class TestsuiteTestCase(TestCase):
         """ Add a testsuite. """
         parser = TestsuiteTestCase.parser_create()
 
-        args = parser.parse_args("testsuite add bob".split())
+        args = parser.parse_args("testplan add bob".split())
         args.func(args)
 
-        args = parser.parse_args("testsuite add mark".split())
+        args = parser.parse_args("testplan add mark".split())
         args.func(args)
 
         names = [item.name.name for item in Testsuite.objects.all()]
@@ -56,7 +56,7 @@ class TestsuiteTestCase(TestCase):
         """ Add a testsuite by context. """
         parser = TestsuiteTestCase.parser_create()
 
-        cmd = "testsuite add testsuite1 --context testplan"
+        cmd = "testplan --context testplan add testsuite1"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
@@ -69,15 +69,15 @@ class TestsuiteTestCase(TestCase):
         """ Add a testsuite by context. """
         parser = TestsuiteTestCase.parser_create()
 
-        cmd = "testsuite add testsuite_bob1 --context testplan1"
+        cmd = "testplan --context testplan1 add testsuite_bob1"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "testsuite add testsuite_bob2 --context testplan2"
+        cmd = "testplan --context testplan2 add testsuite_bob2"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "testsuite add testsuite_ken1 --context testplan2"
+        cmd = "testplan --context testplan2 add testsuite_ken1"
         args = parser.parse_args(cmd.split())
         args.func(args)
 

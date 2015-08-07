@@ -59,6 +59,16 @@ def key_add(args):
     models.TestKey.get_or_create(key=args.key, value=args.value)
 
 
+def key_list(args):
+    """ Add a key to a testsuite. """
+
+    from testdb import models
+    LOGGER.info("list test keys")
+    testkeys = models.TestKey.filter(args.filter)
+    for testkey in testkeys:
+        print testkey
+
+
 def add_subparser(subparser):
     """ Create testsuite CLI commands. """
 
@@ -97,7 +107,7 @@ def add_subparser(subparser):
     parser.add_argument("name", type=str, help="Name of the key.")
     parser.add_argument(
         "--strict", default=False, action="store_true",
-        help="Testsuite key values must strictly match an existing value "\
+        help="Testsuite key values must strictly match an existing value "
              "otherwise any new values will be acceptabed")
     parser.set_defaults(func=key_create)
 

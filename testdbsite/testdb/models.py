@@ -136,7 +136,6 @@ class TestKeySet(models.Model):
     testkey = models.ForeignKey(TestKey)
 
 
-
 class TestsuiteName(models.Model):
     """ Name of testsuite."""
     name = models.CharField(max_length=128, unique=True)

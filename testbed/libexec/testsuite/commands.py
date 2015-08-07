@@ -48,7 +48,6 @@ def add_key(args):
 
     LOGGER.info("adding testsuite %s", args.name)
     models.Testsuite.get_or_create(args.context, args.testsuite, [])
-    
 
 
 def add_subparser(subparser):
