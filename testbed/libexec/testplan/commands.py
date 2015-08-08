@@ -40,8 +40,12 @@ def list_testsuite(args):
     LOGGER.info("listing testsuites")
     testsuites = models.Testsuite.filter(args.filter)
     for testsuite in testsuites:
+        print testsuite
+        for key in testsuite.testsuitekeyset_set.all():
+            print "  testkey", key.testkey
+
         for test in testsuite.test_set.all():
-            print testsuite, test
+            print "  test", test
 
 
 def key_create(args):
@@ -59,15 +63,20 @@ def key_add(args):
     from testdb import models
 
     LOGGER.info("add value to testsuite key %s", args.key)
-    models.TestKey.get_or_create(key=args.key, value=args.value)
+    (testkey, _) = models.TestKey.get_or_create(key=args.key, value=args.value)
+
+    print "MARK: ", args.testsuite, args.context
+    testsuite = models.Testsuite.get_or_create(args.context, args.testsuite)
+    testsuite.testsuitekeyset_set.get_or_create(testkey=testkey)
 
 
 def key_list(args):
     """ Add a key to a testsuite. """
 
     from testdb import models
+
     LOGGER.info("list test keys")
-    testkeys = models.TestKey.filter(args.filter)
+    testkeys = models.TestKey.filter(args.filter).order_by("key")
     for testkey in testkeys:
         print testkey
 
@@ -118,6 +127,7 @@ def add_subparser(subparser):
     parser = subparser.add_parser("add",
                                   description="Add a testsuite key",
                                   help="Add a testsuite key")
+    parser.add_argument("testsuite", type=str, help="Testsuite name")
     parser.add_argument("key", type=str, help="Name of the key")
     parser.add_argument("value", type=str, help="Key's value")
     parser.set_defaults(func=key_add)

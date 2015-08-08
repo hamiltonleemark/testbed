@@ -46,6 +46,10 @@ class TestKey(models.Model):
     key = models.ForeignKey(Key)
     value = models.CharField(max_length=128)
 
+    def __str__(self):
+        """ Return testsuite name. """
+        return "%s=%s" % (self.key, self.value)
+
     @staticmethod
     def get_or_create(key, value):
         """ Create a single test key objects. """
@@ -83,7 +87,7 @@ class Test(models.Model):
 
     def __str__(self):
         """ User representation. """
-        return "%s.%s" % (self.testsuite.name, self.name)
+        return "%s" % self.name
 
     @staticmethod
     def filter(contains):
@@ -159,6 +163,7 @@ class Context(models.Model):
 
 class Testsuite(models.Model):
     """ A Testsuite holds a set of tests. """
+
     context = models.ForeignKey(Context, null=True, blank=True, default=None)
     name = models.ForeignKey(TestsuiteName)
     timestamp = models.DateTimeField(default=timezone.now)
@@ -216,5 +221,5 @@ class TestsuiteFile(models.Model):
 
 class TestsuiteKeySet(models.Model):
     """ Testsuites are associated to a set of keys. """
-    testkey = models.ForeignKey(TestKey)
     testsuite = models.ForeignKey(Testsuite)
+    testkey = models.ForeignKey(TestKey)
