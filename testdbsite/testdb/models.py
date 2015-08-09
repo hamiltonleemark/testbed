@@ -47,7 +47,6 @@ class Result(models.Model):
     key = models.ForeignKey(Key, related_name="key", null=True,
                             blank=True, default=None)
     value = models.DecimalField(max_digits=24, decimal_places=6)
-    name = models.ForeignKey(Key)
     test = models.ForeignKey("Test", null=True, blank=True, default=None)
 
 
@@ -137,7 +136,7 @@ class Test(models.Model):
         @param testkeys Must be an instance of TestKey.
         """
 
-        (name, _) = TestName.objects.get_or_create(name=name)
+        (name, created) = TestName.objects.get_or_create(name=name)
 
         ##
         # Look for test.
@@ -146,15 +145,15 @@ class Test(models.Model):
             find = find.filter(keys=key)
 
         if find.count() == 1:
-            return [item for item in find][0]
+            return ([item for item in find][0], False)
         elif find.count() > 1:
-            raise Test.MultipleObjectsReturned("%s" % (name))
+            raise Test.MultipleObjectsReturned(name)
 
         test = Test.objects.create(testsuite=testsuite, name=name)
 
         for key in keys:
             TestKeySet.objects.create(test=test, testkey=key)
-        return test
+        return (test, True)
 
 
 class TestFile(models.Model):
@@ -230,7 +229,7 @@ class Testsuite(models.Model):
             find = find.filter(keys=testkey)
 
         if find.count() == 1:
-            return [item for item in find][0]
+            return ([item for item in find][0], False)
         elif find.count() > 1:
             raise Testsuite.MultipleObjectsReturned("%s %s" % (context, name))
 
@@ -238,7 +237,7 @@ class Testsuite(models.Model):
         for testkey in testkeys:
             TestsuiteKeySet.objects.create(testsuite=testsuite,
                                            testkey=testkey)
-        return testsuite
+        return (testsuite, True)
 
 
 class TestsuiteFile(models.Model):
