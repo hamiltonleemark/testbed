@@ -23,7 +23,17 @@ from django.db import models
 
 class Key(models.Model):
     """ Key refers to a generic way to retrieve a value."""
+
+    CONFIG_TYPE_ANY = 0
+    CONFIG_TYPE_STRICT = 1
+
+    CONFIG_TYPE = {
+        (CONFIG_TYPE_ANY, "ANY"),
+        (CONFIG_TYPE_STRICT, "STRICT")
+    }
+
     value = models.CharField(max_length=128, unique=True)
+    config_type = models.IntegerField(choices=CONFIG_TYPE, default=0)
 
     def __str__(self):
         """ Return testsuite name. """
@@ -43,12 +53,32 @@ class Result(models.Model):
 
 class TestKey(models.Model):
     """ Tests are associated to a set of keys. """
+
     key = models.ForeignKey(Key)
     value = models.CharField(max_length=128)
 
     def __str__(self):
         """ Return testsuite name. """
         return "%s=%s" % (self.key, self.value)
+
+    @staticmethod
+    def create_check(key, value):
+        """ Return True if get_or_create will be successful.
+        Make strict setting is adhered to as well."""
+        try:
+            cfg = models.Key.objects.get(key=key)
+        except Config.DoesNotExist:
+            return True
+
+        if cfg.config_type == Key.CONFIG_TYPE_ANY:
+            return True
+
+        try:
+            TestKey.objects.get(key=key, value=value)
+        except ConfigValue.DoesNotExist:
+            raise TestKey.DoesNotExist("strict key. Value %s=%s not found" %
+                                        (key, value))
+        return True
 
     @staticmethod
     def get_or_create(key, value):

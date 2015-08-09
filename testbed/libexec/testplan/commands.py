@@ -18,6 +18,8 @@
 CLI for creating testplan.
 """
 import logging
+import yaml
+import testbed.core.config
 
 LOGGER = logging.getLogger(__name__)
 
@@ -38,14 +40,25 @@ def list_testsuite(args):
 
     from testdb import models
     LOGGER.info("listing testsuites")
-    testsuites = models.Testsuite.filter(args.filter)
-    for testsuite in testsuites:
-        print testsuite
-        for key in testsuite.testsuitekeyset_set.all():
-            print "  testkey", key.testkey
 
-        for test in testsuite.test_set.all():
-            print "  test", test
+    testsuites = models.Testsuite.filter(args.filter)
+
+    datatree = testbed.core.config.DataTree()
+
+    for testsuite in testsuites:
+        testkeys = [str(item.testkey)
+                    for item in testsuite.testsuitekeyset_set.all()]
+        tests = [str(item) for item in testsuite.test_set.all()]
+
+        root = {}
+        if tests:
+            root["tests"] = tests
+        if testkeys:
+            root["testkey"] = testkeys
+
+        key = [str(testsuite.context), "testsuite.%s" % testsuite.name]
+        value = datatree.add(key, root)
+    print yaml.dump(datatree)
 
 
 def key_create(args):
@@ -65,7 +78,6 @@ def key_add(args):
     LOGGER.info("add value to testsuite key %s", args.key)
     (testkey, _) = models.TestKey.get_or_create(key=args.key, value=args.value)
 
-    print "MARK: ", args.testsuite, args.context
     testsuite = models.Testsuite.get_or_create(args.context, args.testsuite)
     testsuite.testsuitekeyset_set.get_or_create(testkey=testkey)
 
@@ -130,6 +142,7 @@ def add_subparser(subparser):
     parser.add_argument("testsuite", type=str, help="Testsuite name")
     parser.add_argument("key", type=str, help="Name of the key")
     parser.add_argument("value", type=str, help="Key's value")
+    parser.add_argument("--order", type=int, help="testuite order for viewing")
     parser.set_defaults(func=key_add)
 
     ##
