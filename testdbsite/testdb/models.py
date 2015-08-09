@@ -40,11 +40,11 @@ class Key(models.Model):
         return str(self.value)
 
 
-class Result(models.Model):
+class TestResult(models.Model):
     """ Define a single result. """
-    context = models.ForeignKey(Key, related_name="context", null=True,
+    context = models.ForeignKey(Key, related_name="test_context", null=True,
                                 blank=True, default=None)
-    key = models.ForeignKey(Key, related_name="key", null=True,
+    key = models.ForeignKey(Key, related_name="test_key", null=True,
                             blank=True, default=None)
     value = models.DecimalField(max_digits=24, decimal_places=6)
     test = models.ForeignKey("Test", null=True, blank=True, default=None)
@@ -238,6 +238,18 @@ class Testsuite(models.Model):
             TestsuiteKeySet.objects.create(testsuite=testsuite,
                                            testkey=testkey)
         return (testsuite, True)
+
+
+class TestsuiteResult(models.Model):
+    """ Define a single result. """
+
+    context = models.ForeignKey(Key, related_name="testsuite_context",
+                                null=True, blank=True, default=None)
+    key = models.ForeignKey(Key, related_name="testsuite_key", null=True,
+                            blank=True, default=None)
+    value = models.DecimalField(max_digits=24, decimal_places=6)
+    testsuite = models.ForeignKey(Testsuite, null=True, blank=True,
+                                  default=None)
 
 
 class TestsuiteFile(models.Model):
