@@ -28,8 +28,8 @@ def add_test(args):
     from testdb import models
 
     LOGGER.info("adding test %s.%s", args.testsuite, args.name)
-    testsuite = models.Testsuite.get_or_create(args.context, args.testsuite,
-                                               [])
+    (testsuite,_) = models.Testsuite.get_or_create(args.context,
+                                                   args.testsuite, [])
     models.Test.get_or_create(testsuite, args.name, [])
 
 

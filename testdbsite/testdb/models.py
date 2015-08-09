@@ -240,16 +240,19 @@ class Testsuite(models.Model):
         return (testsuite, True)
 
 
-class TestsuiteResult(models.Model):
-    """ Define a single result. """
-
-    context = models.ForeignKey(Key, related_name="testsuite_context",
-                                null=True, blank=True, default=None)
-    key = models.ForeignKey(Key, related_name="testsuite_key", null=True,
-                            blank=True, default=None)
-    value = models.DecimalField(max_digits=24, decimal_places=6)
+class Testplan(models.Model):
+    """ A test plan consists of a set of testsuites, tests.
+    A test plan governs which testsuites should be run.
+    """
     testsuite = models.ForeignKey(Testsuite, null=True, blank=True,
                                   default=None)
+    order = models.IntegerField(default=0)
+
+    @staticmethod
+    def get_or_create(testsuite, order):
+        """ Get or create testplan for testsuite at the order position. """
+        (testplan, _) = Testplan.objects.get_or_create(testsuite=testsuite)
+        testplan.order = order
 
 
 class TestsuiteFile(models.Model):

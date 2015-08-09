@@ -26,6 +26,7 @@ from .models import TestsuiteKeySet
 from .models import Key
 from .models import TestKey
 from .models import Context
+from .models import Testplan
 
 
 class TestsuiteTestCase(TestCase):
@@ -60,14 +61,16 @@ class TestsuiteTestCase(TestCase):
 
         keys = (TestKey.get_or_create("key1", "value1")[0],
                 TestKey.get_or_create("key2", "value2")[0])
-        testsuite = Testsuite.get_or_create("default", "testsuite_name", keys)
+        (testsuite, _) = Testsuite.get_or_create("default", "testsuite_name",
+                                                 keys)
 
         ##
         # Making sure auto assignment of current time for the timestamp field
         # is working.
         self.assertTrue(testsuite.timestamp >= start_time)
 
-        testsuite1 = Testsuite.get_or_create("default", "testsuite_name", keys)
+        (testsuite1, _) = Testsuite.get_or_create("default", "testsuite_name",
+                                                  keys)
         self.assertTrue(testsuite1.timestamp >= start_time)
 
         self.assertTrue(testsuite.timestamp == testsuite1.timestamp)
@@ -78,8 +81,26 @@ class TestsuiteTestCase(TestCase):
 
         keys = (TestKey.get_or_create("key1", "value1")[0],
                 TestKey.get_or_create("key2", "value2")[0])
-        testsuite = Testsuite.get_or_create("default", "testsuite_name1", keys)
-        test1 = Test.get_or_create(testsuite, "test_name1", keys)
-        test2 = Test.get_or_create(testsuite, "test_name2", keys)
+        (testsuite, _) = Testsuite.get_or_create("default", "testsuite_name1",
+                                                 keys)
+        (test1, _) = Test.get_or_create(testsuite, "test_name1", keys)
+        (test2, _) = Test.get_or_create(testsuite, "test_name2", keys)
 
         self.assertTrue(test1.id != test2.id)
+
+
+    def testplan_order(self):
+        """ Test the creation and order support of test plan. """
+
+        (testsuite, _) = Testsuite.get_or_create("testplan.default",
+                                                 "testsuite1")
+        Testplan.get_or_create(testsuite, 1)
+
+        (testsuite, _) = Testsuite.get_or_create("testplan.default",
+                                                 "testsuite2")
+        Testplan.get_or_create(testsuite, 2)
+
+        testplans = [item for item in Testplan.objects.order_by("order")]
+        testsuites = [item.testsuite for item in testplans]
+
+        print "MARK: testsuites", testsuites

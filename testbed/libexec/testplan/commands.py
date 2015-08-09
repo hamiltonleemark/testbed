@@ -30,7 +30,8 @@ def add_testsuite(args):
     from testdb import models
 
     LOGGER.info("adding testsuite to testplan %s", args.testsuite)
-    testsuite = models.Testsuite.get_or_create(args.context, args.testsuite)
+    (testsuite, _) = models.Testsuite.get_or_create(args.context,
+                                                    args.testsuite)
     (name, _) = models.TestName.objects.get_or_create(name=args.test)
     models.Test.objects.get_or_create(testsuite=testsuite, name=name)
 
