@@ -67,6 +67,7 @@ class TestKey(models.Model):
     def create_check(key, value):
         """ Return True if get_or_create will be successful.
         Make strict setting is adhered to as well."""
+
         try:
             cfg = models.Key.objects.get(key=key)
         except Key.DoesNotExist:
@@ -251,12 +252,6 @@ class Testplan(models.Model):
     testsuite = models.ForeignKey(Testsuite, null=True, blank=True,
                                   default=None)
     order = models.IntegerField(default=0)
-
-    @staticmethod
-    def get_or_create(testsuite, order):
-        """ Get or create testplan for testsuite at the order position. """
-        (testplan, _) = Testplan.objects.get_or_create(testsuite=testsuite)
-        testplan.order = order
 
 
 class TestsuiteFile(models.Model):

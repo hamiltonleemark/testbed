@@ -39,10 +39,16 @@ class TestsuiteTestCase(TestCase):
         """ Add a testsuite. """
         parser = TestsuiteTestCase.parser_create()
 
-        args = parser.parse_args("testplan add bob ken".split())
+        args = parser.parse_args("testplan add bob".split())
         args.func(args)
 
-        args = parser.parse_args("testplan add mark ken".split())
+        args = parser.parse_args("testplan test add bob ken".split())
+        args.func(args)
+
+        args = parser.parse_args("testplan add mark".split())
+        args.func(args)
+
+        args = parser.parse_args("testplan test add mark ken".split())
         args.func(args)
 
         names = [item.name.name for item in Testsuite.objects.all()]
@@ -56,7 +62,11 @@ class TestsuiteTestCase(TestCase):
         """ Add a testsuite by context. """
         parser = TestsuiteTestCase.parser_create()
 
-        cmd = "testplan --context testplan add testsuite1 test1"
+        cmd = "testplan --context testplan add testsuite1"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+
+        cmd = "testplan --context testplan test add testsuite1 test1"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
@@ -69,15 +79,27 @@ class TestsuiteTestCase(TestCase):
         """ Add a testsuite by context. """
         parser = TestsuiteTestCase.parser_create()
 
-        cmd = "testplan --context testplan1 add testsuite_bob1 test2"
+        cmd = "testplan --context testplan1 add testsuite_bob1"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "testplan --context testplan2 add testsuite_bob2 test3"
+        cmd = "testplan --context testplan1 test add testsuite_bob1 test2"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "testplan --context testplan2 add testsuite_ken1 test4"
+        cmd = "testplan --context testplan2 add testsuite_bob2"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+
+        cmd = "testplan --context testplan2 test add testsuite_bob2 test3"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+
+        cmd = "testplan --context testplan2 add testsuite_ken1"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+
+        cmd = "testplan --context testplan2 test add testsuite_ken1 test4"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
@@ -93,3 +115,20 @@ class TestsuiteTestCase(TestCase):
         self.assertTrue(len(names) == 2)
         self.assertTrue(any("bob2" in name for name in names))
         self.assertTrue(any("ken1" in name for name in names))
+
+    def test_order(self):
+        """ Confirm order works. """
+        parser = TestsuiteTestCase.parser_create()
+
+        cmd = "testplan add testsuite_order1 --order 1"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+
+        cmd = "testplan add testsuite_order2 --order 2"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+
+        testsuites = Testsuite.filter("testsuite_order")
+        self.assertEqual(testsuites.count(), 2)
+        self.assertEqual(testsuites[0].name.name, "testsuite_order1")
+        self.assertEqual(testsuites[1].name.name, "testsuite_order2")

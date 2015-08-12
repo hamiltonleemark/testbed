@@ -24,7 +24,28 @@ import testbed.core.config
 LOGGER = logging.getLogger(__name__)
 
 
-def add_testsuite(args):
+def testsuite_add(args):
+    """ Add a testsuite to the database. """
+
+    from testdb import models
+
+    LOGGER.info("adding testsuite to testplan %s", args.testsuite)
+    if args.order == -1:
+        (context, _) = models.Context.objects.get_or_create(name=args.context)
+        find = models.Testplan.objects.filter(testsuite__context=context)
+        try:
+            args.order = find.order_by("order")[0].order
+        except IndexError:
+            args.order = 1
+
+    (testsuite, _) = models.Testsuite.get_or_create(args.context,
+                                                    args.testsuite, None)
+    models.Testplan.objects.get_or_create(testsuite=testsuite,
+                                          order=args.order)
+    
+
+
+def test_add(args):
     """ Add a testsuite to the database. """
 
     from testdb import models
@@ -32,11 +53,11 @@ def add_testsuite(args):
     LOGGER.info("adding testsuite to testplan %s", args.testsuite)
     (testsuite, _) = models.Testsuite.get_or_create(args.context,
                                                     args.testsuite)
-    (name, _) = models.TestName.objects.get_or_create(name=args.test)
+    (name, _) = models.TestName.objects.get_or_create(name=args.name)
     models.Test.objects.get_or_create(testsuite=testsuite, name=name)
 
 
-def list_testsuite(args):
+def testsuite_list(args):
     """ List testsuites based on search criteria. """
 
     from testdb import models
@@ -109,17 +130,33 @@ def add_subparser(subparser):
         "add",
         description="Add a testsuite to the testplan",
         help="Add a testsuite.")
-    parser.set_defaults(func=add_testsuite)
+    parser.set_defaults(func=testsuite_add)
     parser.add_argument("testsuite", type=str, help="Name of the testsuite.")
-    parser.add_argument("test", type=str, help="Name of the test.")
+    parser.add_argument("--order", type=int, default=-1,
+                        help="Order of testsuite as viewed on the website."
+                        "If not specified the next sequential value is "
+                        "assumed")
 
     ##
     # List
     parser = subparser.add_parser("list",
                                   description="List all of the testsuites.",
                                   help="List testsuite")
+    parser.set_defaults(func=testsuite_list)
     parser.add_argument("--filter", type=str, help="Filter testsuites")
-    parser.set_defaults(func=list_testsuite)
+
+    ##
+    # Test 
+    parser = subparser.add_parser("test",
+                                  description="modify test for the testsuite",
+                                  help="Modify test information.")
+    subparser = parser.add_subparsers()
+    parser = subparser.add_parser("add", description="Add test",
+                                  help="add test.")
+
+    parser.set_defaults(func=test_add)
+    parser.add_argument("testsuite", type=str, help="Name of the testsuite.")
+    parser.add_argument("name", type=str, help="Name of the test.")
 
     ##
     # CLI for adding testsuite keys

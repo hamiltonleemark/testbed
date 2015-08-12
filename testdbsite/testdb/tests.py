@@ -93,11 +93,11 @@ class TestsuiteTestCase(TestCase):
 
         (testsuite, _) = Testsuite.get_or_create("testplan.default",
                                                  "testsuite1")
-        Testplan.get_or_create(testsuite, 1)
+        Testplan.objects.get_or_create(testsuite, 1)
 
         (testsuite, _) = Testsuite.get_or_create("testplan.default",
                                                  "testsuite2")
-        Testplan.get_or_create(testsuite, 2)
+        Testplan.objects.get_or_create(testsuite, 2)
 
         testplans = [item for item in Testplan.objects.order_by("order")]
         testsuites = [item.testsuite for item in testplans]
