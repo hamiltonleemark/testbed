@@ -58,7 +58,7 @@ def list_testsuite(args):
             root["testkey"] = testkeys
 
         key = [str(testsuite.context), "testsuite.%s" % testsuite.name]
-        value = datatree.add(key, root)
+        datatree.add(key, root)
     print yaml.dump(datatree)
 
 
@@ -79,7 +79,8 @@ def key_add(args):
     LOGGER.info("add value to testsuite key %s", args.key)
     (testkey, _) = models.TestKey.get_or_create(key=args.key, value=args.value)
 
-    testsuite = models.Testsuite.get_or_create(args.context, args.testsuite)
+    (testsuite, _) = models.Testsuite.get_or_create(args.context,
+                                                    args.testsuite)
     testsuite.testsuitekeyset_set.get_or_create(testkey=testkey)
 
 

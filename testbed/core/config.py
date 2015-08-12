@@ -1,4 +1,11 @@
-class DataTree:
+"""
+ A hierarchy of dictionaries.
+"""
+
+
+# pylint: disable=R0903
+class DataTree(object):
+    """ A tree of dictionaries. """
     def __init__(self):
         self.root = {}
 
@@ -10,7 +17,6 @@ class DataTree:
             next_level = root.get(item, {})
             root[item] = next_level
             root = next_level
-            
+
         root[path[-1]] = value
         return value
-            

@@ -88,7 +88,6 @@ class TestsuiteTestCase(TestCase):
 
         self.assertTrue(test1.id != test2.id)
 
-
     def testplan_order(self):
         """ Test the creation and order support of test plan. """
 
@@ -102,5 +101,5 @@ class TestsuiteTestCase(TestCase):
 
         testplans = [item for item in Testplan.objects.order_by("order")]
         testsuites = [item.testsuite for item in testplans]
-
-        print "MARK: testsuites", testsuites
+        self.assertEqual(testsuites[0].name.name, "testsuite1")
+        self.assertEqual(testsuites[1].name.name, "testsuite2")

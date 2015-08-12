@@ -21,6 +21,9 @@ from django.utils import timezone
 from django.db import models
 
 
+# pylint: disable=E1101
+
+
 class Key(models.Model):
     """ Key refers to a generic way to retrieve a value."""
 
@@ -66,7 +69,7 @@ class TestKey(models.Model):
         Make strict setting is adhered to as well."""
         try:
             cfg = models.Key.objects.get(key=key)
-        except Config.DoesNotExist:
+        except Key.DoesNotExist:
             return True
 
         if cfg.config_type == Key.CONFIG_TYPE_ANY:
@@ -74,9 +77,9 @@ class TestKey(models.Model):
 
         try:
             TestKey.objects.get(key=key, value=value)
-        except ConfigValue.DoesNotExist:
+        except TestKey.DoesNotExist:
             raise TestKey.DoesNotExist("strict key. Value %s=%s not found" %
-                                        (key, value))
+                                       (key, value))
         return True
 
     @staticmethod
@@ -134,9 +137,10 @@ class Test(models.Model):
     def get_or_create(testsuite, name, keys):
         """ Get current or create new objects.
         @param testkeys Must be an instance of TestKey.
+        @return (obj, created) created is a boolean. True if newly created.
         """
 
-        (name, created) = TestName.objects.get_or_create(name=name)
+        (name, _) = TestName.objects.get_or_create(name=name)
 
         ##
         # Look for test.
