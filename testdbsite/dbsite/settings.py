@@ -41,6 +41,16 @@ INSTALLED_APPS = (
     'testdb',
 )
 
+#TEMPLATE_LOADERS = (
+    #"django.template.loaders.filesystem.Loader",
+    #"django.template.loaders.app_directories.Loader",
+    #"django.template.loaders.eggs.Loader",
+#)
+
+#TEMPLATE_DIRS = (
+    #os.path.join(BASE_DIR, "..", "templates"),
+#)
+
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -57,7 +67,7 @@ ROOT_URLCONF = 'dbsite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, "templates"),],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -69,6 +79,8 @@ TEMPLATES = [
         },
     },
 ]
+
+
 
 WSGI_APPLICATION = 'dbsite.wsgi.application'
 

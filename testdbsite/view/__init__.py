@@ -1,0 +1,3 @@
+"""
+View product information. 
+"""
