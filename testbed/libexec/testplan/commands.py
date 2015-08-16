@@ -20,16 +20,12 @@ CLI for creating testplan.
 import logging
 import yaml
 import testbed.core.config
-import api
+from . import api
+
 
 def testsuite_add(args):
     """ Add a testsuite to the database. """
-
-    from testdb import models
-
-    print "MARK: bob"
     return api.get_or_create(args.context, args.testsuite, args.order)
-    
 
 
 def test_add(args):
@@ -38,8 +34,9 @@ def test_add(args):
     from testdb import models
 
     logging.info("adding testsuite to testplan %s", args.testsuite)
-    (testsuite, _) = api.get_or_create(args.context, args.testsuite, -1)
+    (testplan, _) = api.get_or_create(args.context, args.testsuite, -1)
     (name, _) = models.TestName.objects.get_or_create(name=args.name)
+    testsuite = testplan.testsuite
     models.Test.objects.get_or_create(testsuite=testsuite, name=name)
 
 
@@ -96,7 +93,7 @@ def key_list(args):
 
     from testdb import models
 
-    LOGGER.info("list test keys")
+    logging.info("list test keys")
     testkeys = models.TestKey.filter(args.filter).order_by("key")
     for testkey in testkeys:
         print testkey
@@ -132,7 +129,7 @@ def add_subparser(subparser):
     parser.add_argument("--filter", type=str, help="Filter testsuites")
 
     ##
-    # Test 
+    # Test
     parser = subparser.add_parser("test",
                                   description="modify test for the testsuite",
                                   help="Modify test information.")

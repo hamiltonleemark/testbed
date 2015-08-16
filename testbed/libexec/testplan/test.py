@@ -20,6 +20,7 @@ Test testsuite functionality.
 import argparse
 from django.test import TestCase
 from testdb.models import Testsuite
+from testdb.models import Testplan
 from . import commands
 
 
@@ -116,8 +117,9 @@ class TestsuiteTestCase(TestCase):
         self.assertTrue(any("bob2" in name for name in names))
         self.assertTrue(any("ken1" in name for name in names))
 
-    def test_order(self):
+    def test_order1(self):
         """ Confirm order works. """
+
         parser = TestsuiteTestCase.parser_create()
 
         cmd = "testplan add testsuite_order1 --order 1"
@@ -128,7 +130,58 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        testsuites = Testsuite.filter("testsuite_order")
-        self.assertEqual(testsuites.count(), 2)
-        self.assertEqual(testsuites[0].name.name, "testsuite_order1")
-        self.assertEqual(testsuites[1].name.name, "testsuite_order2")
+        cmd = "testplan add testsuite_order3 --order 3"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+
+        testplans = Testplan.filter("testsuite_order")
+        self.assertEqual(testplans.count(), 3)
+        self.assertEqual(testplans[0].testsuite.name.name, "testsuite_order1")
+        self.assertEqual(testplans[1].testsuite.name.name, "testsuite_order2")
+        self.assertEqual(testplans[2].testsuite.name.name, "testsuite_order3")
+
+    def test_order2(self):
+        """ test_order2 Confirm order works. """
+
+        parser = TestsuiteTestCase.parser_create()
+
+        cmd = "testplan add testsuite_order3 --order 3"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+
+        cmd = "testplan add testsuite_order2 --order 1"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+
+        cmd = "testplan add testsuite_order1 --order 1"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+
+        testplans = Testplan.filter("testsuite_order")
+        self.assertEqual(testplans.count(), 3)
+        self.assertEqual(testplans[0].testsuite.name.name, "testsuite_order1")
+        self.assertEqual(testplans[1].testsuite.name.name, "testsuite_order2")
+        self.assertEqual(testplans[2].testsuite.name.name, "testsuite_order3")
+
+    def test_order3(self):
+        """ test_order2 Confirm order works. """
+
+        parser = TestsuiteTestCase.parser_create()
+
+        cmd = "testplan add testsuite_order2 --order 2"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+
+        cmd = "testplan add testsuite_order1 --order 1"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+
+        cmd = "testplan add testsuite_order3 --order 3"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+
+        testplans = Testplan.filter("testsuite_order")
+        self.assertEqual(testplans.count(), 3)
+        self.assertEqual(testplans[0].testsuite.name.name, "testsuite_order1")
+        self.assertEqual(testplans[1].testsuite.name.name, "testsuite_order2")
+        self.assertEqual(testplans[2].testsuite.name.name, "testsuite_order3")

@@ -217,7 +217,7 @@ class Testsuite(models.Model):
             models.Q(name__name__contains=contains))
 
     @staticmethod
-    def get_or_create(context, name, testkeys=None):
+    def get_or_create(context, testsuite_name, testkeys=None):
         """ Get current or create new objects.
         @param testkeys Must be an instance of TestKey.
         """
@@ -225,7 +225,7 @@ class Testsuite(models.Model):
             testkeys = []
 
         (context, _) = Context.objects.get_or_create(name=context)
-        (name, _) = TestsuiteName.objects.get_or_create(name=name)
+        (name, _) = TestsuiteName.objects.get_or_create(name=testsuite_name)
 
         ##
         # Look for testsuite.
@@ -252,6 +252,20 @@ class Testplan(models.Model):
     testsuite = models.ForeignKey(Testsuite, null=True, blank=True,
                                   default=None)
     order = models.IntegerField(default=0)
+
+    def __str__(self):
+        """ User representation. """
+        return "%d: %s" % (self.order, self.testsuite)
+
+    @staticmethod
+    def filter(contains):
+        """ Filter testsuite against a single string. """
+        if not contains:
+            return Testplan.objects.all()
+        find = Testplan.objects.filter(
+            models.Q(testsuite__context__name__contains=contains) |
+            models.Q(testsuite__name__name__contains=contains))
+        return find.order_by("order")
 
 
 class TestsuiteFile(models.Model):

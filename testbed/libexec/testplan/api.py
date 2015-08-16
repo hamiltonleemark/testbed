@@ -5,21 +5,37 @@ import logging
 
 
 def get_or_create(context, testsuite_name, order):
+    """ Get or create a testplan in a certain order.
+    Order is just that the location of the testplan in the list of testplans.
+    The order effects the location the testplan appears on web pages.
+    @param context Testplan context organizes testplans in a logical group.
+                   Testplans with the same context are in the same group.
+                   The order indicates the order of the testplan in the
+                   context.
+    """
 
-    from testdb import models
+    from testdb.models import Testplan
+    from testdb.models import Testsuite
+    from testdb.models import Context
 
-    print "MARK: order", order
     if order == -1:
-        print "MARK: args", order
-        (context, _) = models.Context.objects.get_or_create(name=context)
-        find = models.Testplan.objects.filter(testsuite__context=context)
+        (context, _) = Context.objects.get_or_create(name=context)
+        find = Testplan.objects.filter(testsuite__context=context)
         try:
-            order = find.order_by("order")[0].order
+            order = find.order_by("-order")[0].order
         except IndexError:
             order = 1
-        logging.info("using order %d" % order)
+        logging.info("using order %d", order)
+    else:
+        ##
+        # Order is specified so now we have to move something.
+        testplans = Testplan.objects.filter(order__gte=order).order_by("order")
+        current_order = order
+        for testplan in testplans:
+            if testplan.order == current_order:
+                testplan.order += 1
+                testplan.save()
+                current_order += 1
 
-    (testsuite, _) = models.Testsuite.get_or_create(context, testsuite, None)
-    return models.Testplan.objects.get_or_create(testsuite=testsuite,
-                                                 order=order)
-    
+    (testsuite, _) = Testsuite.get_or_create(context, testsuite_name, None)
+    return Testplan.objects.get_or_create(testsuite=testsuite, order=order)
