@@ -20,28 +20,15 @@ CLI for creating testplan.
 import logging
 import yaml
 import testbed.core.config
-
-LOGGER = logging.getLogger(__name__)
-
+import api
 
 def testsuite_add(args):
     """ Add a testsuite to the database. """
 
     from testdb import models
 
-    LOGGER.info("adding testsuite to testplan %s", args.testsuite)
-    if args.order == -1:
-        (context, _) = models.Context.objects.get_or_create(name=args.context)
-        find = models.Testplan.objects.filter(testsuite__context=context)
-        try:
-            args.order = find.order_by("order")[0].order
-        except IndexError:
-            args.order = 1
-
-    (testsuite, _) = models.Testsuite.get_or_create(args.context,
-                                                    args.testsuite, None)
-    models.Testplan.objects.get_or_create(testsuite=testsuite,
-                                          order=args.order)
+    print "MARK: bob"
+    return api.get_or_create(args.context, args.testsuite, args.order)
     
 
 
@@ -50,9 +37,8 @@ def test_add(args):
 
     from testdb import models
 
-    LOGGER.info("adding testsuite to testplan %s", args.testsuite)
-    (testsuite, _) = models.Testsuite.get_or_create(args.context,
-                                                    args.testsuite)
+    logging.info("adding testsuite to testplan %s", args.testsuite)
+    (testsuite, _) = api.get_or_create(args.context, args.testsuite, -1)
     (name, _) = models.TestName.objects.get_or_create(name=args.name)
     models.Test.objects.get_or_create(testsuite=testsuite, name=name)
 
@@ -61,7 +47,7 @@ def testsuite_list(args):
     """ List testsuites based on search criteria. """
 
     from testdb import models
-    LOGGER.info("listing testsuites")
+    logging.info("listing testsuites")
 
     testsuites = models.Testsuite.filter(args.filter)
 
@@ -88,7 +74,7 @@ def key_create(args):
 
     from testdb import models
 
-    LOGGER.info("create testsuite key %s", args.name)
+    logging.info("create testsuite key %s", args.name)
     models.Key.objects.get_or_create(value=args.name)
 
 
@@ -97,7 +83,7 @@ def key_add(args):
 
     from testdb import models
 
-    LOGGER.info("add value to testsuite key %s", args.key)
+    logging.info("add value to testsuite key %s", args.key)
     (testkey, _) = models.TestKey.get_or_create(key=args.key, value=args.value)
 
     (testsuite, _) = models.Testsuite.get_or_create(args.context,
