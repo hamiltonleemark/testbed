@@ -195,6 +195,12 @@ class Context(models.Model):
         return self.name
 
 
+class TestsuiteKeySet(models.Model):
+    """ Testsuites are associated to a set of keys. """
+    testsuite = models.ForeignKey("Testsuite")
+    testkey = models.ForeignKey(TestKey)
+
+
 class Testsuite(models.Model):
     """ A Testsuite holds a set of tests. """
 
@@ -206,6 +212,10 @@ class Testsuite(models.Model):
     def __str__(self):
         """ User representation. """
         return "%s.%s" % (self.context, self.name)
+
+    def key_get(self, key):
+        """ Return value given key. """
+        return self.keys.get(key__value=key).value
 
     @staticmethod
     def filter(contains):
@@ -257,6 +267,10 @@ class Testplan(models.Model):
         """ User representation. """
         return "%d: %s" % (self.order, self.testsuite)
 
+    def key_get(self, key):
+        """ Return value given key. """
+        return self.testsuite.key_get(key)
+
     @staticmethod
     def filter(contains):
         """ Filter testsuite against a single string. """
@@ -267,6 +281,18 @@ class Testplan(models.Model):
             models.Q(testsuite__name__name__contains=contains))
         return find.order_by("order")
 
+    @staticmethod
+    def get_or_create(testsuite, order):
+        """ Get current or create new objects. """
+
+        ##
+        # Look for testsuite.
+        (testplan, created) = Testplan.objects.get_or_create(
+            testsuite=testsuite)
+        testplan.order = order
+        testplan.save()
+        return (testplan, created)
+
 
 class TestsuiteFile(models.Model):
     """ Hold a single file related to a testsuite. """
@@ -274,9 +300,3 @@ class TestsuiteFile(models.Model):
                                   default=None)
     key = models.ForeignKey(TestKey)
     path = models.CharField(max_length=256, unique=True)
-
-
-class TestsuiteKeySet(models.Model):
-    """ Testsuites are associated to a set of keys. """
-    testsuite = models.ForeignKey(Testsuite)
-    testkey = models.ForeignKey(TestKey)

@@ -185,3 +185,22 @@ class TestsuiteTestCase(TestCase):
         self.assertEqual(testplans[0].testsuite.name.name, "testsuite_order1")
         self.assertEqual(testplans[1].testsuite.name.name, "testsuite_order2")
         self.assertEqual(testplans[2].testsuite.name.name, "testsuite_order3")
+
+    def test_order_one(self):
+        """ test_order_one Confirm order works. """
+
+        parser = TestsuiteTestCase.parser_create()
+
+        cmd = "testplan add testsuite_order_one"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+
+        testplans = Testplan.filter("testsuite_order_one")
+        self.assertEqual(testplans.count(), 1)
+        self.assertEqual(testplans[0].order, 1)
+
+        cmd = "testplan add testsuite_order_one --order 2"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+        self.assertEqual(testplans.count(), 1)
+        self.assertEqual(testplans[0].order, 2)
