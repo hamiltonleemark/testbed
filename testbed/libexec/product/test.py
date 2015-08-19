@@ -73,7 +73,7 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        testsuites = Testsuite.filter("product3")
+        testsuites = Testsuite.filter(api.CONTEXT, "product3")
         branches = [item.key_get("branch") for item in testsuites]
         self.assertTrue(len(branches) == 2)
         self.assertTrue("branch2" in branches)

@@ -36,7 +36,7 @@ def list_testsuite(args):
 
     from testdb import models
     LOGGER.info("listing testsuites")
-    testsuites = models.Testsuite.filter(args.filter)
+    testsuites = models.Testsuite.filter(args.context, args.filter)
     for testsuite in testsuites:
         print testsuite
 

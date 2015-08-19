@@ -49,7 +49,8 @@ class TestTestCase(TestCase):
         args = parser.parse_args("test add testsuite1 test2".split())
         args.func(args)
 
-        names = [item.name.name for item in Testsuite.filter("testsuite1")]
+        names = [item.name.name for item in Testsuite.filter(None,
+                                                             "testsuite1")]
         self.assertTrue(len(names) == 1)
 
         names = [item.name.name for item in Test.filter("testsuite1")]

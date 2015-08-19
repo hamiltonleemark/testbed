@@ -25,7 +25,7 @@ def get_or_create(context, testsuite_name, order):
         (context, _) = Context.objects.get_or_create(name=context)
         find = Testplan.objects.filter(testsuite__context=context)
         try:
-            order = find.order_by("-order")[0].order
+            order = find.order_by("-order")[0].order + 1
         except IndexError:
             order = 1
         logging.info("using order %d", order)

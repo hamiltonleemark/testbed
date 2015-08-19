@@ -218,13 +218,16 @@ class Testsuite(models.Model):
         return self.keys.get(key__value=key).value
 
     @staticmethod
-    def filter(contains):
+    def filter(context, contains):
         """ Filter testsuite against a single string. """
+        if context:
+            find = Testsuite.objects.filter(context__name__contains=context)
+        else:
+            find = Testsuite.objects.all()
+
         if not contains:
-            return Testsuite.objects.all()
-        return Testsuite.objects.filter(
-            models.Q(context__name__contains=contains) |
-            models.Q(name__name__contains=contains))
+            return find
+        return find.filter(name__name__contains=contains)
 
     @staticmethod
     def get_or_create(context, testsuite_name, testkeys=None):

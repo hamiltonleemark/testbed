@@ -28,15 +28,20 @@ def product_add(args):
     return api.get_or_create(args.name, args.branch, args.order)
 
 
-def testplan_add(args):
+def product_remove(args):
+    """ Add a product to the database. """
+    return api.remove(args.name, args.branch)
+
+
+def product_testplan_add(args):
     """ Add a testplan to the database. """
 
     from testdb import models
 
     logging.info("adding testplan to product %s", args.testplan)
-    (testplan, _) = api.get_or_create(api.CONTEXT, args.name, -1)
+    (product, _) = api.get_or_create(api.CONTEXT, args.name, -1)
     (name, _) = models.TestName.objects.get_or_create(name=args.name)
-    testsuite = testplan.testsuite
+    testsuite = product.testsuite
     models.Test.objects.get_or_create(testsuite=testsuite, name=name)
 
 
@@ -46,58 +51,23 @@ def product_list(args):
     from testdb import models
     logging.info("listing products")
 
-    testplans = models.Testplan.filter(args.filter)
-
     datatree = testbed.core.config.DataTree()
 
+    testplans = models.Testplan.filter(args.filter)
+    products = []
     for testplan in testplans:
         testsuite = testplan.testsuite
         testkeys = [str(item.testkey)
                     for item in testsuite.testsuitekeyset_set.all()]
-        tests = [str(item) for item in testsuite.test_set.all()]
-
         root = {}
-        if tests:
-            root["tests"] = tests
         if testkeys:
-            root["testkey"] = testkeys
+            root["key"] = testkeys
+        root["order"] = testplan.order
 
-        key = [api.CONTEXT, "testsuite.%s" % testsuite.name]
-        datatree.add(key, root)
+        key = "product.%s" % testsuite.name
+        products.append({key: root})
+    datatree.add([api.CONTEXT], products)
     print yaml.dump(datatree)
-
-
-def key_create(args):
-    """ Add a key to a testsuite. """
-
-    from testdb import models
-
-    logging.info("create testsuite key %s", args.name)
-    models.Key.objects.get_or_create(value=args.name)
-
-
-def key_add(args):
-    """ Add a key to a testsuite. """
-
-    from testdb import models
-
-    logging.info("add value to testsuite key %s", args.key)
-    (testkey, _) = models.TestKey.get_or_create(key=args.key, value=args.value)
-
-    (testsuite, _) = models.Testsuite.get_or_create(api.CONTEXT,
-                                                    args.testsuite)
-    testsuite.testsuitekeyset_set.get_or_create(testkey=testkey)
-
-
-def key_list(args):
-    """ Add a key to a testsuite. """
-
-    from testdb import models
-
-    logging.info("list test keys")
-    testkeys = models.TestKey.filter(args.filter).order_by("key")
-    for testkey in testkeys:
-        print testkey
 
 
 def add_subparser(subparser):
@@ -117,7 +87,18 @@ def add_subparser(subparser):
     parser.add_argument("--order", type=int, default=-1,
                         help="Order of product as viewed on the website."
                         "If not specified the next sequential value is "
-                        "assumed")
+                        "next value.")
+      
+    ##
+    # Add
+    parser = subparser.add_parser(
+        "remove",
+        description="Remove a product to the database",
+        help="Remove a product.")
+    parser.set_defaults(func=product_remove)
+    parser.add_argument("name", type=str, help="Name of the product.")
+    parser.add_argument("branch", type=str, help="Branch name of the product.")
+
 
     ##
     # List
@@ -137,7 +118,7 @@ def add_subparser(subparser):
     parser = subparser.add_parser("add", description="Add testplan",
                                   help="add test.")
 
-    parser.set_defaults(func=testplan_add)
+    parser.set_defaults(func=product_testplan_add)
     parser.add_argument("name", type=str, help="Name of testplan.")
 
     return subparser

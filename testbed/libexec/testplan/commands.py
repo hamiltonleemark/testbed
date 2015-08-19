@@ -46,7 +46,7 @@ def testsuite_list(args):
     from testdb import models
     logging.info("listing testsuites")
 
-    testsuites = models.Testsuite.filter(args.filter)
+    testsuites = models.Testsuite.filter(args.context, args.filter)
 
     datatree = testbed.core.config.DataTree()
 
