@@ -9,7 +9,6 @@ import logging
 
 def parse():
     """ main entry point. """
-    print "MARK parse"
     from testbed.core import commands
 
     arg_parser = commands.main()
