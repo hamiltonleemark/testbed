@@ -68,7 +68,6 @@ def remove(product_name, branch_name):
     """
 
     from testdb.models import Testplan
-    from testdb.models import Testsuite
     from testdb.models import Context
     from testdb.models import TestKey
 

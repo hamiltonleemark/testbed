@@ -53,7 +53,7 @@ def product_list(args):
 
     datatree = testbed.core.config.DataTree()
 
-    testplans = models.Testplan.filter(args.filter)
+    testplans = models.Testplan.filter(args.filter).order_by("order")
     products = []
     for testplan in testplans:
         testsuite = testplan.testsuite
@@ -88,7 +88,6 @@ def add_subparser(subparser):
                         help="Order of product as viewed on the website."
                         "If not specified the next sequential value is "
                         "next value.")
-      
     ##
     # Add
     parser = subparser.add_parser(
@@ -98,7 +97,6 @@ def add_subparser(subparser):
     parser.set_defaults(func=product_remove)
     parser.add_argument("name", type=str, help="Name of the product.")
     parser.add_argument("branch", type=str, help="Branch name of the product.")
-
 
     ##
     # List
