@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Testdb.  If not, see <http://www.gnu.org/licenses/>.
 """
-CLI for creating testplan.
+CLI for associating a testplan to a product.
 """
 import logging
 import yaml
@@ -63,7 +63,7 @@ def testsuite_list(args):
 
         key = [str(testsuite.context), "testsuite.%s" % testsuite.name]
         datatree.add(key, root)
-    print yaml.dump(datatree)
+    print yaml.dump(datatree, default_flow_style=False)
 
 
 def key_create(args):
@@ -131,7 +131,7 @@ def add_subparser(subparser):
     ##
     # Test
     parser = subparser.add_parser("test",
-                                  description="modify test for the testsuite",
+                                  description="Modify test for the testsuite",
                                   help="Modify test information.")
     subparser = parser.add_subparsers()
     parser = subparser.add_parser("add", description="Add test",

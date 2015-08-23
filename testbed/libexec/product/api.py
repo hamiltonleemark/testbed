@@ -7,10 +7,11 @@ from django.db import models
 CONTEXT = "product.default"
 
 
-def get_or_create(product_name, branch_name, order):
+def get_or_create(product_name, branch_name, order=-1):
     """ Get or create a testplan in a certain order.
-    Order is just that the location of the testplan in the list of testplans.
-    The order effects the location the testplan appears on web pages.
+    @param order order is the location of the testplan in the list of
+                 testplans. The order effects the location the testplan
+                 appears on web pages.
     """
 
     from testdb.models import Testplan

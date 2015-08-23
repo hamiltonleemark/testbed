@@ -2,6 +2,7 @@ from django.conf.urls import patterns, url
 from . import index 
 
 urlpatterns = patterns(
-  "products",
-  url(r"^$", index.view)
+  "product",
+  url(r"^$", index.view),
+  url(r"^(?P<pid>[\d]+)", index.view_product)
 )

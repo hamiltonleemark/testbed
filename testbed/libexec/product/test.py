@@ -96,7 +96,7 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        testplans = Testplan.filter(None)
+        testplans = Testplan.filter(None, None)
         self.assertEqual(testplans.count(), 3)
         self.assertEqual(testplans[0].testsuite.name.name, "product4")
         self.assertEqual(testplans[1].testsuite.name.name, "product4")
@@ -119,7 +119,7 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        testplans = Testplan.filter("product_order")
+        testplans = Testplan.filter(api.CONTEXT, "product_order")
         self.assertEqual(testplans.count(), 3)
         self.assertEqual(testplans[0].testsuite.name.name, "product_order1")
         self.assertEqual(testplans[1].testsuite.name.name, "product_order2")
@@ -142,7 +142,7 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        products = Testplan.filter("product_order")
+        products = Testplan.filter(api.CONTEXT, "product_order")
         self.assertEqual(products.count(), 3)
         self.assertEqual(products[0].testsuite.name.name, "product_order1")
         self.assertEqual(products[1].testsuite.name.name, "product_order2")

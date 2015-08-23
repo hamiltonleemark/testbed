@@ -22,8 +22,6 @@ from django.db import models
 
 
 # pylint: disable=E1101
-
-
 class Key(models.Model):
     """ Key refers to a generic way to retrieve a value."""
 
@@ -275,12 +273,12 @@ class Testplan(models.Model):
         return self.testsuite.key_get(key)
 
     @staticmethod
-    def filter(contains):
+    def filter(context, contains):
         """ Filter testsuite against a single string. """
         if not contains:
             return Testplan.objects.all()
         find = Testplan.objects.filter(
-            models.Q(testsuite__context__name__contains=contains) |
+            models.Q(testsuite__context__name__contains=context) |
             models.Q(testsuite__name__name__contains=contains))
         return find.order_by("order")
 

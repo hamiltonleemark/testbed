@@ -15,9 +15,12 @@ Including another URLconf
 """
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
+from django.views.generic import RedirectView
 
 urlpatterns = patterns("",
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^', include("view.products.urls")),
-    url(r'^products/', include("view.products.urls")),
+    ##
+    # Currently product view is the default entry point into our website.
+    url(r'^$', RedirectView.as_view(permanent=False, url="/product")),
+    url(r'^product/', include("view.product.urls")),
 )

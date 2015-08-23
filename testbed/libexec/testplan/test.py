@@ -22,6 +22,7 @@ from django.test import TestCase
 from testdb.models import Testsuite
 from testdb.models import Testplan
 from . import commands
+from . import api
 
 
 class TestsuiteTestCase(TestCase):
@@ -134,7 +135,7 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        testplans = Testplan.filter("testsuite_order")
+        testplans = Testplan.filter(api.CONTEXT, "testsuite_order")
         self.assertEqual(testplans.count(), 3)
         self.assertEqual(testplans[0].testsuite.name.name, "testsuite_order1")
         self.assertEqual(testplans[1].testsuite.name.name, "testsuite_order2")
@@ -157,7 +158,7 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        testplans = Testplan.filter("testsuite_order")
+        testplans = Testplan.filter(api.CONTEXT, "testsuite_order")
         self.assertEqual(testplans.count(), 3)
         self.assertEqual(testplans[0].testsuite.name.name, "testsuite_order1")
         self.assertEqual(testplans[1].testsuite.name.name, "testsuite_order2")
@@ -180,7 +181,7 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        testplans = Testplan.filter("testsuite_order")
+        testplans = Testplan.filter(api.CONTEXT, "testsuite_order")
         self.assertEqual(testplans.count(), 3)
         self.assertEqual(testplans[0].testsuite.name.name, "testsuite_order1")
         self.assertEqual(testplans[1].testsuite.name.name, "testsuite_order2")
@@ -195,7 +196,7 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        testplans = Testplan.filter("testsuite_order_one")
+        testplans = Testplan.filter(api.CONTEXT, "testsuite_order_one")
         self.assertEqual(testplans.count(), 1)
         self.assertEqual(testplans[0].order, 1)
 

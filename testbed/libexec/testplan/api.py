@@ -3,6 +3,8 @@ Functionality common to more than one command.
 """
 import logging
 
+CONTEXT = "testplan.default"
+
 
 def get_or_create(context, testsuite_name, order):
     """ Get or create a testplan in a certain order.

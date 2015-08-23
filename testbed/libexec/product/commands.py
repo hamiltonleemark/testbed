@@ -15,7 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Testdb.  If not, see <http://www.gnu.org/licenses/>.
 """
-CLI for creating testplan.
+Product CLI.
+
+Products consist of a name and branch name. Products can have multiple
+branches. The combination of product name and branch names are ordered
+which effects how products are displayed. This order can be leveraged
+in various ways such as defining the priority of branches that need testing.
 """
 import logging
 import yaml
@@ -38,11 +43,12 @@ def product_testplan_add(args):
 
     from testdb import models
 
-    logging.info("adding testplan to product %s", args.testplan)
-    (product, _) = api.get_or_create(api.CONTEXT, args.name, -1)
-    (name, _) = models.TestName.objects.get_or_create(name=args.name)
-    testsuite = product.testsuite
-    models.Test.objects.get_or_create(testsuite=testsuite, name=name)
+    logging.info("adding testplan %s to product %s %s", args.testplan,
+                 args.product, args.branch)
+    (product, _) = api.get_or_create(args.product, args.branch)
+    (testplan, _) = models.TestKey.get_or_create("testplan", args.testplan)
+    models.TestsuiteKeySet.objects.create(testsuite=product.testsuite,
+                                          testkey=testplan)
 
 
 def product_list(args):
@@ -52,8 +58,8 @@ def product_list(args):
     logging.info("listing products")
 
     datatree = testbed.core.config.DataTree()
-
-    testplans = models.Testplan.filter(args.filter).order_by("order")
+    testplans = models.Testplan.filter(api.CONTEXT,
+                                       args.filter).order_by("order")
     products = []
     for testplan in testplans:
         testsuite = testplan.testsuite
@@ -67,13 +73,13 @@ def product_list(args):
         key = "product.%s" % testsuite.name
         products.append({key: root})
     datatree.add([api.CONTEXT], products)
-    print yaml.dump(datatree)
+    print yaml.dump(datatree, default_flow_style=False)
 
 
 def add_subparser(subparser):
     """ Create testsuite CLI commands. """
 
-    parser = subparser.add_parser("product", help=__doc__)
+    parser = subparser.add_parser("product", description=__doc__)
     subparser = parser.add_subparsers()
 
     ##
@@ -102,7 +108,7 @@ def add_subparser(subparser):
     # List
     parser = subparser.add_parser("list",
                                   description="List all of the products.",
-                                  help="List products")
+                                  help="List products.")
     parser.set_defaults(func=product_list)
     parser.add_argument("--filter", type=str, help="Filter products")
 
@@ -110,13 +116,16 @@ def add_subparser(subparser):
     # Add testplan
     parser = subparser.add_parser(
         "testplan",
-        description="modify testplan for the product",
-        help="Modify test information.")
+        description="Modify testplan for the product",
+        help="Associate testplan to a product.")
     subparser = parser.add_subparsers()
-    parser = subparser.add_parser("add", description="Add testplan",
-                                  help="add test.")
+    parser = subparser.add_parser(
+        "add", description="Associate testplan to a product",
+        help="add test.")
 
     parser.set_defaults(func=product_testplan_add)
-    parser.add_argument("name", type=str, help="Name of testplan.")
+    parser.add_argument("product", type=str, help="Product name.")
+    parser.add_argument("branch", type=str, help="Branch name.")
+    parser.add_argument("testplan", type=str, help="Name of testplan.")
 
     return subparser
