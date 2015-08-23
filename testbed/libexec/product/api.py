@@ -62,7 +62,7 @@ def filter(value=None):
     return find.order_by("order")
 
 
-def remove(product_name, branch_name):
+def remove(product, branch):
     """ Get or create a testplan in a certain order.
     Order is just that the location of the testplan in the list of testplans.
     The order effects the location the testplan appears on web pages.
@@ -72,19 +72,23 @@ def remove(product_name, branch_name):
     from testdb.models import Context
     from testdb.models import TestKey
 
+    print "MARK: remove", product, branch
+
     try:
-        branch_key = TestKey.objects.get(key__value="branch",
-                                         value=branch_name)
+        branch_key = TestKey.objects.get(key__value="branch", value=branch)
     except TestKey.DoesNotExist, arg:
         raise Testplan.DoesNotExist(arg)
 
+    print "MARK: key", branch_key
     try:
         context = Context.objects.get(name=CONTEXT)
     except Context.DoesNotExist, arg:
         raise Testplan.DoesNotExist(arg)
 
     find = Testplan.objects.filter(testsuite__context=context,
-                                   testsuite__name__name=product_name,
+                                   testsuite__name__name=product,
                                    testsuite__keys=branch_key)
+    print "MARK: finding", find.count()
     for item in find:
+        print "MARK: finding", item
         item.delete()

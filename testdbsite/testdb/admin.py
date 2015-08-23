@@ -74,9 +74,21 @@ class TestsuiteAdmin(admin.ModelAdmin):
     inlines = [TestsuiteKeySetInlineAdmin, TestsuiteFileInlineAdmin,
                TestInlineAdmin]
 
+
+class TestplanAdmin(admin.ModelAdmin):
+    """ Show files associated to testsuite inline. """
+    model = models.Testplan
+    extra = 0
+    list_display = ("order", "testsuite", "branch")
+
+    def branch(self, testplan):
+        return testplan.key_get("branch")
+
+
 admin.site.register(models.Context, ContextAdmin)
 admin.site.register(models.Key, KeyAdmin)
 admin.site.register(models.Test, TestAdmin)
 admin.site.register(models.TestKey, TestKeyAdmin)
 admin.site.register(models.TestsuiteName, TestsuiteNameAdmin)
 admin.site.register(models.Testsuite, TestsuiteAdmin)
+admin.site.register(models.Testplan, TestplanAdmin)
