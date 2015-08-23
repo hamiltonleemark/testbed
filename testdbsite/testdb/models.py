@@ -275,11 +275,15 @@ class Testplan(models.Model):
     @staticmethod
     def filter(context, contains):
         """ Filter testsuite against a single string. """
-        if not contains:
-            return Testplan.objects.all()
-        find = Testplan.objects.filter(
-            models.Q(testsuite__context__name__contains=context) |
-            models.Q(testsuite__name__name__contains=contains))
+        if context:
+            find = Testplan.objects.filter(testsuite__context__name=context)
+        else:
+            find = Testplan.objects.all()
+
+        print "MARK: filter", find.count()
+
+        if contains:
+            find = find.filter(testsuite__name__name__contains=contains)
         return find.order_by("order")
 
     @staticmethod

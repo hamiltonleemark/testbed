@@ -68,18 +68,26 @@ class TestsuiteKeySetInlineAdmin(admin.TabularInline):
 
 class TestsuiteAdmin(admin.ModelAdmin):
     """ Show testsuite. """
+    model = models.Testsuite
     list_display = ("context", "name", "timestamp")
     date_hierarchy = "timestamp"
     search_fields = ("context", "name", "timestamp")
+
     inlines = [TestsuiteKeySetInlineAdmin, TestsuiteFileInlineAdmin,
                TestInlineAdmin]
 
 
 class TestplanAdmin(admin.ModelAdmin):
-    """ Show files associated to testsuite inline. """
+    """ Administrate testplan content. """
     model = models.Testplan
     extra = 0
-    list_display = ("order", "testsuite", "branch")
+
+    list_display = ("order", "context", "name", "branch")
+    def context(self, testplan):
+        return testplan.testsuite.context
+
+    def name(self, testplan):
+        return testplan.testsuite.name
 
     def branch(self, testplan):
         return testplan.key_get("branch")

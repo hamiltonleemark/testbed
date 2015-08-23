@@ -40,22 +40,23 @@ def test_add(args):
     models.Test.objects.get_or_create(testsuite=testsuite, name=name)
 
 
-def testsuite_list(args):
+def testplan_list(args):
     """ List testsuites based on search criteria. """
 
     from testdb import models
-    logging.info("listing testsuites")
+    logging.info("listing testplan")
 
-    testsuites = models.Testsuite.filter(args.context, args.filter)
-
+    testplans = models.Testplan.filter(args.context, None)
     datatree = testbed.core.config.DataTree()
 
-    for testsuite in testsuites:
+    for testplan in testplans:
+        testsuite = testplan.testsuite
+
         testkeys = [str(item.testkey)
                     for item in testsuite.testsuitekeyset_set.all()]
         tests = [str(item) for item in testsuite.test_set.all()]
 
-        root = {}
+        root = {"order": testplan.order}
         if tests:
             root["tests"] = tests
         if testkeys:
@@ -103,7 +104,7 @@ def add_subparser(subparser):
     """ Create testsuite CLI commands. """
 
     parser = subparser.add_parser("testplan", help=__doc__)
-    parser.add_argument("--context", default="testplan.default", type=str,
+    parser.add_argument("--context", default=api.CONTEXT, type=str,
                         help="Specify a different context.")
     subparser = parser.add_subparsers()
 
@@ -125,7 +126,7 @@ def add_subparser(subparser):
     parser = subparser.add_parser("list",
                                   description="List all of the testsuites.",
                                   help="List testsuite")
-    parser.set_defaults(func=testsuite_list)
+    parser.set_defaults(func=testplan_list)
     parser.add_argument("--filter", type=str, help="Filter testsuites")
 
     ##

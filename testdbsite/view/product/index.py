@@ -38,11 +38,12 @@ def view_product(_, pid):
     product = models.Testplan.objects.get(id=pid)
 
     testplan = product.key_get("testplan")
+    print "MARK: testplan", testplan
 
     ##
     # To view a products specific test plan. Retrieve the product and then
     # retrieve the testplan value.
-    testplans = models.Testplan.objects.filter(name=testplan)
+    testplans = models.Testplan.objects.get(testsuite__name__name=testplan)
 
     html_data = {}
     return render_to_response("products/index.html", html_data)
