@@ -77,20 +77,40 @@ class TestsuiteAdmin(admin.ModelAdmin):
                TestInlineAdmin]
 
 
+class TestplanOrderAdmin(admin.ModelAdmin):
+    """ Show testplan order. """
+    model = models.TestplanOrder
+    extra = 0
+
+
+class TestplanOrderInlineAdmin(admin.TabularInline):
+    """ Show set of keys that associate a testsuite. """
+
+    model = models.TestplanOrder
+    extra = 0
+
+
+# pylint: disable=R0201
 class TestplanAdmin(admin.ModelAdmin):
     """ Administrate testplan content. """
     model = models.Testplan
     extra = 0
 
-    list_display = ("order", "context", "name", "branch")
+    list_display = ("order", "context")
+
+    def order(self, testplan):
+        """ Return the testplan order. """
+        return testplan.order
+
     def context(self, testplan):
+        """ Return testplan context. """
         return testplan.testsuite.context
 
-    def name(self, testplan):
-        return testplan.testsuite.name
 
-    def branch(self, testplan):
-        return testplan.key_get("branch")
+class ProductAdmin(admin.ModelAdmin):
+    """ Administrate testplan content. """
+    model = models.TestProduct
+    extra = 0
 
 
 admin.site.register(models.Context, ContextAdmin)
@@ -98,5 +118,7 @@ admin.site.register(models.Key, KeyAdmin)
 admin.site.register(models.Test, TestAdmin)
 admin.site.register(models.TestKey, TestKeyAdmin)
 admin.site.register(models.TestsuiteName, TestsuiteNameAdmin)
+admin.site.register(models.TestProduct, ProductAdmin)
 admin.site.register(models.Testsuite, TestsuiteAdmin)
 admin.site.register(models.Testplan, TestplanAdmin)
+admin.site.register(models.TestplanOrder, TestplanOrderAdmin)

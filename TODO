@@ -19,3 +19,7 @@
 4. Create push and pull database.
 5. Second goal
    Support MongoDB 
+6. add store and restore serialize to handle do_list methods.
+7. figure out best way to handle large scale of tests.
+8. Support json, yaml, output.
+9. change context to group. Use TestKey for group values.

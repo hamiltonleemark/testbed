@@ -256,13 +256,19 @@ class Testsuite(models.Model):
         return (testsuite, True)
 
 
+class TestplanKeySet(models.Model):
+    """ Testsuites are associated to a set of keys. """
+
+    testplan = models.ForeignKey("Testplan")
+    testkey = models.ForeignKey(TestKey)
+
+
 class Testplan(models.Model):
     """ A test plan consists of a set of testsuites, tests.
     A test plan governs which testsuites should be run.
     """
-    testsuite = models.ForeignKey(Testsuite, null=True, blank=True,
-                                  default=None)
-    order = models.IntegerField(default=0)
+    context = models.ForeignKey(Context)
+    keys = models.ManyToManyField(TestKey, through="TestplanKeySet")
 
     def __str__(self):
         """ User representation. """
@@ -273,30 +279,49 @@ class Testplan(models.Model):
         return self.testsuite.key_get(key)
 
     @staticmethod
-    def filter(context, contains):
-        """ Filter testsuite against a single string. """
-        if context:
-            find = Testplan.objects.filter(testsuite__context__name=context)
-        else:
-            find = Testplan.objects.all()
+    def get_or_create(context, testkeys=None):
+        """ Get current or create new objects.
+        @param testkeys Must be an instance of TestKey.
+        """
+        if not testkeys:
+            testkeys = []
 
-        print "MARK: filter", find.count()
-
-        if contains:
-            find = find.filter(testsuite__name__name__contains=contains)
-        return find.order_by("order")
-
-    @staticmethod
-    def get_or_create(testsuite, order):
-        """ Get current or create new objects. """
+        (context, _) = Context.objects.get_or_create(name=context)
 
         ##
         # Look for testsuite.
-        (testplan, created) = Testplan.objects.get_or_create(
-            testsuite=testsuite)
-        testplan.order = order
-        testplan.save()
-        return (testplan, created)
+        find = Testplan.objects.filter(context=context)
+        for testkey in testkeys:
+            find = find.filter(keys=testkey)
+
+        if find.count() == 1:
+            return ([item for item in find][0], False)
+        elif find.count() > 1:
+            raise Testsuite.MultipleObjectsReturned(str(context))
+
+        testplan = Testplan.objects.create(context=context)
+        for testkey in testkeys:
+            TestplanKeySet.objects.create(testplan=testplan, testkey=testkey)
+        return (testplan, True)
+
+
+class TestplanOrder(models.Model):
+    """ Controls the order of the testsuite in the testplan. """
+
+    testsuite = models.OneToOneField(Testsuite, primary_key=True)
+    order = models.IntegerField(default=0)
+    testplan = models.ForeignKey(Testplan, null=True, blank=True, default=None)
+
+    @staticmethod
+    def get_or_create(testplan, testsuite, order):
+        """ Get current or create new objects. """
+
+        results = TestplanOrder.objects.get_or_create(testsuite=testsuite,
+                                                      testplan=testplan)
+        results[0].order = order
+
+        results[0].save()
+        return results
 
 
 class TestsuiteFile(models.Model):
@@ -305,3 +330,84 @@ class TestsuiteFile(models.Model):
                                   default=None)
     key = models.ForeignKey(TestKey)
     path = models.CharField(max_length=256, unique=True)
+
+
+class TestProductKeySet(models.Model):
+    """ Testsuites are associated to a set of keys. """
+
+    testproduct = models.ForeignKey("TestProduct")
+    testkey = models.ForeignKey(TestKey)
+
+
+class TestProduct(models.Model):
+    """ A test plan consists of a set of testsuites, tests.
+    A test plan governs which testsuites should be run.
+    """
+
+    context = models.ForeignKey(Context)
+    product = models.ForeignKey(Key, related_name="product")
+    branch = models.ForeignKey(Key, related_name="branch")
+    keys = models.ManyToManyField(TestKey, through="TestProductKeySet")
+    order = models.IntegerField(default=0)
+
+    def __str__(self):
+        """ User representation. """
+        return "%d: %s %s" % (self.order, self.context,
+                              self.key_get("product", "NA"))
+
+    def key_get(self, key, default=None):
+        """ Return value given key. """
+        try:
+            return self.keys.get(key__value=key).value
+        except TestKey.DoesNotExist:
+            return default
+
+    @staticmethod
+    def get_or_create(context, product, branch, testkeys=None):
+        """ Get current or create new objects.
+        @param testkeys Must be an instance of TestKey.
+        """
+        if not testkeys:
+            testkeys = []
+
+        (context, _) = Context.objects.get_or_create(name=context)
+        (product, _) = Key.objects.get_or_create(value=product)
+        (branch, _) = Key.objects.get_or_create(value=branch)
+
+        ##
+        # Look for testsuite.
+        find = TestProduct.objects.filter(context=context, product=product,
+                                          branch=branch)
+        for testkey in testkeys:
+            find = find.filter(keys=testkey)
+
+        if find.count() == 1:
+            return ([item for item in find][0], False)
+        elif find.count() > 1:
+            raise Testsuite.MultipleObjectsReturned("%s %s %s" % (context,
+                                                                  product,
+                                                                  branch))
+
+        product = TestProduct.objects.create(context=context,
+                                             product=product,
+                                             branch=branch)
+        for testkey in testkeys:
+            TestProductKeySet.objects.create(testproduct=product,
+                                             testkey=testkey)
+        return (product, True)
+
+    @staticmethod
+    def filter(context, contains):
+        """ Filter testsuite against a single string. """
+
+        if context:
+            (context, _) = Context.objects.get_or_create(name=context)
+            find = TestProduct.objects.filter(context=context)
+        else:
+            find = TestProduct.objects.all()
+
+        if contains:
+            find = find.filter(models.Q(product__value__contains=contains) |
+                               models.Q(branch__value__contains=contains) |
+                               models.Q(keys__key__value__contains=contains))
+        return find.order_by("order")

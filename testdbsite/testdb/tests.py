@@ -27,6 +27,7 @@ from .models import Key
 from .models import TestKey
 from .models import Context
 from .models import Testplan
+from .models import TestplanOrder
 
 
 class TestsuiteTestCase(TestCase):
@@ -91,15 +92,24 @@ class TestsuiteTestCase(TestCase):
     def testplan_order(self):
         """ Test the creation and order support of test plan. """
 
-        (testsuite, _) = Testsuite.get_or_create("testplan.default",
-                                                 "testsuite1")
-        Testplan.objects.get_or_create(testsuite=testsuite, order=1)
+        test_keys = [TestKey.get_or_create("key1", "value1.1"),
+                     TestKey.get_or_create("key1", "value1.2"),
+                     TestKey.get_or_create("key2", "value2.1")]
+        test_keys = [item[0] for item in test_keys]
+        (testplan, _) = Testplan.get_or_create("testplan.default", test_keys)
 
-        (testsuite, _) = Testsuite.get_or_create("testplan.default",
-                                                 "testsuite2")
-        Testplan.objects.get_or_create(testsuite=testsuite, order=2)
+        (testsuite, _) = Testsuite.get_or_create("default", "testsuite1")
+        (testplanorder, _) = TestplanOrder.objects.get_or_create(
+            testsuite=testsuite, order=1)
+        testplan.testplanorder_set.add(testplanorder)
 
-        testplans = [item for item in Testplan.objects.order_by("order")]
+        (testsuite, _) = Testsuite.get_or_create("default", "testsuite2")
+        (testplanorder, _) = TestplanOrder.objects.get_or_create(
+            testsuite=testsuite, order=2)
+        testplan.testplanorder_set.add(testplanorder)
+
+        testplans = TestplanOrder.objects.order_by("order")
+        testplans = [item for item in testplans]
         testsuites = [item.testsuite for item in testplans]
         self.assertEqual(testsuites[0].name.name, "testsuite1")
         self.assertEqual(testsuites[1].name.name, "testsuite2")
