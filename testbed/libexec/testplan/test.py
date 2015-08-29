@@ -20,9 +20,8 @@ Test testsuite functionality.
 import argparse
 from django.test import TestCase
 from testdb.models import Testsuite
-from testdb.models import Testplan
+from testdb.models import TestplanOrder
 from . import commands
-from . import api
 
 
 class TestsuiteTestCase(TestCase):
@@ -105,14 +104,7 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        testsuites = Testsuite.filter(None, "bob")
-        items = [item for item in testsuites]
-        self.assertTrue(len(items) == 2)
-        names = [item.name.name for item in items]
-        self.assertTrue(any("bob1" in name for name in names))
-        self.assertTrue(any("bob2" in name for name in names))
-
-        testsuites = Testsuite.filter("testplan2", None)
+        testsuites = Testsuite.objects.filter(context__name="testplan2")
         names = [item.name.name for item in testsuites]
         self.assertTrue(len(names) == 2)
         self.assertTrue(any("bob2" in name for name in names))
@@ -135,7 +127,7 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        testplans = Testplan.filter(api.CONTEXT, "testsuite_order")
+        testplans = TestplanOrder.objects.all().order_by("order")
         self.assertEqual(testplans.count(), 3)
         self.assertEqual(testplans[0].testsuite.name.name, "testsuite_order1")
         self.assertEqual(testplans[1].testsuite.name.name, "testsuite_order2")
@@ -158,7 +150,7 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        testplans = Testplan.filter(api.CONTEXT, "testsuite_order")
+        testplans = TestplanOrder.objects.all().order_by("order")
         self.assertEqual(testplans.count(), 3)
         self.assertEqual(testplans[0].testsuite.name.name, "testsuite_order1")
         self.assertEqual(testplans[1].testsuite.name.name, "testsuite_order2")
@@ -181,7 +173,7 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        testplans = Testplan.filter(api.CONTEXT, "testsuite_order")
+        testplans = TestplanOrder.objects.all().order_by("order")
         self.assertEqual(testplans.count(), 3)
         self.assertEqual(testplans[0].testsuite.name.name, "testsuite_order1")
         self.assertEqual(testplans[1].testsuite.name.name, "testsuite_order2")
@@ -196,12 +188,13 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        testplans = Testplan.filter(api.CONTEXT, "testsuite_order_one")
+        testplans = TestplanOrder.objects.all()
         self.assertEqual(testplans.count(), 1)
         self.assertEqual(testplans[0].order, 1)
 
         cmd = "testplan add testsuite_order_one --order 2"
         args = parser.parse_args(cmd.split())
         args.func(args)
+        testplans = TestplanOrder.objects.all()
         self.assertEqual(testplans.count(), 1)
         self.assertEqual(testplans[0].order, 2)

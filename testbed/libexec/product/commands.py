@@ -15,16 +15,15 @@
 # You should have received a copy of the GNU General Public License
 # along with Testdb.  If not, see <http://www.gnu.org/licenses/>.
 """
-Product CLI.
+Products consist of a name, a branch name and their test plans.
 
-Products consist of a name and branch name. Products can have multiple
+Products can have multiple
 branches. The combination of product name and branch names are ordered
 which effects how products are displayed. This order can be leveraged
 in various ways such as defining the priority of branches that need testing.
 """
 import logging
 import yaml
-import testbed.core.config
 from . import api
 
 
@@ -35,7 +34,7 @@ def product_add(args):
 
 def product_remove(args):
     """ Add a product to the database. """
-    return api.remove(args.name, args.branch)
+    return api.remove(args.product, args.branch)
 
 
 def product_testplan_add(args):
@@ -52,34 +51,41 @@ def product_testplan_add(args):
 
 
 def product_list(args):
-    """ List products based on search criteria. """
+    """ List products based on search criteria.
+
+    list products in a dense manner.
+    """
 
     from testdb import models
     logging.info("listing products")
 
-    datatree = testbed.core.config.DataTree()
-    testplans = models.Testplan.filter(api.CONTEXT,
-                                       args.filter).order_by("order")
-    products = []
-    for testplan in testplans:
-        testsuite = testplan.testsuite
-        testkeys = [str(item.testkey)
-                    for item in testsuite.testsuitekeyset_set.all()]
-        root = {}
-        if testkeys:
-            root["key"] = testkeys
-        root["order"] = testplan.order
+    products = models.TestProduct.filter(api.CONTEXT,
+                                         args.filter).order_by("order")
+    root = {}
+    for product in products:
+        level = {
+            product.order: "%s %s" % (str(product.product),
+                                      str(product.branch))
+            }
 
-        key = "product.%s" % testsuite.name
-        products.append({key: root})
-    datatree.add([api.CONTEXT], products)
-    print yaml.dump(datatree, default_flow_style=False)
+        testkeys = {str(item.testkey.key): str(item.testkey.value)
+                    for item in product.testproductkeyset_set.all()}
+        if testkeys:
+            level["keys"] = testkeys
+
+        context = str(product.context)
+        if context not in root:
+            root[context] = []
+        root[context].append(level)
+    print yaml.dump(root, default_flow_style=False)
 
 
 def add_subparser(subparser):
     """ Create testsuite CLI commands. """
 
-    parser = subparser.add_parser("product", description=__doc__)
+    parser = subparser.add_parser("product",
+                                  help="setup and modify products",
+                                  description=__doc__)
     subparser = parser.add_subparsers()
 
     ##

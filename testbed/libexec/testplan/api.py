@@ -20,12 +20,15 @@ def get_or_create(context, testsuite_name, order):
     """
 
     from testdb.models import Testplan
+    from testdb.models import TestplanOrder
     from testdb.models import Testsuite
     from testdb.models import Context
 
+    (context, _) = Context.objects.get_or_create(name=context)
+    (testplan, created) = Testplan.objects.get_or_create(context=context)
+
     if order == -1:
-        (context, _) = Context.objects.get_or_create(name=context)
-        find = Testplan.objects.filter(testsuite__context=context)
+        find = testplan.testplanorder_set.all()
         try:
             order = find.order_by("-order")[0].order + 1
         except IndexError:
@@ -35,12 +38,34 @@ def get_or_create(context, testsuite_name, order):
     ##
     # Assert order is not -1.
     # Order is specified so now we have to move something.
-    testplans = Testplan.objects.filter(order__gte=order).order_by("order")
+    planorders = testplan.testplanorder_set.filter(order__gte=order)
     current_order = order
-    for testplan in testplans:
-        if testplan.order == current_order:
-            testplan.order += 1
-            testplan.save()
-            current_order += 1
+    for prevplan in planorders.order_by("order"):
+        if prevplan.order == current_order:
+            prevplan.order += 1
+            prevplan.save()
+            current_order = prevplan.order
+
     (testsuite, _) = Testsuite.get_or_create(context, testsuite_name, None)
-    return Testplan.get_or_create(testsuite=testsuite, order=order)
+    (_, created) = TestplanOrder.get_or_create(testplan, testsuite, order)
+    return (testplan, created)
+
+
+def remove(context, testsuite_name):
+    """ Get or create a testplan in a certain order.
+
+    @param context Testplan context organizes testplans in a logical group.
+                   Testplans with the same context are in the same group.
+                   The order indicates the order of the testplan in the
+                   context.
+    @param testsuite_name The testsuite name for the testplan
+    """
+
+    from testdb.models import Testplan
+    from testdb.models import Context
+
+    (context, _) = Context.objects.get_or_create(name=context)
+    testplan = Testplan.objects.get(testsuite__context=context,
+                                    testsuite__name__name=testsuite_name)
+    testplan.delete()
+    return True

@@ -7,58 +7,63 @@ from django.db import models
 CONTEXT = "product.default"
 
 
-def get_or_create(product_name, branch_name, order=-1):
+# pylint: disable=R0914
+def get_or_create(productname, branchname, order=-1):
     """ Get or create a testplan in a certain order.
+    @param product_name Is the name of the product
     @param order order is the location of the testplan in the list of
                  testplans. The order effects the location the testplan
                  appears on web pages.
     """
+    from testdb.models import TestProduct
 
-    from testdb.models import Testplan
-    from testdb.models import Testsuite
-    from testdb.models import Context
-    from testdb.models import TestKey
+    logging.info("adding product %s %s", productname, branchname)
 
-    (branch_key, _) = TestKey.get_or_create("branch", branch_name)
-    (context, _) = Context.objects.get_or_create(name=CONTEXT)
     if order == -1:
-        find = Testplan.objects.filter(testsuite__context=context,
-                                       testsuite__keys=branch_key)
+        find = TestProduct.objects.filter(context__name=CONTEXT)
         try:
-            order = find.order_by("-order")[0].order + 1
+            order = find.order_by("-order")[0].order
         except IndexError:
-            order = 1
+            order = 0
+
+        order += 1
         logging.info("using order %d", order)
 
     ##
     # Order is specified so now we have to move something.
-    testplans = Testplan.objects.filter(testsuite__context=context,
-                                        order__gte=order).order_by("order")
+    products = TestProduct.objects.filter(context__name=CONTEXT,
+                                          order__gte=order).order_by("order")
     current_order = order
-    for testplan in testplans:
-        if testplan.order == current_order:
-            testplan.order += 1
-            testplan.save()
-            current_order += 1
+    for product in products:
+        if product.order == current_order:
+            product.order += 1
+            logging.debug("updating order %s to %d", productname,
+                          product.order)
+            product.save()
+            current_order = product.order
 
-    (testsuite, _) = Testsuite.get_or_create(CONTEXT, product_name,
-                                             [branch_key])
-    return Testplan.get_or_create(testsuite=testsuite, order=order)
+    (product, created) = TestProduct.get_or_create(CONTEXT, productname,
+                                                   branchname)
+    product.order = order
+    product.save()
+
+    return (product, created)
 
 
 # pylint: disable=W0622
 def filter(value=None):
     """ Retrieve the list of products based on product and or branch_name. """
 
-    from testdb.models import Testplan
+    from testdb.models import TestProduct
     from testdb.models import Context
 
     (context, _) = Context.objects.get_or_create(name=CONTEXT)
-    find = Testplan.objects.filter(testsuite__context=context)
+    find = TestProduct.objects.filter(context=context)
     if value:
         find = find.filter(
-            models.Q(testsuite__name__name__contains=value) |
-            models.Q(testsuite__keys__key__value__contains=value))
+            models.Q(product__value__contains=value) |
+            models.Q(branch__value__contains=value) |
+            models.Q(keys__key__value__contains=value))
     return find.order_by("order")
 
 
@@ -72,14 +77,11 @@ def remove(product, branch):
     from testdb.models import Context
     from testdb.models import TestKey
 
-    print "MARK: remove", product, branch
-
     try:
         branch_key = TestKey.objects.get(key__value="branch", value=branch)
     except TestKey.DoesNotExist, arg:
         raise Testplan.DoesNotExist(arg)
 
-    print "MARK: key", branch_key
     try:
         context = Context.objects.get(name=CONTEXT)
     except Context.DoesNotExist, arg:

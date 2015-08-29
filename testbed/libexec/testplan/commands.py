@@ -19,16 +19,22 @@ CLI for associating a testplan to a product.
 """
 import logging
 import yaml
-import testbed.core.config
 from . import api
 
 
-def testsuite_add(args):
+def do_testsuite_add(args):
     """ Add a testsuite to the database. """
+
     return api.get_or_create(args.context, args.testsuite, args.order)
 
 
-def test_add(args):
+def do_testsuite_remove(args):
+    """ Add a testsuite to the database. """
+
+    return api.remove(args.context, args.testsuite)
+
+
+def do_key_add(args):
     """ Add a testsuite to the database. """
 
     from testdb import models
@@ -40,81 +46,116 @@ def test_add(args):
     models.Test.objects.get_or_create(testsuite=testsuite, name=name)
 
 
-def testplan_list(args):
+def do_testplan_list(args):
     """ List testsuites based on search criteria. """
 
     from testdb import models
     logging.info("listing testplan")
 
-    testplans = models.Testplan.filter(args.context, None)
-    datatree = testbed.core.config.DataTree()
-
+    testplans = models.Testplan.objects.all()
+    root = {}
     for testplan in testplans:
-        testsuite = testplan.testsuite
+        level = {}
+        testkeys = {str(item.testkey.key): str(item.testkey.value)
+                    for item in testplan.testplankeyset_set.all()}
 
-        testkeys = [str(item.testkey)
-                    for item in testsuite.testsuitekeyset_set.all()]
-        tests = [str(item) for item in testsuite.test_set.all()]
+        testsuites = [{item.order: str(item.testsuite.name),
+                       "tests": [str(item)
+                                 for item in item.testsuite.test_set.all()]}
+                      for item in testplan.testplanorder_set.order_by("order")]
 
-        root = {"order": testplan.order}
-        if tests:
-            root["tests"] = tests
         if testkeys:
-            root["testkey"] = testkeys
+            level["testkey"] = testkeys
+        if testsuites:
+            level["testsuites"] = testsuites
+        root[args.context] = level
+    print yaml.dump(root, default_flow_style=False)
 
-        key = [str(testsuite.context), "testsuite.%s" % testsuite.name]
-        datatree.add(key, root)
-    print yaml.dump(datatree, default_flow_style=False)
+
+def do_testplan_key_add(args):
+    """ Add a key to a testsuite. """
+
+    from testdb import models
+    logging.info("add testpan key %s", args.name)
+
+    (testkey, _) = models.TestKey.get_or_create(key=args.name,
+                                                value=args.value)
+
+    (context, _) = models.Context.objects.get_or_create(name=args.context)
+    (testplan, _) = models.Testplan.objects.get_or_create(context=context)
+    testplan.testplankeyset_set.get_or_create(testplan=testplan,
+                                              testkey=testkey)
 
 
-def key_create(args):
+def do_testplan_key_remove(args):
+    """ Add a key to a testsuite. """
+
+    from testdb import models
+    logging.info("remove key %s from testpan %s", args.key, args.context)
+    context = models.Context.objects.get_or_create(name=args.context)
+    (testplan, _) = models.Testplan.get(testsuite__context=context)
+    testkey = testplan.testplankeyset_set.get(testkey__key=args.key)
+    testkey.delete()
+
+
+def do_testplan_key_list(args):
     """ Add a key to a testsuite. """
 
     from testdb import models
 
-    logging.info("create testsuite key %s", args.name)
-    models.Key.objects.get_or_create(value=args.name)
-
-
-def key_add(args):
-    """ Add a key to a testsuite. """
-
-    from testdb import models
-
-    logging.info("add value to testsuite key %s", args.key)
-    (testkey, _) = models.TestKey.get_or_create(key=args.key, value=args.value)
-
-    (testsuite, _) = models.Testsuite.get_or_create(args.context,
-                                                    args.testsuite)
-    testsuite.testsuitekeyset_set.get_or_create(testkey=testkey)
-
-
-def key_list(args):
-    """ Add a key to a testsuite. """
-
-    from testdb import models
-
-    logging.info("list test keys")
-    testkeys = models.TestKey.filter(args.filter).order_by("key")
+    logging.info("list testplan keys")
+    (testplan, _) = models.Testplan.get(context=args.context)
+    testkeys = testplan.testplankeyset_set.filter(args.filter).order_by("key")
     for testkey in testkeys:
         print testkey
+
+
+def do_testplan_test_add(args):
+    """ Add a key to a testsuite. """
+
+    from testdb import models
+    logging.info("add test to testplan tstsuite key %s", args.name)
+
+    ##
+    # Make sure testsuite is part of the test plan.
+    (context, _) = models.Context.objects.get_or_create(name=args.context)
+    try:
+        testplan = models.Testplan.objects.get(context=context)
+    except models.Context.DoesNotExist:
+        raise ValueError("testplan %s does not exist", args.context)
+    try:
+        (name, _) = models.TestsuiteName.objects.get_or_create(
+            name=args.testsuite)
+        testsuite = models.Testsuite.objects.get(name=name)
+    except models.Testsuite.DoesNotExist:
+        raise ValueError("testuite %s does not exist", args.testsuite)
+
+    try:
+        models.TestplanOrder.objects.get(testsuite=testsuite,
+                                         testplan=testplan)
+    except models.TestplanOrder.DoesNotExist:
+        raise ValueError("testplan %s does not contain testsuite %s",
+                         args.context, args.testsuite)
+    return models.Test.get_or_create(testsuite, args.name, [])
 
 
 def add_subparser(subparser):
     """ Create testsuite CLI commands. """
 
-    parser = subparser.add_parser("testplan", help=__doc__)
+    parser = subparser.add_parser("testplan",
+                                  help="Setup and modify test plans.",
+                                  description=__doc__)
     parser.add_argument("--context", default=api.CONTEXT, type=str,
                         help="Specify a different context.")
-    subparser = parser.add_subparsers()
+    rootparser = parser.add_subparsers()
 
     ##
     # Add
-    parser = subparser.add_parser(
+    parser = rootparser.add_parser(
         "add",
         description="Add a testsuite to the testplan",
         help="Add a testsuite.")
-    parser.set_defaults(func=testsuite_add)
+    parser.set_defaults(func=do_testsuite_add)
     parser.add_argument("testsuite", type=str, help="Name of the testsuite.")
     parser.add_argument("--order", type=int, default=-1,
                         help="Order of testsuite as viewed on the website."
@@ -122,59 +163,56 @@ def add_subparser(subparser):
                         "assumed")
 
     ##
+    # Remove
+    parser = rootparser.add_parser(
+        "remove",
+        description="Remove a testsuite from the testplan",
+        help="Remove a testsuite.")
+    parser.set_defaults(func=do_testsuite_remove)
+    parser.add_argument("testsuite", type=str, help="Name of the testsuite.")
+
+    ##
     # List
-    parser = subparser.add_parser("list",
-                                  description="List all of the testsuites.",
-                                  help="List testsuite")
-    parser.set_defaults(func=testplan_list)
+    parser = rootparser.add_parser("list",
+                                   description="List all of the testsuites.",
+                                   help="List testsuite.")
+    parser.set_defaults(func=do_testplan_list)
     parser.add_argument("--filter", type=str, help="Filter testsuites")
 
     ##
-    # Test
-    parser = subparser.add_parser("test",
-                                  description="Modify test for the testsuite",
-                                  help="Modify test information.")
+    # Key
+    parser = rootparser.add_parser("key",
+                                   description="Modify keys testplan.",
+                                   help="Modify testplan keys.")
     subparser = parser.add_subparsers()
-    parser = subparser.add_parser("add", description="Add test",
+    parser = subparser.add_parser("add", description="Add key",
                                   help="add test.")
 
-    parser.set_defaults(func=test_add)
-    parser.add_argument("testsuite", type=str, help="Name of the testsuite.")
-    parser.add_argument("name", type=str, help="Name of the test.")
-
-    ##
-    # CLI for adding testsuite keys
-    # Keys are how testsuites are organized and searched in the database.
-    parser = subparser.add_parser("key",
-                                  help="APIs for manipulating testsuite keys")
-    subparser = parser.add_subparsers()
-    parser = subparser.add_parser(
-        "create",
-        description="CLI for creating testsuite keys",
-        help="Create a testsuite key.")
-    parser.add_argument("name", type=str, help="Name of the key.")
+    parser.set_defaults(func=do_testplan_key_add)
+    parser.add_argument("name", type=str, help="Name of the key")
+    parser.add_argument("value", type=str, help="Key's value")
     parser.add_argument(
         "--strict", default=False, action="store_true",
-        help="Testsuite key values must strictly match an existing value "
-             "otherwise any new values will be acceptabed")
-    parser.set_defaults(func=key_create)
+        help="A key which must strictly match an existing values")
 
-    parser = subparser.add_parser("add",
+    parser = subparser.add_parser("remove",
                                   description="Add a testsuite key",
                                   help="Add a testsuite key")
-    parser.add_argument("testsuite", type=str, help="Testsuite name")
-    parser.add_argument("key", type=str, help="Name of the key")
-    parser.add_argument("value", type=str, help="Key's value")
-    parser.add_argument("--order", type=int, help="testuite order for viewing")
-    parser.set_defaults(func=key_add)
+    parser.add_argument("name", type=str, help="Name of the key")
+    parser.add_argument("--value", type=str, help="Key's value")
+    parser.set_defaults(func=do_testplan_key_remove)
 
     ##
-    # List
-    parser = subparser.add_parser("list", description="List test keys",
-                                  help="List testsuite")
-    parser.add_argument("--filter", type=str, help="Filter test keys")
-    parser.set_defaults(func=key_list)
+    # Test
+    parser = rootparser.add_parser("test",
+                                   description="Modify tests in testsuite.",
+                                   help="Modify test in testsuite.")
+    subparser = parser.add_subparsers()
+    parser = subparser.add_parser("add", description="Add key",
+                                  help="add test.")
 
-    ##
-    # List
+    parser.set_defaults(func=do_testplan_test_add)
+    parser.add_argument("testsuite", type=str, help="testsuite name")
+    parser.add_argument("name", type=str, help="name of test")
+
     return subparser

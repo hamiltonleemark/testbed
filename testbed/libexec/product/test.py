@@ -19,8 +19,7 @@ Test testsuite functionality.
 """
 import argparse
 from django.test import TestCase
-from testdb.models import Testsuite
-from testdb.models import Testplan
+from testdb.models import TestProduct
 from . import commands
 from . import api
 
@@ -47,9 +46,9 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args("product add product1 branch2".split())
         args.func(args)
 
-        testplans = api.filter("product1")
-        self.assertEqual(testplans.count(), 2)
-        branches = [item.key_get("branch") for item in testplans]
+        products = api.filter("product1")
+        self.assertEqual(products.count(), 2)
+        branches = [str(item.branch) for item in products]
         self.assertTrue("branch1" in branches)
         self.assertTrue("branch2" in branches)
 
@@ -73,8 +72,8 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        testsuites = Testsuite.filter(api.CONTEXT, "product3")
-        branches = [item.key_get("branch") for item in testsuites]
+        testsuites = TestProduct.filter(api.CONTEXT, "product3")
+        branches = [str(item.branch) for item in testsuites]
         self.assertTrue(len(branches) == 2)
         self.assertTrue("branch2" in branches)
         self.assertTrue("branch3" in branches)
@@ -96,11 +95,11 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        testplans = Testplan.filter(None, None)
-        self.assertEqual(testplans.count(), 3)
-        self.assertEqual(testplans[0].testsuite.name.name, "product4")
-        self.assertEqual(testplans[1].testsuite.name.name, "product4")
-        self.assertEqual(testplans[2].testsuite.name.name, "product5")
+        products = TestProduct.filter(None, None)
+        self.assertEqual(products.count(), 3)
+        self.assertEqual(products[0].product.value, "product4")
+        self.assertEqual(products[1].product.value, "product4")
+        self.assertEqual(products[2].product.value, "product5")
 
     def test_order2(self):
         """ test_order2 Confirm order works. """
@@ -119,11 +118,11 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        testplans = Testplan.filter(api.CONTEXT, "product_order")
-        self.assertEqual(testplans.count(), 3)
-        self.assertEqual(testplans[0].testsuite.name.name, "product_order1")
-        self.assertEqual(testplans[1].testsuite.name.name, "product_order2")
-        self.assertEqual(testplans[2].testsuite.name.name, "product_order3")
+        products = TestProduct.filter(api.CONTEXT, "product_order")
+        self.assertEqual(products.count(), 3)
+        self.assertEqual(str(products[0].product), "product_order1")
+        self.assertEqual(str(products[1].product), "product_order2")
+        self.assertEqual(str(products[2].product), "product_order3")
 
     def test_order3(self):
         """ test_order3 Confirm order works. """
@@ -142,8 +141,9 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        products = Testplan.filter(api.CONTEXT, "product_order")
+        products = TestProduct.filter(api.CONTEXT, "product_order")
+        print "MARK: ", products
         self.assertEqual(products.count(), 3)
-        self.assertEqual(products[0].testsuite.name.name, "product_order1")
-        self.assertEqual(products[1].testsuite.name.name, "product_order2")
-        self.assertEqual(products[2].testsuite.name.name, "product_order3")
+        self.assertEqual(str(products[0].product), "product_order1")
+        self.assertEqual(str(products[1].product), "product_order2")
+        self.assertEqual(str(products[2].product), "product_order3")
