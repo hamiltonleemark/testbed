@@ -46,8 +46,8 @@ def product_testplan_add(args):
                  args.product, args.branch)
     (product, _) = api.get_or_create(args.product, args.branch)
     (testplan, _) = models.TestKey.get_or_create("testplan", args.testplan)
-    models.TestsuiteKeySet.objects.create(testsuite=product.testsuite,
-                                          testkey=testplan)
+    models.TestProductKeySet.objects.create(testproduct=product,
+                                            testkey=testplan)
 
 
 def product_list(args):

@@ -410,4 +410,4 @@ class TestProduct(models.Model):
             find = find.filter(models.Q(product__value__contains=contains) |
                                models.Q(branch__value__contains=contains) |
                                models.Q(keys__key__value__contains=contains))
-        return find.order_by("order")
+        return find.order_by("context", "order")

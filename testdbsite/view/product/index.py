@@ -12,21 +12,20 @@ class ProductView(object):
 
     def context(self):
         """ Return the name of the product. """
-        return str(self.product.testsuite.context.name)
+        return str(self.product.context.name)
 
     def name(self):
         """ Return the name of the product. """
-        return str(self.product.testsuite.name)
+        return str(self.product.product)
 
     def branch(self):
         """ Return the name of the product branch. """
-        return str(self.product.testsuite.key_get("branch"))
+        return str(self.product.branch)
 
 def view(_):
     """ Summarize product information. """
 
-    testplans = models.Testplan.objects.filter(
-        testsuite__context__name__startswith="product").order_by("order")
+    testplans = models.TestProduct.filter(None, None)
 
     products = [ProductView(item) for item in testplans]
     html_data = {"products": products}
@@ -35,15 +34,17 @@ def view(_):
 def view_product(_, pid):
     """ Summarize product information. """
 
-    product = models.Testplan.objects.get(id=pid)
+    product = models.TestProduct.objects.get(id=pid)
 
-    testplan = product.key_get("testplan")
-    print "MARK: testplan", testplan
+    testplan = product.key_get("testplan", None)
 
     ##
     # To view a products specific test plan. Retrieve the product and then
     # retrieve the testplan value.
-    testplans = models.Testplan.objects.get(testsuite__name__name=testplan)
+    try:
+        testplans = models.Testplan.objects.get(context__name=testplan)
+    except models.Testplan.DoesNotExist:
+        testplans = []
 
     html_data = {}
     return render_to_response("products/index.html", html_data)

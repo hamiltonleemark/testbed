@@ -112,6 +112,8 @@ class ProductAdmin(admin.ModelAdmin):
     model = models.TestProduct
     extra = 0
 
+    list_display = ("order", "context", "product", "branch")
+
 
 admin.site.register(models.Context, ContextAdmin)
 admin.site.register(models.Key, KeyAdmin)
