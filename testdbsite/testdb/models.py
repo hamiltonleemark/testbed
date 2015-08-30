@@ -209,15 +209,18 @@ class Testsuite(models.Model):
 
     def __str__(self):
         """ User representation. """
+
         return "%s.%s" % (self.context, self.name)
 
     def key_get(self, key):
         """ Return value given key. """
+
         return self.keys.get(key__value=key).value
 
     @staticmethod
     def filter(context, contains):
         """ Filter testsuite against a single string. """
+
         if context:
             find = Testsuite.objects.filter(context__name__contains=context)
         else:
@@ -230,6 +233,7 @@ class Testsuite(models.Model):
     @staticmethod
     def get_or_create(context, testsuite_name, testkeys=None):
         """ Get current or create new objects.
+
         @param testkeys Must be an instance of TestKey.
         """
         if not testkeys:
