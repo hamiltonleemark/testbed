@@ -18,35 +18,32 @@
 CLI for testsuites.
 """
 import logging
-
-LOGGER = logging.getLogger(__name__)
+from . import api
 
 
 def add_testsuite(args):
     """ Add a testsuite to the database. """
 
-    from testdb import models
-
-    LOGGER.info("adding testsuite %s", args.name)
-    models.Testsuite.get_or_create(args.context, args.name, [])
+    logging.info("adding testsuite %s", args.name)
+    api.add_testsuite(args.context, args.name, [])
 
 
 def list_testsuite(args):
     """ List testsuites based on search criteria. """
 
     from testdb import models
-    LOGGER.info("listing testsuites")
+    logging.info("listing testsuites")
     testsuites = models.Testsuite.filter(args.context, args.filter)
     for testsuite in testsuites:
         print testsuite
 
 
-def add_key(args):
+def do_add_key(args):
     """ Add a key to a testsuite. """
 
     from testdb import models
 
-    LOGGER.info("adding testsuite %s", args.name)
+    logging.info("adding testsuite %s", args.name)
     models.Testsuite.get_or_create(args.context, args.testsuite, [])
 
 
@@ -83,7 +80,7 @@ def add_subparser(subparser):
     parser = subparser.add_parser("add",
                                   description="Add a testsuite key",
                                   help="Add a testsuite key.")
-    parser.set_defaults(func=add_key)
+    parser.set_defaults(func=do_add_key)
     parser.add_argument("testsuite", type=str, help="Name of the testsuite.")
     parser.add_argument("key", type=str, help="Name of the key.")
     parser.add_argument("value", type=str, help="Key's value.")

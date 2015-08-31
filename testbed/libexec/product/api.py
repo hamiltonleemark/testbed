@@ -90,7 +90,5 @@ def remove(product, branch):
     find = Testplan.objects.filter(testsuite__context=context,
                                    testsuite__name__name=product,
                                    testsuite__keys=branch_key)
-    print "MARK: finding", find.count()
     for item in find:
-        print "MARK: finding", item
         item.delete()

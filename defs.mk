@@ -52,3 +52,4 @@ check:: pep8 pylint subdirs python27 test
 clean::
 	find . -name "#*" -delete
 	find . -name ".#*" -delete
+	find . -name "*~" -delete

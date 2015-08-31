@@ -114,7 +114,11 @@ class Test(models.Model):
                                   default=None)
     name = models.ForeignKey(TestName)
     keys = models.ManyToManyField(TestKey, through="TestKeySet")
-    status = models.IntegerField(default=0, blank=True, null=True)
+    status = models.IntegerField(default=-1, blank=True, null=True)
+
+    def key_get(self, key):
+        """ Return value given key. """
+        return self.keys.get(key__value=key).value
 
     def __str__(self):
         """ User representation. """
@@ -214,7 +218,6 @@ class Testsuite(models.Model):
 
     def key_get(self, key):
         """ Return value given key. """
-
         return self.keys.get(key__value=key).value
 
     @staticmethod

@@ -142,7 +142,6 @@ class TestsuiteTestCase(TestCase):
         args.func(args)
 
         products = TestProduct.filter(api.CONTEXT, "product_order")
-        print "MARK: ", products
         self.assertEqual(products.count(), 3)
         self.assertEqual(str(products[0].product), "product_order1")
         self.assertEqual(str(products[1].product), "product_order2")
