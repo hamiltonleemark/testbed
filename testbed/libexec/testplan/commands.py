@@ -123,6 +123,7 @@ def do_testplan_test_add(args):
         testplan = models.Testplan.objects.get(context=context)
     except models.Context.DoesNotExist:
         raise ValueError("testplan %s does not exist", args.context)
+
     try:
         (name, _) = models.TestsuiteName.objects.get_or_create(
             name=args.testsuite)

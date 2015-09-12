@@ -30,3 +30,23 @@ def add_testsuite(context, testsuite_name, testkeys):
                 for (key, value) in testkeys]
 
     return models.Testsuite.get_or_create(context, testsuite_name, testkeys)
+
+
+def list_testsuite(context, testkeys, testsuite_name=None):
+    """ Retrieve the list of products based on product and or branch_name. """
+
+    from testdb import models
+
+    if context:
+        find = models.Testsuite.objects.filter(context__name=context)
+    else:
+        find = models.Testsuite.objects.filter
+
+    if testsuite_name:
+        find = find.filter(name__name=testsuite_name)
+
+    for (key, value) in testkeys:
+        (testkey, _) = models.TestKey.get_or_create(key, value)
+        find = find.filter(keys=testkey)
+
+    return find

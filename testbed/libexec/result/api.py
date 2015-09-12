@@ -29,9 +29,10 @@ def set_result(context, product, branch, build, testsuite, test, result,
     (branch, _) = models.TestKey.get_or_create("branch", branch)
     (build, _) = models.TestKey.get_or_create("build", build)
     (testname, _) = models.TestName.objects.get_or_create(name=test)
-    (testsuite, _) = models.Testsuite.get_or_create(context, testsuite, [])
+    (testsuite, _) = models.Testsuite.get_or_create(context, testsuite,
+                                                    testkeys)
     testkeys += [product, branch, build]
-    (test, _) = models.Test.get_or_create(testsuite, testname, testkeys)
+    (test, _) = models.Test.get_or_create(testsuite, testname, [])
 
     if result == "pass":
         test.status = 0
@@ -42,7 +43,7 @@ def set_result(context, product, branch, build, testsuite, test, result,
 
 
 # pylint: disable=W0622
-def list_result(context, testkeys, testsuite=None, test=None):
+def list_result(context, testkeys, testsuite_name=None, test_name=None):
     """ Retrieve the list of products based on product and or branch_name. """
 
     from testdb import models
@@ -52,15 +53,13 @@ def list_result(context, testkeys, testsuite=None, test=None):
     else:
         find = models.Test.objects.filter
 
+    if testsuite_name:
+        find = find.filter(testsuite__name__name=testsuite_name)
+    if test_name:
+        find = find.filter(test__name=test_name)
+
     for (key, value) in testkeys:
-        print "MARK: key", key, value
         (testkey, _) = models.TestKey.get_or_create(key, value)
-        find = find.filter(keys=testkey)
-
-    if test:
-        find = find.filter(test__name=test)
-
-    if testsuite:
-        find = find.filter(testsuite__name=testsuite)
+        find = find.filter(testsuite__keys=testkey)
 
     return find

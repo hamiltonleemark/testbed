@@ -94,7 +94,8 @@ class TestsuiteTestCase(TestCase):
 
         test_keys = [TestKey.get_or_create("key1", "value1.1"),
                      TestKey.get_or_create("key1", "value1.2"),
-                     TestKey.get_or_create("key2", "value2.1")]
+                     TestKey.get_or_create("key2", "value2.1"),
+                     TestKey.get_or_create("key2", "value2.2")]
         test_keys = [item[0] for item in test_keys]
         (testplan, _) = Testplan.get_or_create("testplan.default", test_keys)
 

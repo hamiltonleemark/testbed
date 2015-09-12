@@ -25,8 +25,10 @@ from . import commands
 from . import api
 from testbed.libexec import build
 from testbed.libexec import testsuite
+from testbed.libexec import testplan
 
 
+# pylint: disable=R0914
 class TestTestCase(TestCase):
     """ Tests for Django backend.
 
@@ -41,30 +43,93 @@ class TestTestCase(TestCase):
         commands.add_subparser(subparser)
         return arg_parser
 
-    def test_commands_add(self):
-        """ Add a test. """
-        count = 10
+    def test_commands_large(self):
+        """ test_commands_large: Check the time for handling a lot of tests.
+        """
+        from testdb import models
 
-        build.api.get_or_create("product1", "branch1", "build1")
-
-        testkeys = [("key1", "value1"), ("key2", "value2")]
-        testsuite.api.add_testsuite("default", "testsuite1", testkeys)
-
-        for item in range(0, count):
-            api.set_result("default", "product1", "branch1", "build1",
-                           "testsuite1", "test%d" % item, "pass", testkeys)
-
-        testkeys += [("build", "build1"), ("product", "product1")]
-        testkeys += [("branch", "branch1")]
-
-        results = api.list_result("default", [])
-        self.assertEqual(len(results), 10)
+        build_count = 10
+        testsuite_count = 100
 
         start = datetime.datetime.now()
-        results = api.list_result("default", testkeys)
+        for bitem in range(0, build_count):
+            build.api.get_or_create("product1", "branch1", "build%d" % bitem)
+            testkeys = [
+                ("key1", "value1"),
+                ("key2", "value2"),
+                ("key3", "value3"),
+                ("key4", "value4"),
+                ("product", "product1"),
+                ("branch", "branch1"),
+                ("build", "build%d" % bitem)
+            ]
+            for titem in range(0, testsuite_count):
+                testsuite.api.add_testsuite("default", "testsuite%d" % titem,
+                                            testkeys)
+                api.set_result("default", "product1", "branch1", "build1",
+                               "testsuite%d" % titem, "test1", "pass",
+                               testkeys)
         end = datetime.datetime.now()
         duration = end - start
-        self.assertEqual(len(results), 10)
+        print "\ncreated testsuite %d %s" % (testsuite_count, duration)
 
-        logging.info("search count %d duration %d", count, duration)
-        print "search count %d duration %s" % (count, duration)
+        ##
+        # Create testplan.
+        start = datetime.datetime.now()
+        for item in range(0, testsuite_count):
+            testplan.api.get_or_create(testplan.api.CONTEXT,
+                                       "testsuite%d" % item, item)
+        end = datetime.datetime.now()
+        duration = end - start
+        print "testplan create %d %s" % (testsuite_count, duration)
+
+        context = models.Context.objects.get(name=testplan.api.CONTEXT)
+        testplan1 = models.Testplan.objects.get(context=context)
+        orders = testplan1.testplanorder_set.all().order_by("order")
+        self.assertEqual(len(orders), testsuite_count)
+
+        results = api.list_result("default", [])
+        self.assertEqual(len(results), build_count*testsuite_count)
+
+        ##
+        # Time retrieving testsuies.
+        start = datetime.datetime.now()
+        results = []
+        for order in orders:
+            testkeys = [
+                ("key1", "value1"),
+                ("key2", "value2"),
+                ("key3", "value3"),
+                ("key4", "value4"),
+                ("product", "product1"),
+                ("branch", "branch1"),
+                ("build", "build1")
+            ]
+            results += testsuite.api.list_testsuite("default", testkeys,
+                                                    order.testsuite.name)
+        end = datetime.datetime.now()
+        logging.info("testsuite search %d duration %d", testsuite_count,
+                     duration)
+        print "search testsuite count %d duration %s" % (testsuite_count,
+                                                         duration)
+        self.assertEqual(len(results), testsuite_count)
+
+        start = datetime.datetime.now()
+        results = []
+        for order in orders:
+            testkeys = [
+                ("key1", "value1"),
+                ("key2", "value2"),
+                ("key3", "value3"),
+                ("key4", "value4"),
+                ("product", "product1"),
+                ("branch", "branch1"),
+                ("build", "build1")
+            ]
+            results += api.list_result("default", testkeys,
+                                       order.testsuite.name)
+        end = datetime.datetime.now()
+        duration = end - start
+        logging.info("search count %d duration %d", testsuite_count, duration)
+        print "search test %d duration %s" % (testsuite_count, duration)
+        self.assertEqual(len(results), testsuite_count)
