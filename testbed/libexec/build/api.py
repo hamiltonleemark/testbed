@@ -3,6 +3,7 @@ Functionality common to more than one command.
 """
 import logging
 import datetime
+from testbed.libexec import testplan
 
 
 CONTEXT = "build.default"
@@ -31,9 +32,9 @@ def get_or_create(productname, branchname, buildname, when=None):
     testkeys = [product, branch, build]
     name = "%s.%s" % (productname, branchname)
 
-    ##
-    # Order is specified so now we have to move something.
-    return models.Testsuite.get_or_create(context, name, testkeys)
+    results = models.Testsuite.get_or_create(context, name, None, testkeys)
+
+    return results
 
 
 def build_list(productname, branchname=None):

@@ -4,6 +4,7 @@ Functionality common to more than one command.
 import logging
 
 CONTEXT = "testplan.default"
+ORDER_NEXT = -1
 
 
 def get_or_create(context, testsuite_name, order):
@@ -27,7 +28,7 @@ def get_or_create(context, testsuite_name, order):
     (context, _) = Context.objects.get_or_create(name=context)
     (testplan, created) = Testplan.objects.get_or_create(context=context)
 
-    if order == -1:
+    if order == ORDER_NEXT:
         find = testplan.testplanorder_set.all()
         try:
             order = find.order_by("-order")[0].order + 1
@@ -49,6 +50,26 @@ def get_or_create(context, testsuite_name, order):
     (testsuite, _) = Testsuite.get_or_create(context, testsuite_name, None)
     (_, created) = TestplanOrder.get_or_create(testplan, testsuite, order)
     return (testplan, created)
+
+
+def planorder_get(context, testsuite_name, keys):
+    """ Return TestplanOrder. """
+    from testdb import models
+
+    context = models.Context.objects.get(name=context)
+    testplan = models.Testplan.objects.get(context=context)
+    testkeys = []
+    for (key, value) in keys:
+        print "MARK: testplan keys", key, value
+        (testkey, _) = models.TestKey.get_and_check(key=key, value=value)
+        testkeys.append(testkey)
+        print "MARK: testplan keys after", key, value
+    find = testplan.testplanorder_set.filter()
+    for testkey in testkeys:
+        find = find.filter(testkeys=testkey)
+        print "MARK: find", testkey, find.count()
+    name = models.TestsuiteName.objects.get(name=testsuite_name)
+    return find.get(testsuite__name=name)
 
 
 def remove(context, testsuite_name):

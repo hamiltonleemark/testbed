@@ -39,13 +39,14 @@ class TestsuiteTestCase(TestCase):
         """ Add a testsuite. """
         parser = TestsuiteTestCase.parser_create()
 
-        args = parser.parse_args("build add product1 branch1 1".split())
+        args = parser.parse_args("build add product1 branch1 build1".split())
         args.func(args)
 
-        args = parser.parse_args("build add product1 branch1 2".split())
+        args = parser.parse_args("build add product1 branch1 build2".split())
         args.func(args)
 
         builds = api.build_list("product1")
+        print "MARK: builds", builds
         self.assertEqual(len(builds), 2)
-        self.assertTrue("1" in builds)
-        self.assertTrue("2" in builds)
+        self.assertTrue("build1" in builds)
+        self.assertTrue("build2" in builds)

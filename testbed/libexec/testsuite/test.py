@@ -20,7 +20,9 @@ Test testsuite functionality.
 import argparse
 from django.test import TestCase
 from testdb.models import Testsuite
+from testdb.models import Testplan
 from . import commands
+from testbed.libexec import testplan
 
 
 class TestsuiteTestCase(TestCase):
@@ -39,8 +41,18 @@ class TestsuiteTestCase(TestCase):
         """ Add a testsuite. """
         parser = TestsuiteTestCase.parser_create()
 
+        print "MARK: 1"
+        testplan.api.get_or_create(testplan.api.CONTEXT, "bob",
+                                   testplan.api.ORDER_NEXT)
+        print "MARK: 2"
+        print "MARK: 2", Testplan.objects.all()
+        testplan.api.get_or_create(testplan.api.CONTEXT, "mark",
+                                   testplan.api.ORDER_NEXT)
+        print "MARK: 3"
+
         args = parser.parse_args("testsuite add bob".split())
         args.func(args)
+        print "MARK: 4"
 
         args = parser.parse_args("testsuite add mark".split())
         args.func(args)
@@ -56,6 +68,9 @@ class TestsuiteTestCase(TestCase):
         """ Add a testsuite by context. """
         parser = TestsuiteTestCase.parser_create()
 
+        testplan.api.get_or_create(testplan.api.CONTEXT, "testsuite1",
+                                   testplan.api.ORDER_NEXT)
+
         cmd = "testsuite --context testplan add testsuite1"
         args = parser.parse_args(cmd.split())
         args.func(args)
@@ -69,27 +84,29 @@ class TestsuiteTestCase(TestCase):
         """ Add a testsuite by context. """
         parser = TestsuiteTestCase.parser_create()
 
-        cmd = "testsuite --context testplan1 add testsuite_bob1"
+        testplan.api.get_or_create(testplan.api.CONTEXT, "testsuite_bob1",
+                                   testplan.api.ORDER_NEXT)
+        testplan.api.get_or_create(testplan.api.CONTEXT, "testsuite_bob2",
+                                   testplan.api.ORDER_NEXT)
+        testplan.api.get_or_create(testplan.api.CONTEXT, "testsuite_ken1",
+                                   testplan.api.ORDER_NEXT)
+
+        cmd = "testsuite add testsuite_bob1"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "testsuite --context testplan2 add testsuite_bob2"
+        cmd = "testsuite add testsuite_bob2"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "testsuite --context testplan2 add testsuite_ken1"
+        cmd = "testsuite add testsuite_ken1"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        testsuites = Testsuite.filter(None, "bob")
+        testsuites = Testsuite.filter("default", "bob")
         items = [item for item in testsuites]
+        print "MARK: items", items
         self.assertTrue(len(items) == 2)
         names = [item.name.name for item in items]
         self.assertTrue(any("bob1" in name for name in names))
         self.assertTrue(any("bob2" in name for name in names))
-
-        testsuites = Testsuite.filter("testplan2", None)
-        names = [item.name.name for item in testsuites]
-        self.assertTrue(len(names) == 2)
-        self.assertTrue(any("bob2" in name for name in names))
-        self.assertTrue(any("ken1" in name for name in names))

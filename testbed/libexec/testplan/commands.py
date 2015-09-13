@@ -34,18 +34,6 @@ def do_testsuite_remove(args):
     return api.remove(args.context, args.testsuite)
 
 
-def do_key_add(args):
-    """ Add a testsuite to the database. """
-
-    from testdb import models
-
-    logging.info("adding testsuite to testplan %s", args.testsuite)
-    (testplan, _) = api.get_or_create(args.context, args.testsuite, -1)
-    (name, _) = models.TestName.objects.get_or_create(name=args.name)
-    testsuite = testplan.testsuite
-    models.Test.objects.get_or_create(testsuite=testsuite, name=name)
-
-
 def do_testplan_list(args):
     """ List testsuites based on search criteria. """
 
@@ -111,7 +99,7 @@ def do_testplan_key_list(args):
 
 
 def do_testplan_test_add(args):
-    """ Add a key to a testsuite. """
+    """ Add a test to a testplan. """
 
     from testdb import models
     logging.info("add test to testplan tstsuite key %s", args.name)

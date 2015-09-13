@@ -14,3 +14,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Testdb.  If not, see <http://www.gnu.org/licenses/>.
+
+import api
+#__all__ = ["api"]

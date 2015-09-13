@@ -20,6 +20,8 @@ CLI for testsuites.
 import logging
 from . import api
 
+CONTEXT="default"
+
 
 def add_testsuite(args):
     """ Add a testsuite to the database. """
@@ -51,7 +53,7 @@ def add_subparser(subparser):
     """ Create testsuite CLI commands. """
 
     parser = subparser.add_parser("testsuite", help=__doc__)
-    parser.add_argument("--context", default="default", type=str,
+    parser.add_argument("--context", default=CONTEXT, type=str,
                         help="Testsuite context.")
     subparser = parser.add_subparsers()
 

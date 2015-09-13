@@ -24,3 +24,6 @@
 8. Support json, yaml, output.
 9. change context to group. Use TestKey for group values.
 10. Look at pyreverse
+11. Model APIs will use native model objcts in their API.
+12. api files will use native python objects.
+13. Change filter method in models to contains

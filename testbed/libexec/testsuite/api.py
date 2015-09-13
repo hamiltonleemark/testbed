@@ -18,6 +18,7 @@
 CLI for testsuites.
 """
 import logging
+from testbed.libexec import testplan
 
 
 def add_testsuite(context, testsuite_name, testkeys):
@@ -26,8 +27,13 @@ def add_testsuite(context, testsuite_name, testkeys):
     from testdb import models
     logging.info("adding testsuite %s", testsuite_name)
 
+    print "MARK: add testsuite 1", models.Testplan.objects.all()
+    testplanorder = testplan.api.planorder_get(testplan.api.CONTEXT,
+                                               testsuite_name, testkeys)
+    print "MARK: add testsuite 2", models.Testplan.objects.all()
     testkeys = [models.TestKey.get_or_create(key, value)[0]
                 for (key, value) in testkeys]
+    print "MARK: add testsuite 3"
 
     return models.Testsuite.get_or_create(context, testsuite_name, testkeys)
 
@@ -45,8 +51,7 @@ def list_testsuite(context, testkeys, testsuite_name=None):
     if testsuite_name:
         find = find.filter(name__name=testsuite_name)
 
-    for (key, value) in testkeys:
-        (testkey, _) = models.TestKey.get_or_create(key, value)
+    for testkey in testkeys:
         find = find.filter(keys=testkey)
 
     return find

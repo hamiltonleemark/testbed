@@ -58,8 +58,7 @@ def list_result(context, testkeys, testsuite_name=None, test_name=None):
     if test_name:
         find = find.filter(test__name=test_name)
 
-    for (key, value) in testkeys:
-        (testkey, _) = models.TestKey.get_or_create(key, value)
+    for testkey in testkeys:
         find = find.filter(testsuite__keys=testkey)
 
     return find

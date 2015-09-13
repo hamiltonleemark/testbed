@@ -99,14 +99,16 @@ class TestsuiteTestCase(TestCase):
         test_keys = [item[0] for item in test_keys]
         (testplan, _) = Testplan.get_or_create("testplan.default", test_keys)
 
-        (testsuite, _) = Testsuite.get_or_create("default", "testsuite1")
+        (testsuite, _) = Testsuite.get_or_create("default", "testsuite1",
+                                                 testplan)
         (testplanorder, _) = TestplanOrder.objects.get_or_create(
             testsuite=testsuite, order=1)
         testplan.testplanorder_set.add(testplanorder)
 
-        (testsuite, _) = Testsuite.get_or_create("default", "testsuite2")
+        (testsuite, _) = Testsuite.get_or_create("default", "testsuite2",
+                                                 testplan)
         (testplanorder, _) = TestplanOrder.objects.get_or_create(
-            testsuite=testsuite, order=2)
+            testplan=testplan, testsuite=testsuite, order=2)
         testplan.testplanorder_set.add(testplanorder)
 
         testplans = TestplanOrder.objects.order_by("order")
