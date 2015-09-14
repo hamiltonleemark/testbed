@@ -62,30 +62,17 @@ class TestKey(models.Model):
         return "%s=%s" % (self.key, self.value)
 
     @staticmethod
-    def get_and_check(key, value):
-        """ Return True if get_or_create will be successful.
-
-        Make strict setting is adhered to as well."""
-
-        try:
-            cfg = Key.objects.get(value=key)
-        except Key.DoesNotExist:
-            raise TestKey.DoesNotExist("key %s not found" % key)
-
-        if cfg.config_type != Key.CONFIG_TYPE_ANY:
-            raise TestKey.DoesNotExist("key %s is strict" % key)
-
-        try:
-            testkey = TestKey.objects.get(key=key, value=value)
-        except TestKey.DoesNotExist:
-            raise TestKey.DoesNotExist("strict key. Value %s=%s not found" %
-                                       (key, value))
-        return testkey
-
-    @staticmethod
     def get_or_create(key, value):
         """ Create a single test key objects. """
         (key, _) = Key.objects.get_or_create(value=key)
+        try:
+            testkey = TestKey.objects.get(key=key, value=value)
+            if testkey:
+                return (testkey, False)
+        except TestKey.DoesNotExist:
+            pass
+        if key.config_type != Key.CONFIG_TYPE_ANY:
+            raise TestKey.DoesNotExist("key %s is strict" % key)
         return TestKey.objects.get_or_create(key=key, value=value)
 
     @staticmethod
@@ -212,7 +199,7 @@ class Testsuite(models.Model):
     timestamp = models.DateTimeField(default=timezone.now)
     keys = models.ManyToManyField(TestKey, through="TestsuiteKeySet")
     testplanorder = models.ForeignKey("TestplanOrder", null=True, blank=True,
-                                      default=None)
+                                      default=None, related_name="order")
 
     def __str__(self):
         """ User representation. """
@@ -237,12 +224,11 @@ class Testsuite(models.Model):
         return find.filter(name__name__contains=contains)
 
     @staticmethod
-    def get_or_create(context, testsuite_name, testplan, testkeys=None):
+    def get_or_create(context, testsuite_name, testplanorder, testkeys=None):
         """ Get current or create new objects.
 
         @param testkeys Must be an instance of TestKey.
         """
-        print "MARK: testsuite.get_or_create", testkeys
         if not testkeys:
             testkeys = []
 
@@ -252,17 +238,16 @@ class Testsuite(models.Model):
         ##
         # Look for testsuite.
         find = Testsuite.objects.filter(context=context, name=name)
-        print "MARK: testsuite.get_or_create", testkeys, find.count()
         for testkey in testkeys:
             find = find.filter(keys=testkey)
-            print "MARK: testsuite.get_or_create key", testkey, find.count()
 
         if find.count() == 1:
             return ([item for item in find][0], False)
         elif find.count() > 1:
             raise Testsuite.MultipleObjectsReturned("%s %s" % (context, name))
 
-        testsuite = Testsuite.objects.create(name=name, context=context)
+        testsuite = Testsuite.objects.create(name=name, context=context,
+                                             testplanorder=testplanorder)
         for testkey in testkeys:
             TestsuiteKeySet.objects.create(testsuite=testsuite,
                                            testkey=testkey)
@@ -320,8 +305,8 @@ class Testplan(models.Model):
 
 class TestplanOrder(models.Model):
     """ Controls the order of the testsuite in the testplan. """
-
-    testsuite = models.OneToOneField(Testsuite, primary_key=True)
+    testsuite = models.OneToOneField(Testsuite, primary_key=True,
+                                     related_name="testsuite")
     order = models.IntegerField(default=0)
     testplan = models.ForeignKey(Testplan, null=True, blank=True, default=None)
 

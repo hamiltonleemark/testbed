@@ -41,18 +41,12 @@ class TestsuiteTestCase(TestCase):
         """ Add a testsuite. """
         parser = TestsuiteTestCase.parser_create()
 
-        print "MARK: 1"
         testplan.api.get_or_create(testplan.api.CONTEXT, "bob",
                                    testplan.api.ORDER_NEXT)
-        print "MARK: 2"
-        print "MARK: 2", Testplan.objects.all()
         testplan.api.get_or_create(testplan.api.CONTEXT, "mark",
                                    testplan.api.ORDER_NEXT)
-        print "MARK: 3"
-
         args = parser.parse_args("testsuite add bob".split())
         args.func(args)
-        print "MARK: 4"
 
         args = parser.parse_args("testsuite add mark".split())
         args.func(args)
@@ -105,7 +99,6 @@ class TestsuiteTestCase(TestCase):
 
         testsuites = Testsuite.filter("default", "bob")
         items = [item for item in testsuites]
-        print "MARK: items", items
         self.assertTrue(len(items) == 2)
         names = [item.name.name for item in items]
         self.assertTrue(any("bob1" in name for name in names))

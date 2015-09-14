@@ -46,7 +46,6 @@ class TestsuiteTestCase(TestCase):
         args.func(args)
 
         builds = api.build_list("product1")
-        print "MARK: builds", builds
         self.assertEqual(len(builds), 2)
         self.assertTrue("build1" in builds)
         self.assertTrue("build2" in builds)

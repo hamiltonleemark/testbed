@@ -48,8 +48,8 @@ class TestTestCase(TestCase):
         """
         from testdb import models
 
-        build_count = 20
-        testsuite_count = 100
+        build_count = 2
+        testsuite_count = 1
 
         testkeys = [
             ("key1", "value1"),
@@ -79,31 +79,26 @@ class TestTestCase(TestCase):
         self.assertEqual(len(orders), testsuite_count)
         #
         ##
+
+        ##
+        # Create build content as in a history.
         start = datetime.datetime.now()
         for bitem in range(0, build_count):
             build.api.get_or_create("product1", "branch1", "build%d" % bitem)
-            testkeys = [
-                ("key1", "value1"),
-                ("key2", "value2"),
-                ("key3", "value3"),
-                ("key4", "value4"),
-                ("product", "product1"),
-                ("branch", "branch1"),
-                ("build", "build%d" % bitem)
-            ]
+            testsuitekeys = testkeys + [("build", "build%d" % bitem)]
             for titem in range(0, testsuite_count):
-                print "MARK: testkeys", testkeys
-                testsuite.api.add_testsuite("default", "testsuite%d" % titem,
-                                            testkeys)
+                (testuite, rtc) = testsuite.api.add_testsuite(
+                    "default", "testsuite%d" % titem, testsuitekeys)
+                self.assertTrue(rtc)
                 api.set_result("default", "product1", "branch1", "build1",
-                               "testsuite%d" % titem, "test1", "pass",
-                               testkeys)
+                               "testsuite%d" % titem, "test1", "pass", [])
         end = datetime.datetime.now()
         duration = end - start
         print "\ncreated testsuite %d %s" % (testsuite_count, duration)
-
         results = api.list_result("default", [])
         self.assertEqual(len(results), build_count*testsuite_count)
+        #
+        ##
 
         ##
         # Time retrieving testsuies.
@@ -114,6 +109,7 @@ class TestTestCase(TestCase):
         testkeys.append(buildkey)
         results = []
         for order in orders:
+            testsuitekeys = testkeys + [("build", "build%d" % bitem)]
             result = testsuite.api.list_testsuite("default", testkeys,
                                                   order.testsuite.name)
             results.append(result)
@@ -121,6 +117,7 @@ class TestTestCase(TestCase):
         duration = end - start
         print "testsuite search %d duration %s" % (testsuite_count, duration)
         self.assertEqual(len(results), testsuite_count)
+        ##
 
         start = datetime.datetime.now()
         results = []
@@ -129,5 +126,5 @@ class TestTestCase(TestCase):
                                        order.testsuite.name)
         end = datetime.datetime.now()
         duration = end - start
-        print "test serach %d duration %s" % (testsuite_count, duration)
+        print "test search %d duration %s" % (testsuite_count, duration)
         self.assertEqual(len(results), testsuite_count)

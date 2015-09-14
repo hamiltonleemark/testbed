@@ -23,6 +23,7 @@ def get_or_create(context, testsuite_name, order):
     from testdb.models import Testplan
     from testdb.models import TestplanOrder
     from testdb.models import Testsuite
+    from testdb.models import TestsuiteName
     from testdb.models import Context
 
     (context, _) = Context.objects.get_or_create(name=context)
@@ -47,8 +48,9 @@ def get_or_create(context, testsuite_name, order):
             prevplan.save()
             current_order = prevplan.order
 
-    (testsuite, _) = Testsuite.get_or_create(context, testsuite_name, None)
-    (_, created) = TestplanOrder.get_or_create(testplan, testsuite, order)
+    (name, _) = TestsuiteName.objects.get_or_create(name=testsuite_name)
+    (testsuite, _) = Testsuite.get_or_create(context, name, None, None)
+    (_, created) = TestplanOrder.get_or_create(testplan, name, order)
     return (testplan, created)
 
 
@@ -56,20 +58,18 @@ def planorder_get(context, testsuite_name, keys):
     """ Return TestplanOrder. """
     from testdb import models
 
+    testkeys = [models.TestKey.get_or_create(key=key, value=value)[0]
+                for (key, value) in keys]
+
     context = models.Context.objects.get(name=context)
-    testplan = models.Testplan.objects.get(context=context)
-    testkeys = []
-    for (key, value) in keys:
-        print "MARK: testplan keys", key, value
-        (testkey, _) = models.TestKey.get_and_check(key=key, value=value)
-        testkeys.append(testkey)
-        print "MARK: testplan keys after", key, value
-    find = testplan.testplanorder_set.filter()
+    find = models.Testplan.objects.filter(context=context)
     for testkey in testkeys:
-        find = find.filter(testkeys=testkey)
-        print "MARK: find", testkey, find.count()
+        find = find.filter(keys=testkey)
+
+    testplans = [item for item in find]
     name = models.TestsuiteName.objects.get(name=testsuite_name)
-    return find.get(testsuite__name=name)
+    # \todo deal with many test plan or zero.
+    return models.TestplanOrder.objects.get(testplan=testplans[0], name=name)
 
 
 def remove(context, testsuite_name):
