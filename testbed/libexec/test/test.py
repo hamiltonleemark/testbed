@@ -22,6 +22,7 @@ from django.test import TestCase
 from testdb.models import Testsuite
 from testdb.models import Test
 from . import commands
+from testbed.libexec import testplan
 
 
 class TestTestCase(TestCase):
@@ -43,6 +44,8 @@ class TestTestCase(TestCase):
 
         parser = TestTestCase.parser_create()
 
+        testplan.api.get_or_create(testplan.api.CONTEXT, "testsuite1",
+                                   testplan.api.ORDER_NEXT)
         args = parser.parse_args("test add testsuite1 test1".split())
         args.func(args)
 
@@ -61,6 +64,10 @@ class TestTestCase(TestCase):
 
     def test_context_add(self):
         """ Add a testsuite by context. """
+
+        testplan.api.get_or_create("testplan.testplan1", "testsuite1",
+                                   testplan.api.ORDER_NEXT)
+
         parser = TestTestCase.parser_create()
 
         cmd = "test add testsuite1 test1 --context testplan1"

@@ -3,6 +3,7 @@ Functionality common to more than one command.
 """
 import logging
 
+ROOT = "testplan"
 CONTEXT = "testplan.default"
 ORDER_NEXT = -1
 
@@ -25,6 +26,8 @@ def get_or_create(context, testsuite_name, order):
     from testdb.models import Testsuite
     from testdb.models import TestsuiteName
     from testdb.models import Context
+
+    print "MARK: get_or_create", testsuite_name
 
     (context, _) = Context.objects.get_or_create(name=context)
     (testplan, created) = Testplan.objects.get_or_create(context=context)
@@ -49,8 +52,13 @@ def get_or_create(context, testsuite_name, order):
             current_order = prevplan.order
 
     (name, _) = TestsuiteName.objects.get_or_create(name=testsuite_name)
-    (testsuite, _) = Testsuite.get_or_create(context, name, None, None)
-    (_, created) = TestplanOrder.get_or_create(testplan, name, order)
+    (testplanorder, created) = TestplanOrder.get_or_create(testplan, name,
+                                                           order)
+    if created:
+        print "MARK: get_or_create created testsuite",testplanorder.id
+        (obj, created) = Testsuite.objects.get_or_create(
+            context=context, name=name, testplanorder=testplanorder)
+    print "MARK: get_or_create.testplan", testplan, created, obj.id
     return (testplan, created)
 
 
@@ -67,9 +75,14 @@ def planorder_get(context, testsuite_name, keys):
         find = find.filter(keys=testkey)
 
     testplans = [item for item in find]
+    if len(testplans) == 0:
+        return None
     name = models.TestsuiteName.objects.get(name=testsuite_name)
+
     # \todo deal with many test plan or zero.
-    return models.TestplanOrder.objects.get(testplan=testplans[0], name=name)
+    return models.TestplanOrder.objects.get(testplan=testplans[0],
+                                            testsuite__context=context,
+                                            testsuite__name=name)
 
 
 def remove(context, testsuite_name):

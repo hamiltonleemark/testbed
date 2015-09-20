@@ -63,7 +63,7 @@ class TestsuiteTestCase(TestCase):
         keys = (TestKey.get_or_create("key1", "value1")[0],
                 TestKey.get_or_create("key2", "value2")[0])
         (testsuite, _) = Testsuite.get_or_create("default", "testsuite_name",
-                                                 keys)
+                                                 None, keys)
 
         ##
         # Making sure auto assignment of current time for the timestamp field
@@ -71,7 +71,7 @@ class TestsuiteTestCase(TestCase):
         self.assertTrue(testsuite.timestamp >= start_time)
 
         (testsuite1, _) = Testsuite.get_or_create("default", "testsuite_name",
-                                                  keys)
+                                                  None, keys)
         self.assertTrue(testsuite1.timestamp >= start_time)
 
         self.assertTrue(testsuite.timestamp == testsuite1.timestamp)
@@ -82,8 +82,9 @@ class TestsuiteTestCase(TestCase):
 
         keys = (TestKey.get_or_create("key1", "value1")[0],
                 TestKey.get_or_create("key2", "value2")[0])
+
         (testsuite, _) = Testsuite.get_or_create("default", "testsuite_name1",
-                                                 keys)
+                                                 None, keys)
         (test1, _) = Test.get_or_create(testsuite, "test_name1", keys)
         (test2, _) = Test.get_or_create(testsuite, "test_name2", keys)
 
@@ -98,21 +99,22 @@ class TestsuiteTestCase(TestCase):
                      TestKey.get_or_create("key2", "value2.2")]
         test_keys = [item[0] for item in test_keys]
         (testplan, _) = Testplan.get_or_create("testplan.default", test_keys)
+        (testplanorder, _) = TestplanOrder.get_or_create(testplan, 1)
 
         (testsuite, _) = Testsuite.get_or_create("default", "testsuite1",
-                                                 testplan)
+                                                 testplanorder, [])
         (testplanorder, _) = TestplanOrder.objects.get_or_create(
             testsuite=testsuite, order=1)
         testplan.testplanorder_set.add(testplanorder)
 
         (testsuite, _) = Testsuite.get_or_create("default", "testsuite2",
-                                                 testplan)
+                                                 testplanorder, [])
         (testplanorder, _) = TestplanOrder.objects.get_or_create(
-            testplan=testplan, testsuite=testsuite, order=2)
+            testplan=testplan, order=2)
         testplan.testplanorder_set.add(testplanorder)
 
         testplans = TestplanOrder.objects.order_by("order")
-        testplans = [item for item in testplans]
-        testsuites = [item.testsuite for item in testplans]
+        testsuites = [Testsuite.objects.get(testplanorder=item)
+                      for item in testplans]
         self.assertEqual(testsuites[0].name.name, "testsuite1")
         self.assertEqual(testsuites[1].name.name, "testsuite2")

@@ -27,8 +27,9 @@ def add_testsuite(context, testsuite_name, testkeys):
     from testdb import models
     logging.info("adding testsuite %s", testsuite_name)
 
+
     ##
-    # Keep only testkeys that are associated to a testplan
+    # \todo Keep only testkeys that are associated to a testplan
     testplankeys = [item for item in testkeys if item[0] != "build"]
 
     testplanorder = testplan.api.planorder_get(testplan.api.CONTEXT,

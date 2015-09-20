@@ -26,10 +26,16 @@ def add_test(args):
     """ Add a test. """
 
     from testdb import models
+    from testbed.libexec import testplan
 
     LOGGER.info("adding test %s.%s", args.testsuite, args.name)
+
+    planorder = testplan.api.planorder_get(
+        testplan.api.ROOT + "." + args.context, args.testsuite, [])
+    
     (testsuite, _) = models.Testsuite.get_or_create(args.context,
-                                                    args.testsuite, [])
+                                                    args.testsuite, planorder,
+                                                    [])
     models.Test.get_or_create(testsuite, args.name, [])
 
 

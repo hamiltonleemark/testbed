@@ -27,7 +27,6 @@ from testbed.libexec import build
 from testbed.libexec import testsuite
 from testbed.libexec import testplan
 
-
 # pylint: disable=R0914
 class TestTestCase(TestCase):
     """ Tests for Django backend.
@@ -49,7 +48,7 @@ class TestTestCase(TestCase):
         from testdb import models
 
         build_count = 2
-        testsuite_count = 1
+        testsuite_count = 2
 
         testkeys = [
             ("key1", "value1"),
@@ -63,11 +62,17 @@ class TestTestCase(TestCase):
         ##
         # Create testplan.
         for item in range(0, testsuite_count):
-            testplan.api.get_or_create(testplan.api.CONTEXT,
-                                       "testsuite%d" % item, item)
+            (_, created) = testplan.api.get_or_create(testplan.api.CONTEXT,
+                                                      "testsuite%d" % item,
+                                                      item)
+            self.assertTrue(created, "created testsuite%d" % item)
+
 
         context = models.Context.objects.get(name=testplan.api.CONTEXT)
         testplan1 = models.Testplan.objects.get(context=context)
+
+        find = testplan1.testplanorder_set.all()
+        self.assertEqual(find.count(), testsuite_count)
 
         for testkey in testkeys:
             (testkey, _) = models.TestKey.get_or_create(key=testkey[0],
@@ -77,6 +82,9 @@ class TestTestCase(TestCase):
 
         orders = testplan1.testplanorder_set.all().order_by("order")
         self.assertEqual(len(orders), testsuite_count)
+        for order in orders:
+            print "MARK: order", order.testsuite_set.all()
+            self.assertEqual(order.testsuite_set.all().count(), 1)
         #
         ##
 
@@ -86,12 +94,15 @@ class TestTestCase(TestCase):
         for bitem in range(0, build_count):
             build.api.get_or_create("product1", "branch1", "build%d" % bitem)
             testsuitekeys = testkeys + [("build", "build%d" % bitem)]
+
             for titem in range(0, testsuite_count):
-                (testuite, rtc) = testsuite.api.add_testsuite(
-                    "default", "testsuite%d" % titem, testsuitekeys)
-                self.assertTrue(rtc)
-                api.set_result("default", "product1", "branch1", "build1",
-                               "testsuite%d" % titem, "test1", "pass", [])
+                (_, rtc) = testsuite.api.add_testsuite("default",
+                                                       "testsuite%d" % titem,
+                                                       testsuitekeys)
+                self.assertTrue(rtc, "new test not created")
+                api.set_result("default", "product1", "branch1",
+                               "build%d" % bitem, "testsuite%d" % titem,
+                               "test1", "pass", [])
         end = datetime.datetime.now()
         duration = end - start
         print "\ncreated testsuite %d %s" % (testsuite_count, duration)
@@ -108,8 +119,13 @@ class TestTestCase(TestCase):
         (buildkey, _) = models.TestKey.get_or_create("build", "build1")
         testkeys.append(buildkey)
         results = []
-        for order in orders:
+        self.assertEqual(len(orders), testsuite_count)
+        for (order, testsuite1) in testplan1.testsuites():
+            print "MARK: order", order.testsuite_set.all()
+            self.assertEqual(order.testsuite_set.filter(context__name=testplan.api.CONTEXT).count(), 1)
+
             testsuitekeys = testkeys + [("build", "build%d" % bitem)]
+            print "MARK: what", order.testsuite_set.all()
             result = testsuite.api.list_testsuite("default", testkeys,
                                                   order.testsuite.name)
             results.append(result)
@@ -122,6 +138,7 @@ class TestTestCase(TestCase):
         start = datetime.datetime.now()
         results = []
         for order in orders:
+            print "MARK: what", order.testsuite_set.all()
             results += api.list_result("default", testkeys,
                                        order.testsuite.name)
         end = datetime.datetime.now()

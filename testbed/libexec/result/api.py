@@ -16,9 +16,11 @@ def set_result(context, product, branch, build, testsuite, test, result,
                  appears on web pages.
     """
     from testdb import models
+    from testbed.libexec import testplan
 
     if not testkeys:
         testkeys = []
+
     testkeys = [models.TestKey.get_or_create(key, value)[0]
                 for (key, value) in testkeys]
 
@@ -29,9 +31,12 @@ def set_result(context, product, branch, build, testsuite, test, result,
     (branch, _) = models.TestKey.get_or_create("branch", branch)
     (build, _) = models.TestKey.get_or_create("build", build)
     (testname, _) = models.TestName.objects.get_or_create(name=test)
+
+    planorder = testplan.api.planorder_get(context, testsuite, testkeys)
+
+    testkeys = [product, branch, build]
     (testsuite, _) = models.Testsuite.get_or_create(context, testsuite,
-                                                    testkeys)
-    testkeys += [product, branch, build]
+                                                    planorder, testkeys)
     (test, _) = models.Test.get_or_create(testsuite, testname, [])
 
     if result == "pass":

@@ -190,21 +190,23 @@ class TestsuiteKeySet(models.Model):
     testsuite = models.ForeignKey("Testsuite")
     testkey = models.ForeignKey(TestKey)
 
+    def __str__(self):
+        """ User representation. """
+        return "%s %s" % (str(self.testsuite.context), str(self.testkey))
+
 
 class Testsuite(models.Model):
     """ A Testsuite holds a set of tests. """
-
     context = models.ForeignKey(Context, null=True, blank=True, default=None)
     name = models.ForeignKey(TestsuiteName)
     timestamp = models.DateTimeField(default=timezone.now)
     keys = models.ManyToManyField(TestKey, through="TestsuiteKeySet")
     testplanorder = models.ForeignKey("TestplanOrder", null=True, blank=True,
-                                      default=None, related_name="order")
+                                      default=None)
 
     def __str__(self):
         """ User representation. """
-
-        return "%s.%s" % (self.context, self.name)
+        return "%s.%s %s" % (self.context, self.name, self.timestamp)
 
     def key_get(self, key):
         """ Return value given key. """
@@ -224,7 +226,7 @@ class Testsuite(models.Model):
         return find.filter(name__name__contains=contains)
 
     @staticmethod
-    def get_or_create(context, testsuite_name, testplanorder, testkeys=None):
+    def get_or_create(context, testsuite_name, testplanorder, testkeys):
         """ Get current or create new objects.
 
         @param testkeys Must be an instance of TestKey.
@@ -242,7 +244,8 @@ class Testsuite(models.Model):
             find = find.filter(keys=testkey)
 
         if find.count() == 1:
-            return ([item for item in find][0], False)
+            results = ([item for item in find][0], False)
+            return results
         elif find.count() > 1:
             raise Testsuite.MultipleObjectsReturned("%s %s" % (context, name))
 
@@ -276,6 +279,16 @@ class Testplan(models.Model):
         """ Return value given key. """
         return self.testsuite.key_get(key)
 
+    def testsuites(self):
+        """ Testsuite set associated with this testplan.
+        @return (order, testsuite)
+        """
+
+        find = self.testplanorder_set().filter(testsuite__context=context)
+
+        # \todo this needs to be an iterator or generator.
+        return [(item.order, item.testsuite_set.all()[0]) for item in find]
+
     @staticmethod
     def get_or_create(context, testkeys=None):
         """ Get current or create new objects.
@@ -305,21 +318,23 @@ class Testplan(models.Model):
 
 class TestplanOrder(models.Model):
     """ Controls the order of the testsuite in the testplan. """
-    testsuite = models.OneToOneField(Testsuite, primary_key=True,
-                                     related_name="testsuite")
+
     order = models.IntegerField(default=0)
     testplan = models.ForeignKey(Testplan, null=True, blank=True, default=None)
 
+    def __str__(self):
+        """ User representation. """
+        return "%d: %s" % (self.order, self.testplan.context)
+
     @staticmethod
-    def get_or_create(testplan, testsuite, order):
+    def get_or_create(testplan, testsuite_name, order):
         """ Get current or create new objects. """
 
-        results = TestplanOrder.objects.get_or_create(testsuite=testsuite,
-                                                      testplan=testplan)
-        results[0].order = order
-
-        results[0].save()
-        return results
+        (testplan, created) = TestplanOrder.objects.get_or_create(
+            testplan=testplan, testsuite__name=testsuite_name)
+        testplan.order = order
+        testplan.save()
+        return (testplan, created)
 
 
 class TestsuiteFile(models.Model):
