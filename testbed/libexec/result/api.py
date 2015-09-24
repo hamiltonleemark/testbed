@@ -2,12 +2,14 @@
 Functionality common to more than one command.
 """
 import logging
+from testbed.libexec import testplan
+from testbed.libexec import testsuite
 
 
 # pylint: disable=R0913
 # pylint: disable=R0914
 def set_result(context, product, branch, build, testsuite, test, result,
-               testkeys=None):
+               keys=None):
     """ Get or create a testplan in a certain order.
 
     @param product_name Is the name of the product
@@ -16,13 +18,12 @@ def set_result(context, product, branch, build, testsuite, test, result,
                  appears on web pages.
     """
     from testdb import models
-    from testbed.libexec import testplan
 
-    if not testkeys:
-        testkeys = []
+    if not keys:
+        keys = []
 
     testkeys = [models.TestKey.get_or_create(key, value)[0]
-                for (key, value) in testkeys]
+                for (key, value) in keys]
 
     logging.info("result for %s %s %s %s %s %s", product, branch, build,
                  testsuite, test, result)
@@ -32,11 +33,16 @@ def set_result(context, product, branch, build, testsuite, test, result,
     (build, _) = models.TestKey.get_or_create("build", build)
     (testname, _) = models.TestName.objects.get_or_create(name=test)
 
-    planorder = testplan.api.planorder_get(context, testsuite, testkeys)
+    print "MARK: set_result", testplan.api.CONTEXT, keys
+    planorder = testplan.api.planorder_get(testplan.api.CONTEXT, testsuite, keys)
+    if planorder is None:
+        raise ValueError("plan missing %s.%s" % (testplan.api.CONTEXT, testsuite))
+    print "MARK: set_result planorder", planorder.id
 
     testkeys = [product, branch, build]
     (testsuite, _) = models.Testsuite.get_or_create(context, testsuite,
                                                     planorder, testkeys)
+    print "MARK: set_result testsuite", context, testsuite
     (test, _) = models.Test.get_or_create(testsuite, testname, [])
 
     if result == "pass":
@@ -44,6 +50,7 @@ def set_result(context, product, branch, build, testsuite, test, result,
     else:
         test.status = 1
     test.save()
+
     return test
 
 
@@ -53,17 +60,20 @@ def list_result(context, testkeys, testsuite_name=None, test_name=None):
 
     from testdb import models
 
-    if context:
-        find = models.Test.objects.filter(testsuite__context__name=context)
-    else:
-        find = models.Test.objects.filter
+    print "MARK: context", context
 
-    if testsuite_name:
-        find = find.filter(testsuite__name__name=testsuite_name)
-    if test_name:
-        find = find.filter(test__name=test_name)
+    context = models.Context.objects.get(name=context)
+    testsuites = testsuite.api.list_testsuite(context, testkeys,
+                                              testsuite_name)
 
-    for testkey in testkeys:
-        find = find.filter(testsuite__keys=testkey)
+    for testsuite_item in testsuites:
+        print "MARK: list_result", testsuite_item
+        if test_name:
+            find = find.filter(test__name=test_name)
+        else:
+            find = testsuite_item.test_set.all()
 
-    return find
+        print "MARK: list_result count", find.count()
+        for test in find:
+            print "  MARK: test", test
+            yield (testsuite_item, test)

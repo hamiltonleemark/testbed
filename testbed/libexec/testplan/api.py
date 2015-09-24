@@ -27,8 +27,6 @@ def get_or_create(context, testsuite_name, order):
     from testdb.models import TestsuiteName
     from testdb.models import Context
 
-    print "MARK: get_or_create", testsuite_name
-
     (context, _) = Context.objects.get_or_create(name=context)
     (testplan, created) = Testplan.objects.get_or_create(context=context)
 
@@ -54,11 +52,6 @@ def get_or_create(context, testsuite_name, order):
     (name, _) = TestsuiteName.objects.get_or_create(name=testsuite_name)
     (testplanorder, created) = TestplanOrder.get_or_create(testplan, name,
                                                            order)
-    if created:
-        print "MARK: get_or_create created testsuite",testplanorder.id
-        (obj, created) = Testsuite.objects.get_or_create(
-            context=context, name=name, testplanorder=testplanorder)
-    print "MARK: get_or_create.testplan", testplan, created, obj.id
     return (testplan, created)
 
 
@@ -66,8 +59,9 @@ def planorder_get(context, testsuite_name, keys):
     """ Return TestplanOrder. """
     from testdb import models
 
+    print "MARK: planorder_get", keys
     testkeys = [models.TestKey.get_or_create(key=key, value=value)[0]
-                for (key, value) in keys]
+                for (key, value) in keys if key != "build"]
 
     context = models.Context.objects.get(name=context)
     find = models.Testplan.objects.filter(context=context)
@@ -103,3 +97,23 @@ def remove(context, testsuite_name):
                                     testsuite__name__name=testsuite_name)
     testplan.delete()
     return True
+
+
+def get(context, testkeys):
+    """ Get testplan. """
+
+    print "MARK get", testkeys
+
+    from testdb.models import Testplan
+    from testdb.models import Context
+
+    (context, _) = Context.objects.get_or_create(name=context)
+    if len(testkeys) == 0:
+         return Testplan.objects.get(context=context)
+    else:
+        find = Testplan.objects.filter(context=context)
+
+        for testkey in testkeys[:-1]:
+            find = find.filter(keys=testkey)
+        return find.get(keys=testkeys[-1])
+

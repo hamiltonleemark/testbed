@@ -212,18 +212,18 @@ class Testsuite(models.Model):
         """ Return value given key. """
         return self.keys.get(key__value=key).value
 
-    @staticmethod
-    def filter(context, contains):
-        """ Filter testsuite against a single string. """
-
-        if context:
-            find = Testsuite.objects.filter(context__name=context)
-        else:
-            find = Testsuite.objects.all()
-
-        if not contains:
-            return find
-        return find.filter(name__name__contains=contains)
+    #@staticmethod
+    #def filter(context, contains):
+    #    """ Filter testsuite against a single string. """
+#
+#        if context:
+#            find = Testsuite.objects.filter(context__name=context)
+#        else:
+#            find = Testsuite.objects.all()
+#
+#        if not contains:
+#            return find
+#        return find.filter(name__name__contains=contains)
 
     @staticmethod
     def get_or_create(context, testsuite_name, testplanorder, testkeys):
@@ -256,6 +256,23 @@ class Testsuite(models.Model):
                                            testkey=testkey)
         return (testsuite, True)
 
+    @staticmethod
+    def filter(context, testplanorder, testkeys):
+        """ Get testsuite based on testplanorder and testkeys."""
+
+        print "MARK: Testsuite.filter", context, testplanorder
+
+        find = Testsuite.objects.filter(context=context,
+                                        testplanorder=testplanorder)
+
+        if not testkeys:
+            return find
+        ##
+        # Look for testsuite.
+        for testkey in testkeys[:-1]:
+            find = find.filter(keys=testkey)
+        return find.filter(keys=testkeys[-1])
+
 
 class TestplanKeySet(models.Model):
     """ Testsuites are associated to a set of keys. """
@@ -279,15 +296,12 @@ class Testplan(models.Model):
         """ Return value given key. """
         return self.testsuite.key_get(key)
 
-    def testsuites(self):
+    def testsuites_all(self):
         """ Testsuite set associated with this testplan.
         @return (order, testsuite)
         """
-
-        find = self.testplanorder_set().filter(testsuite__context=context)
-
-        # \todo this needs to be an iterator or generator.
-        return [(item.order, item.testsuite_set.all()[0]) for item in find]
+        for item in self.testplanorder_set.all():
+            yield (item.order, item.testsuite_set.all()[0])
 
     @staticmethod
     def get_or_create(context, testkeys=None):
@@ -319,8 +333,8 @@ class Testplan(models.Model):
 class TestplanOrder(models.Model):
     """ Controls the order of the testsuite in the testplan. """
 
-    order = models.IntegerField(default=0)
     testplan = models.ForeignKey(Testplan, null=True, blank=True, default=None)
+    order = models.IntegerField(default=0)
 
     def __str__(self):
         """ User representation. """
@@ -330,11 +344,24 @@ class TestplanOrder(models.Model):
     def get_or_create(testplan, testsuite_name, order):
         """ Get current or create new objects. """
 
-        (testplan, created) = TestplanOrder.objects.get_or_create(
-            testplan=testplan, testsuite__name=testsuite_name)
-        testplan.order = order
-        testplan.save()
-        return (testplan, created)
+        print "MARK: model.get_or_create", testsuite_name
+
+        created = False
+        try:
+            testplanorder = TestplanOrder.objects.get(
+                testplan=testplan, testsuite__name=testsuite_name)
+            testplanorder.order = order
+            testplanorder.save()
+        except TestplanOrder.DoesNotExist:
+            testplanorder = TestplanOrder.objects.create(testplan=testplan,
+                                                         order=order)
+            Testsuite.objects.create(context=testplan.context,
+                                     name=testsuite_name,
+                                     testplanorder=testplanorder)
+            created = True
+
+        print "MARK: model.get_or_create", testplanorder, testsuite_name, created
+        return (testplanorder, created)
 
 
 class TestsuiteFile(models.Model):

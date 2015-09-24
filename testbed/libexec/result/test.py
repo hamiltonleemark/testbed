@@ -79,15 +79,16 @@ class TestTestCase(TestCase):
                                                         value=testkey[1])
             testplan1.testplankeyset_set.get_or_create(testplan=testplan1,
                                                        testkey=testkey)
+            print "MARK: testplan", testplan1.id, testplan1, testkeys
 
         orders = testplan1.testplanorder_set.all().order_by("order")
         self.assertEqual(len(orders), testsuite_count)
         for order in orders:
-            print "MARK: order", order.testsuite_set.all()
             self.assertEqual(order.testsuite_set.all().count(), 1)
         #
         ##
 
+        print "MARK: 1"
         ##
         # Create build content as in a history.
         start = datetime.datetime.now()
@@ -95,52 +96,46 @@ class TestTestCase(TestCase):
             build.api.get_or_create("product1", "branch1", "build%d" % bitem)
             testsuitekeys = testkeys + [("build", "build%d" % bitem)]
 
+            print "MARK: 2"
             for titem in range(0, testsuite_count):
+                print "MARK: 3", titem
                 (_, rtc) = testsuite.api.add_testsuite("default",
                                                        "testsuite%d" % titem,
                                                        testsuitekeys)
                 self.assertTrue(rtc, "new test not created")
+                print "MARK: 4"
+                print "MARK: test testsuite keys", testsuitekeys
                 api.set_result("default", "product1", "branch1",
                                "build%d" % bitem, "testsuite%d" % titem,
-                               "test1", "pass", [])
+                               "test1", "pass", testsuitekeys)
         end = datetime.datetime.now()
+
         duration = end - start
         print "\ncreated testsuite %d %s" % (testsuite_count, duration)
-        results = api.list_result("default", [])
+        results = [item for item in api.list_result("default", [])]
         self.assertEqual(len(results), build_count*testsuite_count)
         #
         ##
 
         ##
-        # Time retrieving testsuies.
+        # Time retrieving testsuites.
         start = datetime.datetime.now()
         testkeys = [item.testkey
                     for item in testplan1.testplankeyset_set.all()]
         (buildkey, _) = models.TestKey.get_or_create("build", "build1")
         testkeys.append(buildkey)
-        results = []
         self.assertEqual(len(orders), testsuite_count)
-        for (order, testsuite1) in testplan1.testsuites():
-            print "MARK: order", order.testsuite_set.all()
-            self.assertEqual(order.testsuite_set.filter(context__name=testplan.api.CONTEXT).count(), 1)
-
-            testsuitekeys = testkeys + [("build", "build%d" % bitem)]
-            print "MARK: what", order.testsuite_set.all()
-            result = testsuite.api.list_testsuite("default", testkeys,
-                                                  order.testsuite.name)
-            results.append(result)
+        results = [item for item in testsuite.api.list_testsuite("default", testkeys)]
         end = datetime.datetime.now()
         duration = end - start
+        self.assertEqual(len(results), testsuite_count*build_count)
         print "testsuite search %d duration %s" % (testsuite_count, duration)
-        self.assertEqual(len(results), testsuite_count)
         ##
 
+        ##
+        # Time to retrieving test results
         start = datetime.datetime.now()
-        results = []
-        for order in orders:
-            print "MARK: what", order.testsuite_set.all()
-            results += api.list_result("default", testkeys,
-                                       order.testsuite.name)
+        results = [item for item in api.list_result("default", testkeys)]
         end = datetime.datetime.now()
         duration = end - start
         print "test search %d duration %s" % (testsuite_count, duration)

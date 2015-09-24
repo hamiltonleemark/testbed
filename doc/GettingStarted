@@ -1,0 +1,7 @@
+Here are the required steps to setup the development environment.
+
+1. sudo apt-get install pip
+2. sudo pip install django==1.8.4
+3. sudo apt-get install python-yaml
+4. sudo pip install pep8==1.6.2
+5. sudo pip install pylint==1.4.4
