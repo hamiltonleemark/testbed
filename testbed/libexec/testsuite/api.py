@@ -63,7 +63,4 @@ def list_testsuite(context, testkeys, testsuite_name=None):
     # Given the order now find the list of testsuites.
     (context, _) = models.Context.objects.get_or_create(name=context)
     for order in orders:
-        print "MARK: list_testsuite 1", order
-        for testsuite in models.Testsuite.filter(context, order, testkeys):
-            print "MARK: list_testsuite 2", order, testsuite
-            yield testsuite
+        yield models.Testsuite.get(context, order, testkeys)

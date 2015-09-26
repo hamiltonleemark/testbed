@@ -79,7 +79,6 @@ class TestTestCase(TestCase):
                                                         value=testkey[1])
             testplan1.testplankeyset_set.get_or_create(testplan=testplan1,
                                                        testkey=testkey)
-            print "MARK: testplan", testplan1.id, testplan1, testkeys
 
         orders = testplan1.testplanorder_set.all().order_by("order")
         self.assertEqual(len(orders), testsuite_count)
@@ -88,7 +87,6 @@ class TestTestCase(TestCase):
         #
         ##
 
-        print "MARK: 1"
         ##
         # Create build content as in a history.
         start = datetime.datetime.now()
@@ -96,15 +94,11 @@ class TestTestCase(TestCase):
             build.api.get_or_create("product1", "branch1", "build%d" % bitem)
             testsuitekeys = testkeys + [("build", "build%d" % bitem)]
 
-            print "MARK: 2"
             for titem in range(0, testsuite_count):
-                print "MARK: 3", titem
                 (_, rtc) = testsuite.api.add_testsuite("default",
                                                        "testsuite%d" % titem,
                                                        testsuitekeys)
                 self.assertTrue(rtc, "new test not created")
-                print "MARK: 4"
-                print "MARK: test testsuite keys", testsuitekeys
                 api.set_result("default", "product1", "branch1",
                                "build%d" % bitem, "testsuite%d" % titem,
                                "test1", "pass", testsuitekeys)

@@ -22,6 +22,7 @@ from django.test import TestCase
 from testdb.models import Testsuite
 from testdb.models import TestplanOrder
 from . import commands
+from . import api
 
 
 class TestsuiteTestCase(TestCase):
@@ -73,6 +74,7 @@ class TestsuiteTestCase(TestCase):
 
         names = [item.name.name for item in Testsuite.objects.all()]
         self.assertTrue("testsuite1" in names)
+
         context = [item.context.name for item in Testsuite.objects.all()]
         self.assertTrue(any("testplan" in item for item in context))
 
@@ -127,11 +129,13 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        testplans = TestplanOrder.objects.all().order_by("order")
-        self.assertEqual(testplans.count(), 3)
-        self.assertEqual(testplans[0].testsuite.name.name, "testsuite_order1")
-        self.assertEqual(testplans[1].testsuite.name.name, "testsuite_order2")
-        self.assertEqual(testplans[2].testsuite.name.name, "testsuite_order3")
+        testplan1 = api.get(api.CONTEXT, [])
+        orders = [item for item in testplan1.testsuites_all()]
+        self.assertEqual(len(orders), 3)
+
+        self.assertEqual(orders[0][1].name.name, "testsuite_order1")
+        self.assertEqual(orders[1][1].name.name, "testsuite_order2")
+        self.assertEqual(orders[2][1].name.name, "testsuite_order3")
 
     def test_order2(self):
         """ test_order2 Confirm order works. """
@@ -150,11 +154,14 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
+        testplan1 = api.get(api.CONTEXT, [])
+        orders = [item for item in testplan1.testsuites_all()]
         testplans = TestplanOrder.objects.all().order_by("order")
-        self.assertEqual(testplans.count(), 3)
-        self.assertEqual(testplans[0].testsuite.name.name, "testsuite_order1")
-        self.assertEqual(testplans[1].testsuite.name.name, "testsuite_order2")
-        self.assertEqual(testplans[2].testsuite.name.name, "testsuite_order3")
+
+        self.assertEqual(len(orders), 3)
+        self.assertEqual(orders[0][1].name.name, "testsuite_order1")
+        self.assertEqual(orders[1][1].name.name, "testsuite_order2")
+        self.assertEqual(orders[2][1].name.name, "testsuite_order3")
 
     def test_order3(self):
         """ test_order2 Confirm order works. """
@@ -173,11 +180,14 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
+        testplan1 = api.get(api.CONTEXT, [])
+        orders = [item for item in testplan1.testsuites_all()]
         testplans = TestplanOrder.objects.all().order_by("order")
-        self.assertEqual(testplans.count(), 3)
-        self.assertEqual(testplans[0].testsuite.name.name, "testsuite_order1")
-        self.assertEqual(testplans[1].testsuite.name.name, "testsuite_order2")
-        self.assertEqual(testplans[2].testsuite.name.name, "testsuite_order3")
+
+        self.assertEqual(len(orders), 3)
+        self.assertEqual(orders[0][1].name.name, "testsuite_order1")
+        self.assertEqual(orders[1][1].name.name, "testsuite_order2")
+        self.assertEqual(orders[2][1].name.name, "testsuite_order3")
 
     def test_order_one(self):
         """ test_order_one Confirm order works. """

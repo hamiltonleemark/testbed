@@ -59,7 +59,6 @@ def planorder_get(context, testsuite_name, keys):
     """ Return TestplanOrder. """
     from testdb import models
 
-    print "MARK: planorder_get", keys
     testkeys = [models.TestKey.get_or_create(key=key, value=value)[0]
                 for (key, value) in keys if key != "build"]
 
@@ -101,8 +100,6 @@ def remove(context, testsuite_name):
 
 def get(context, testkeys):
     """ Get testplan. """
-
-    print "MARK get", testkeys
 
     from testdb.models import Testplan
     from testdb.models import Context

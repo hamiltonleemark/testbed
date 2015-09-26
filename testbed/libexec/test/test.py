@@ -52,8 +52,9 @@ class TestTestCase(TestCase):
         args = parser.parse_args("test add testsuite1 test2".split())
         args.func(args)
 
-        names = [item.name.name for item in Testsuite.filter(None,
-                                                             "testsuite1")]
+        names = [item.name.name for item in Testsuite.contains("default",
+                                                               "testsuite1")]
+        print "MARK: names", names
         self.assertTrue(len(names) == 1)
 
         names = [item.name.name for item in Test.filter("testsuite1")]
@@ -96,18 +97,23 @@ class TestTestCase(TestCase):
         self.assertTrue("testsuite1" in names)
 
     def test_list_filter(self):
-        """ Add a testsuite by context. """
+        """ Add a test to testsuite. """
         parser = TestTestCase.parser_create()
 
-        cmd = "test add testsuite2 test1 --context testplan2"
+        testplan.api.get_or_create(testplan.api.CONTEXT, "testsuite2",
+                                   testplan.api.ORDER_NEXT)
+        testplan.api.get_or_create(testplan.api.CONTEXT, "testsuite3",
+                                   testplan.api.ORDER_NEXT)
+
+        cmd = "test add testsuite2 test1"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "test add testsuite3 test2 --context testplan2"
+        cmd = "test add testsuite3 test2"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "test add testsuite3 test3 --context testplan2"
+        cmd = "test add testsuite3 test3"
         args = parser.parse_args(cmd.split())
         args.func(args)
 

@@ -97,9 +97,9 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        testsuites = Testsuite.filter("default", "bob")
+        testsuites = Testsuite.contains("default", "testsuite_bob1")
         items = [item for item in testsuites]
-        self.assertTrue(len(items) == 2)
+        self.assertTrue(len(items) == 1)
         names = [item.name.name for item in items]
         self.assertTrue(any("bob1" in name for name in names))
         self.assertTrue(any("bob2" in name for name in names))
