@@ -156,7 +156,6 @@ class TestsuiteTestCase(TestCase):
 
         testplan1 = api.get(api.CONTEXT, [])
         orders = [item for item in testplan1.testsuites_all()]
-        testplans = TestplanOrder.objects.all().order_by("order")
 
         self.assertEqual(len(orders), 3)
         self.assertEqual(orders[0][1].name.name, "testsuite_order1")
@@ -164,7 +163,7 @@ class TestsuiteTestCase(TestCase):
         self.assertEqual(orders[2][1].name.name, "testsuite_order3")
 
     def test_order3(self):
-        """ test_order2 Confirm order works. """
+        """ test_order3 Confirm order works. """
 
         parser = TestsuiteTestCase.parser_create()
 
@@ -182,7 +181,7 @@ class TestsuiteTestCase(TestCase):
 
         testplan1 = api.get(api.CONTEXT, [])
         orders = [item for item in testplan1.testsuites_all()]
-        testplans = TestplanOrder.objects.all().order_by("order")
+        TestplanOrder.objects.all().order_by("order")
 
         self.assertEqual(len(orders), 3)
         self.assertEqual(orders[0][1].name.name, "testsuite_order1")

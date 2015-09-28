@@ -93,26 +93,25 @@ class TestsuiteTestCase(TestCase):
     def testplan_order(self):
         """ Test the creation and order support of test plan. """
 
-        test_keys = [TestKey.get_or_create("key1", "value1.1"),
-                     TestKey.get_or_create("key1", "value1.2"),
-                     TestKey.get_or_create("key2", "value2.1"),
-                     TestKey.get_or_create("key2", "value2.2")]
+        test_keys = [TestKey.get_or_create("key1", "value1.1")]
         test_keys = [item[0] for item in test_keys]
-        (testplan, _) = Testplan.get_or_create("testplan.default", test_keys)
-        (testplanorder, _) = TestplanOrder.get_or_create(testplan, 1)
 
-        (testsuite, _) = Testsuite.get_or_create("default", "testsuite1",
-                                                 testplanorder, [])
-        (testplanorder, _) = TestplanOrder.objects.get_or_create(
-            testsuite=testsuite, order=1)
-        testplan.testplanorder_set.add(testplanorder)
+        (testplan, rtc) = Testplan.get_or_create("testplan.default", test_keys)
+        self.assertTrue(rtc, "testplan not created")
 
-        (testsuite, _) = Testsuite.get_or_create("default", "testsuite2",
-                                                 testplanorder, [])
-        (testplanorder, _) = TestplanOrder.objects.get_or_create(
+        (testplanorder, rtc) = TestplanOrder.objects.get_or_create(
+            testplan=testplan, order=1)
+        self.assertTrue(rtc, "testplanorder not created")
+
+        (_, rtc) = Testsuite.get_or_create("testplan.default", "testsuite1",
+                                           testplanorder, [])
+        self.assertTrue(rtc, "testsuite1 not created")
+
+        (testplanorder, rtc) = TestplanOrder.objects.get_or_create(
             testplan=testplan, order=2)
-        testplan.testplanorder_set.add(testplanorder)
-
+        (_, rtc) = Testsuite.get_or_create("default", "testsuite2",
+                                           testplanorder, [])
+        self.assertTrue(rtc, "testsuite2 not created")
         testplans = TestplanOrder.objects.order_by("order")
         testsuites = [Testsuite.objects.get(testplanorder=item)
                       for item in testplans]

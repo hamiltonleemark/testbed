@@ -38,6 +38,7 @@ def add_testsuite(context, testsuite_name, testkeys):
     return models.Testsuite.get_or_create(context, testsuite_name,
                                           testplanorder, testkeys)
 
+
 # \todo This should be called filter
 def list_testsuite(context, testkeys, testsuite_name=None):
     """ Retrieve the list of testsuite testkeys. """
@@ -63,4 +64,7 @@ def list_testsuite(context, testkeys, testsuite_name=None):
     # Given the order now find the list of testsuites.
     (context, _) = models.Context.objects.get_or_create(name=context)
     for order in orders:
-        yield models.Testsuite.get(context, order, testkeys)
+        testsuites = models.Testsuite.filter(context=context, order=order,
+                                             keys=testkeys)
+        for item in testsuites:
+            yield item

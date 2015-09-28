@@ -262,18 +262,41 @@ class Testsuite(models.Model):
     # this should be a get maybe.
     @staticmethod
     def get(context, testplanorder, testkeys):
-        """ List of testsuites based on testplan. """
+        """ List of testsuites based on testplan.
+        @return Return a single Testsuite object.
+        """
 
         find = Testsuite.objects.filter(context=context,
                                         testplanorder=testplanorder)
 
         if not testkeys:
-            return find
+            return find[0]
         ##
         # Look for testsuite.
         for testkey in testkeys[:-1]:
             find = find.filter(keys=testkey)
-        return find.get(keys=testkeys[-1])
+        results = [item for item in find.get(keys=testkeys[-1])]
+        return results[0]
+
+    ##
+    # \todo This is not making a lot of sense. Why is this filter
+    # this should be a get maybe.
+    @staticmethod
+    def filter(context, order, keys):
+        """ List of testsuites based on testplan.
+        @return Return a single Testsuite object.
+        """
+
+        find = Testsuite.objects.filter(context=context, testplanorder=order)
+
+        if not keys:
+            return find
+
+        ##
+        # Look for testsuite.
+        for key in keys:
+            find = find.filter(keys=key)
+        return find
 
 
 class TestplanKeySet(models.Model):
@@ -302,7 +325,7 @@ class Testplan(models.Model):
         """ Testsuite set associated with this testplan.
         @return (order, testsuite)
         """
-        for item in self.testplanorder_set.all():
+        for item in self.testplanorder_set.all().order_by("order"):
             yield (item.order, item.testsuite_set.all()[0])
 
     @staticmethod

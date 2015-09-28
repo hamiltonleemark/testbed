@@ -20,7 +20,7 @@ CLI for testsuites.
 import logging
 from . import api
 
-CONTEXT="default"
+CONTEXT = "default"
 
 
 def add_testsuite(args):
@@ -35,18 +35,9 @@ def list_testsuite(args):
 
     from testdb import models
     logging.info("listing testsuites")
-    testsuites = models.Testsuite.filter(args.context, args.filter)
+    testsuites = models.Testsuite.filter(args.context, args.filter, keys=[])
     for testsuite in testsuites:
         print testsuite
-
-
-def do_add_key(args):
-    """ Add a key to a testsuite. """
-
-    from testdb import models
-
-    logging.info("adding testsuite %s", args.name)
-    models.Testsuite.get_or_create(args.context, args.testsuite, [])
 
 
 def add_subparser(subparser):
@@ -82,10 +73,6 @@ def add_subparser(subparser):
     parser = subparser.add_parser("add",
                                   description="Add a testsuite key",
                                   help="Add a testsuite key.")
-    parser.set_defaults(func=do_add_key)
-    parser.add_argument("testsuite", type=str, help="Name of the testsuite.")
-    parser.add_argument("key", type=str, help="Name of the key.")
-    parser.add_argument("value", type=str, help="Key's value.")
 
     ##
     # List

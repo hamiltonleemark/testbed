@@ -54,7 +54,6 @@ class TestTestCase(TestCase):
 
         names = [item.name.name for item in Testsuite.contains("default",
                                                                "testsuite1")]
-        print "MARK: names", names
         self.assertTrue(len(names) == 1)
 
         names = [item.name.name for item in Test.filter("testsuite1")]

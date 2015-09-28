@@ -19,13 +19,13 @@ Test test functionality.
 """
 import datetime
 import argparse
-import logging
 from django.test import TestCase
 from . import commands
 from . import api
 from testbed.libexec import build
 from testbed.libexec import testsuite
 from testbed.libexec import testplan
+
 
 # pylint: disable=R0914
 class TestTestCase(TestCase):
@@ -47,8 +47,9 @@ class TestTestCase(TestCase):
         """
         from testdb import models
 
-        build_count = 2
-        testsuite_count = 2
+        build_count = 10
+        testsuite_count = 100
+        test_count = 1
 
         testkeys = [
             ("key1", "value1"),
@@ -66,7 +67,6 @@ class TestTestCase(TestCase):
                                                       "testsuite%d" % item,
                                                       item)
             self.assertTrue(created, "created testsuite%d" % item)
-
 
         context = models.Context.objects.get(name=testplan.api.CONTEXT)
         testplan1 = models.Testplan.objects.get(context=context)
@@ -99,38 +99,42 @@ class TestTestCase(TestCase):
                                                        "testsuite%d" % titem,
                                                        testsuitekeys)
                 self.assertTrue(rtc, "new test not created")
-                api.set_result("default", "product1", "branch1",
-                               "build%d" % bitem, "testsuite%d" % titem,
-                               "test1", "pass", testsuitekeys)
+                for testitem in range(0, test_count):
+                    (_, rtc) = api.set_result("default", "testsuite%d" % titem,
+                                              "test%d" % testitem, "pass",
+                                              testsuitekeys)
+                self.assertTrue(rtc, "result not created")
         end = datetime.datetime.now()
 
         duration = end - start
         print "\ncreated testsuite %d %s" % (testsuite_count, duration)
         results = [item for item in api.list_result("default", [])]
-        self.assertEqual(len(results), build_count*testsuite_count)
+        self.assertEqual(len(results), build_count*testsuite_count*test_count)
         #
         ##
 
         ##
-        # Time retrieving testsuites.
+        # Time retrieving all testsuites.
         start = datetime.datetime.now()
         testkeys = [item.testkey
                     for item in testplan1.testplankeyset_set.all()]
         (buildkey, _) = models.TestKey.get_or_create("build", "build1")
+
         testkeys.append(buildkey)
         self.assertEqual(len(orders), testsuite_count)
-        results = [item for item in testsuite.api.list_testsuite("default", testkeys)]
+        results = [item for item in testsuite.api.list_testsuite("default",
+                                                                 testkeys)]
         end = datetime.datetime.now()
         duration = end - start
-        self.assertEqual(len(results), testsuite_count*build_count)
+        self.assertEqual(len(results), testsuite_count)
         print "testsuite search %d duration %s" % (testsuite_count, duration)
         ##
 
         ##
-        # Time to retrieving test results
+        # Time to retrieving all test results
         start = datetime.datetime.now()
         results = [item for item in api.list_result("default", testkeys)]
         end = datetime.datetime.now()
         duration = end - start
         print "test search %d duration %s" % (testsuite_count, duration)
-        self.assertEqual(len(results), testsuite_count)
+        self.assertEqual(len(results), testsuite_count*test_count)

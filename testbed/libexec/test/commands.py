@@ -32,7 +32,6 @@ def add_test(args):
 
     planorder = testplan.api.planorder_get(
         testplan.api.ROOT + "." + args.context, args.testsuite, [])
-    
     (testsuite, _) = models.Testsuite.get_or_create(args.context,
                                                     args.testsuite, planorder,
                                                     [])

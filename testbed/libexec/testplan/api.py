@@ -8,8 +8,10 @@ CONTEXT = "testplan.default"
 ORDER_NEXT = -1
 
 
+# pylint: disable=R0914
 def get_or_create(context, testsuite_name, order):
-    """ Get or create a testplan in a certain order.
+    """ Get or create a testplan and set order.
+
     Order is just that the location of the testplan in the list of testplans.
     The order effects the location the testplan appears on web pages.
     @param testsuite_name The testsuite name for the testplan
@@ -23,7 +25,6 @@ def get_or_create(context, testsuite_name, order):
 
     from testdb.models import Testplan
     from testdb.models import TestplanOrder
-    from testdb.models import Testsuite
     from testdb.models import TestsuiteName
     from testdb.models import Context
 
@@ -50,13 +51,13 @@ def get_or_create(context, testsuite_name, order):
             current_order = prevplan.order
 
     (name, _) = TestsuiteName.objects.get_or_create(name=testsuite_name)
-    (testplanorder, created) = TestplanOrder.get_or_create(testplan, name,
-                                                           order)
+    (_, created) = TestplanOrder.get_or_create(testplan, name, order)
     return (testplan, created)
 
 
 def planorder_get(context, testsuite_name, keys):
     """ Return TestplanOrder. """
+
     from testdb import models
 
     testkeys = [models.TestKey.get_or_create(key=key, value=value)[0]
@@ -106,11 +107,11 @@ def get(context, testkeys):
 
     (context, _) = Context.objects.get_or_create(name=context)
     if len(testkeys) == 0:
-         return Testplan.objects.get(context=context)
+        return Testplan.objects.get(context=context)
     else:
         find = Testplan.objects.filter(context=context)
 
         for testkey in testkeys[:-1]:
             find = find.filter(keys=testkey)
-        return find.get(keys=testkeys[-1])
 
+        return find.get(keys=testkeys[-1])

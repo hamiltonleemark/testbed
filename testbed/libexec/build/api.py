@@ -3,7 +3,6 @@ Functionality common to more than one command.
 """
 import logging
 import datetime
-from testbed.libexec import testplan
 
 
 CONTEXT = "build.default"

@@ -28,8 +28,13 @@ LOGGER = logging.getLogger(__name__)
 def do_set_result(args):
     """ Add a test. """
 
-    api.set_result(args.context, args.product, args.branch, args.build,
-                   args.testsuite, args.test, args.result)
+    keys = [
+        ("product", args.product),
+        ("branch", args.branch),
+        ("build", args.build)
+        ]
+
+    api.set_result(args.context, keys, args.testsuite, args.test, args.result)
 
 
 def do_list_result(args):

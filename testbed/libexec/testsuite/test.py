@@ -20,7 +20,6 @@ Test testsuite functionality.
 import argparse
 from django.test import TestCase
 from testdb.models import Testsuite
-from testdb.models import Testplan
 from . import commands
 from testbed.libexec import testplan
 
@@ -101,5 +100,4 @@ class TestsuiteTestCase(TestCase):
         items = [item for item in testsuites]
         self.assertTrue(len(items) == 1)
         names = [item.name.name for item in items]
-        self.assertTrue(any("bob1" in name for name in names))
-        self.assertTrue(any("bob2" in name for name in names))
+        self.assertEqual("testsuite_bob1", names[0])
