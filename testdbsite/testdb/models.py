@@ -208,6 +208,10 @@ class Testsuite(models.Model):
         """ User representation. """
         return "%s.%s %s" % (self.context, self.name, self.timestamp)
 
+
+    def name_get(self):
+        """ Return the testsuite name. """
+        return self.name.name
     def key_get(self, key):
         """ Return value given key. """
         return self.keys.get(key__value=key).value
