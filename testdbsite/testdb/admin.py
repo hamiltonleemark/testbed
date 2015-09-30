@@ -31,11 +31,13 @@ class ContextAdmin(admin.ModelAdmin):
 class KeyAdmin(admin.ModelAdmin):
     """ View key. """
     model = models.Key
+    list_display = ("value", "config_type", )
 
 
 class TestKeyAdmin(admin.ModelAdmin):
     """ View Test Key. """
     model = models.TestKey
+    list_display = ("key", "value", )
 
 
 class TestAdmin(admin.ModelAdmin):
@@ -107,12 +109,17 @@ class TestplanAdmin(admin.ModelAdmin):
         return testplan.testsuite.context
 
 
+class TestProductKeySetAdmin(admin.TabularInline):
+    """ Show set of keys that associate a testsuite. """
+    model = models.TestProductKeySet
+    extra = 0
+
+
 class ProductAdmin(admin.ModelAdmin):
     """ Administrate testplan content. """
     model = models.TestProduct
-    extra = 0
 
-    list_display = ("order", "context", "product", "branch")
+    inlines = [TestProductKeySetAdmin]
 
 
 admin.site.register(models.Context, ContextAdmin)

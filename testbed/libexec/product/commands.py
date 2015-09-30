@@ -129,7 +129,7 @@ def add_subparser(subparser):
     subparser = parser.add_subparsers()
     parser = subparser.add_parser(
         "add", description="Associate testplan to a product",
-        help="add test.")
+        help="add testplan to product.")
 
     parser.set_defaults(func=product_testplan_add)
     parser.add_argument("product", type=str, help="Product name.")
