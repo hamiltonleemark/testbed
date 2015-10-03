@@ -220,7 +220,7 @@ class Testsuite(models.Model):
         self.testplanorder.serialize(serializer)
 
         for item in self.testsuitekeyset_set.all():
-            serialize.add(item)
+            serializer.add(item)
 
         serializer.add(self)
 
