@@ -56,11 +56,6 @@ def do_testplan_list(args):
                     "tests": [item for item in testsuite.test_set.all()]
                     })
 
-        #testsuites = [{item.order: str(item.testsuite.name),
-                       #"tests": [str(item)
-                                 #for item in item.testsuite.test_set.all()]}
-                      #for item in testplan.testplanorder_set.order_by("order")]
-
         if testkeys:
             level["testkey"] = testkeys
         if testsuites:

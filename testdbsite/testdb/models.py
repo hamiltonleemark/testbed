@@ -168,6 +168,10 @@ class TestsuiteName(models.Model):
     """ Name of testsuite."""
     name = models.CharField(max_length=128, unique=True)
 
+    def serialize(self, serializer):
+        """ Serialize this object. """
+        serializer.add(self)
+
     def __str__(self):
         """ Return testsuite name. """
         return str(self.name)
@@ -180,6 +184,10 @@ class Context(models.Model):
     """
     name = models.CharField(max_length=128, null=True, blank=True,
                             default=None)
+
+    def serialize(self, serializer):
+        """ Serialize this object. """
+        serializer.add(self)
 
     def __str__(self):
         return self.name
@@ -204,14 +212,26 @@ class Testsuite(models.Model):
     testplanorder = models.ForeignKey("TestplanOrder", null=True, blank=True,
                                       default=None)
 
+    def serialize(self, serializer):
+        """ Serialize this object and recursively foreign objects. """
+
+        self.context.serialize(serializer)
+        self.name.serialize(serializer)
+        self.testplanorder.serialize(serializer)
+
+        for item in self.testsuitekeyset_set.all():
+            serialize.add(item)
+
+        serializer.add(self)
+
     def __str__(self):
         """ User representation. """
         return "%s.%s %s" % (self.context, self.name, self.timestamp)
 
-
     def name_get(self):
         """ Return the testsuite name. """
         return self.name.name
+
     def key_get(self, key):
         """ Return value given key. """
         return self.keys.get(key__value=key).value
@@ -317,6 +337,11 @@ class Testplan(models.Model):
     context = models.ForeignKey(Context)
     keys = models.ManyToManyField(TestKey, through="TestplanKeySet")
 
+    def serialize(self, serializer):
+        """ Serialize and instance of this model. """
+        self.context.serialize(serializer)
+        serializer.add(self)
+
     def __str__(self):
         """ User representation. """
         return str(self.context)
@@ -365,6 +390,11 @@ class TestplanOrder(models.Model):
     testplan = models.ForeignKey(Testplan, null=True, blank=True,
                                  default=None)
     order = models.IntegerField(default=0)
+
+    def serialize(self, serializer):
+        """ Serialize this object. """
+        self.testplan.serialize(serializer)
+        serializer.add(self)
 
     def __str__(self):
         """ User representation. """
