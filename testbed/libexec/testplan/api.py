@@ -86,16 +86,27 @@ def remove(context, testsuite_name):
                    Testplans with the same context are in the same group.
                    The order indicates the order of the testplan in the
                    context.
+
     @param testsuite_name The testsuite name for the testplan
     """
 
     from testdb.models import Testplan
     from testdb.models import Context
 
+    planorder = planorder_get(context, testsuite_name, [])
+    planorder.delete()
+
     (context, _) = Context.objects.get_or_create(name=context)
-    testplan = Testplan.objects.get(testsuite__context=context,
-                                    testsuite__name__name=testsuite_name)
-    testplan.delete()
+    testplan = Testplan.objects.get(context=context)
+
+    ##
+    # testsuites are ordered sequentially starting with 1.
+    planorders = testplan.testplanorder_set.all().order_by("order")
+    order = 1
+    for planorder in planorders:
+        planorder.order = order
+        planorder.save()
+
     return True
 
 

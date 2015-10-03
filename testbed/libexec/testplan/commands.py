@@ -22,19 +22,19 @@ import yaml
 from . import api
 
 
-def do_testsuite_add(args):
+def do_add(args):
     """ Add a testsuite to the database. """
 
     return api.get_or_create(args.context, args.testsuite, args.order)
 
 
-def do_testsuite_remove(args):
+def do_remove(args):
     """ Add a testsuite to the database. """
 
     return api.remove(args.context, args.testsuite)
 
 
-def do_testplan_list(args):
+def do_list(args):
     """ List testsuites based on search criteria. """
 
     from testdb import models
@@ -64,7 +64,7 @@ def do_testplan_list(args):
     print yaml.dump(root, default_flow_style=False)
 
 
-def do_testplan_key_add(args):
+def do_key_add(args):
     """ Add a key to a testsuite. """
 
     from testdb import models
@@ -79,7 +79,7 @@ def do_testplan_key_add(args):
                                               testkey=testkey)
 
 
-def do_testplan_key_remove(args):
+def do_key_remove(args):
     """ Add a key to a testsuite. """
 
     from testdb import models
@@ -102,7 +102,7 @@ def do_testplan_key_list(args):
         print testkey
 
 
-def do_testplan_test_add(args):
+def do_test_add(args):
     """ Add a test to a testplan. """
 
     from testdb import models
@@ -148,7 +148,7 @@ def add_subparser(subparser):
         "add",
         description="Add a testsuite to the testplan",
         help="Add a testsuite.")
-    parser.set_defaults(func=do_testsuite_add)
+    parser.set_defaults(func=do_add)
     parser.add_argument("testsuite", type=str, help="Name of the testsuite.")
     parser.add_argument("--order", type=int, default=-1,
                         help="Order of testsuite as viewed on the website."
@@ -158,10 +158,9 @@ def add_subparser(subparser):
     ##
     # Remove
     parser = rootparser.add_parser(
-        "remove",
-        description="Remove a testsuite from the testplan",
+        "remove", description="Remove a testsuite from the testplan",
         help="Remove a testsuite.")
-    parser.set_defaults(func=do_testsuite_remove)
+    parser.set_defaults(func=do_remove)
     parser.add_argument("testsuite", type=str, help="Name of the testsuite.")
 
     ##
@@ -169,7 +168,7 @@ def add_subparser(subparser):
     parser = rootparser.add_parser("list",
                                    description="List all of the testsuites.",
                                    help="List testsuite.")
-    parser.set_defaults(func=do_testplan_list)
+    parser.set_defaults(func=do_list)
     parser.add_argument("--filter", type=str, help="Filter testsuites")
 
     ##
@@ -178,22 +177,23 @@ def add_subparser(subparser):
                                    description="Modify keys testplan.",
                                    help="Modify testplan keys.")
     subparser = parser.add_subparsers()
-    parser = subparser.add_parser("add", description="Add key",
-                                  help="add test.")
+    parser = subparser.add_parser("add",
+                                  description="Add key and value to testplan",
+                                  help="Add key and value to testplan.")
 
-    parser.set_defaults(func=do_testplan_key_add)
-    parser.add_argument("name", type=str, help="Name of the key")
+    parser.set_defaults(func=do_key_add)
+    parser.add_argument("name", type=str, help="Name of the key to add")
     parser.add_argument("value", type=str, help="Key's value")
     parser.add_argument(
         "--strict", default=False, action="store_true",
         help="A key which must strictly match an existing values")
 
     parser = subparser.add_parser("remove",
-                                  description="Add a testsuite key",
+                                  description="Remove a testsuite key",
                                   help="Add a testsuite key")
     parser.add_argument("name", type=str, help="Name of the key")
     parser.add_argument("--value", type=str, help="Key's value")
-    parser.set_defaults(func=do_testplan_key_remove)
+    parser.set_defaults(func=do_key_remove)
 
     ##
     # Test
@@ -204,7 +204,7 @@ def add_subparser(subparser):
     parser = subparser.add_parser("add", description="Add key",
                                   help="add test.")
 
-    parser.set_defaults(func=do_testplan_test_add)
+    parser.set_defaults(func=do_test_add)
     parser.add_argument("testsuite", type=str, help="testsuite name")
     parser.add_argument("name", type=str, help="name of test")
 

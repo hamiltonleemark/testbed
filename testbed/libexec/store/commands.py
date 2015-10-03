@@ -25,7 +25,7 @@ def do_store(args):
         logging.info("Context %s limits results %d", args.context,
                      find.count())
     except models.Context.DoesNotExist:
-        find = models.Testsuites.objects.all()
+        find = models.Testsuite.objects.all()
         logging.info("results %d", find.count())
 
     ##

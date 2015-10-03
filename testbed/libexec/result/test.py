@@ -127,6 +127,7 @@ class TestTestCase(TestCase):
         end = datetime.datetime.now()
         duration = end - start
         self.assertEqual(len(results), testsuite_count)
+        self.assertTrue(duration.seconds < 1.0, "query is taking too long.")
         print "testsuite search %d duration %s" % (testsuite_count, duration)
         ##
 
@@ -137,4 +138,5 @@ class TestTestCase(TestCase):
         end = datetime.datetime.now()
         duration = end - start
         print "test search %d duration %s" % (testsuite_count, duration)
+        self.assertTrue(duration.seconds < 1.0, "query is taking too long.")
         self.assertEqual(len(results), testsuite_count*test_count)
