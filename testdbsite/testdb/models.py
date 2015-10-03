@@ -424,6 +424,17 @@ class TestplanOrder(models.Model):
             created = True
         return (testplanorder, created)
 
+    @staticmethod
+    def create(testplan, testsuite_name, order):
+        """ Get current or create new objects. """
+
+        testplanorder = TestplanOrder.objects.create(testplan=testplan,
+                                                     order=order)
+        Testsuite.objects.create(context=testplan.context,
+                                 name=testsuite_name,
+                                 testplanorder=testplanorder)
+        return testplanorder
+
 
 class TestsuiteFile(models.Model):
     """ Hold a single file related to a testsuite. """
