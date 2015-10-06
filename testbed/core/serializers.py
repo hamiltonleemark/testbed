@@ -28,7 +28,6 @@ class Serializer(object):
 
     def add(self, item):
         """ Add content to be serialized. """
-        print "MARK: adding", item.__class__.__name__, item.pk
         key = (item.__class__.__name__, item.pk)
         if key not in self._prev_results:
             self._results.append(item)

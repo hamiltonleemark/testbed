@@ -18,6 +18,7 @@ def parse():
 
 def env_setup():
     """ Main entry point. """
+
     # \todo figure out how this works when we install tbd.
     try:
         testbed_dir = os.environ["TESTBED"]
@@ -27,7 +28,7 @@ def env_setup():
         # {{TESTBED }} is set to a path.
         installation = "{{TESTBED}}"
         if installation[0] == "{":
-            cur_dir = os.path.abspath(os.path.join("..", __file__))
+            cur_dir = os.path.abspath(os.path.join(__file__, ".."))
             testbed_dir = os.path.dirname(cur_dir)
         else:
             testbed_dir = installation
