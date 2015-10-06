@@ -117,30 +117,30 @@ def do_test_add(args):
     """ Add a test to a testplan. """
 
     from testdb import models
-    logging.info("add test to testplan tstsuite key %s", args.name)
 
     ##
     # Make sure testsuite is part of the test plan.
-    (context, _) = models.Context.objects.get_or_create(name=args.context)
     try:
+        context = models.Context.objects.get(name=args.context)
         testplan = models.Testplan.objects.get(context=context)
-    except models.Context.DoesNotExist:
-        raise ValueError("testplan %s does not exist", args.context)
+    except (models.Context.DoesNotExist, models.Testplan.DoesNotExist):
+        raise argparse.ArgumentError("testplan for context %s missing",
+                                     args.context)
 
     try:
-        (name, _) = models.TestsuiteName.objects.get_or_create(
-            name=args.testsuite)
-        testsuite = models.Testsuite.objects.get(name=name)
-    except models.Testsuite.DoesNotExist:
-        raise ValueError("testuite %s does not exist", args.testsuite)
+        planorder = testplan.testplanorder_set.get(order=args.order,
+                                                   testplan=testplan)
+        testsuite = models.Testsuite.objects.get(context=context,
+                                                 testplanorder=planorder)
+    except (models.Testsuite.DoesNotExist, models.TestplanOrder.DoesNotExist):
+        raise argparse.ArgumentError("testplan %s does not contain %s",
+                                     args.context, args.order)
 
-    try:
-        models.TestplanOrder.objects.get(testsuite=testsuite,
-                                         testplan=testplan)
-    except models.TestplanOrder.DoesNotExist:
-        raise ValueError("testplan %s does not contain testsuite %s",
-                         args.context, args.testsuite)
-    return models.Test.get_or_create(testsuite, args.name, [])
+    print "MARK: adding test", testsuite, args.name
+    models.Test.get_or_create(testsuite, args.name, [])
+    logging.info("add test %s to testsuite %s.%s", args.name, planorder.order,
+                 testsuite.name)
+    return True
 
 
 def valid_order(value):

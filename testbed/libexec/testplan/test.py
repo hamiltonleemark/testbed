@@ -41,16 +41,16 @@ class TestsuiteTestCase(TestCase):
         """ Add a testsuite. """
         parser = TestsuiteTestCase.parser_create()
 
-        args = parser.parse_args("testplan add bob".split())
+        args = parser.parse_args("testplan add bob --order 1".split())
         args.func(args)
 
-        args = parser.parse_args("testplan test add bob ken".split())
+        args = parser.parse_args("testplan test add 1 ken".split())
         args.func(args)
 
-        args = parser.parse_args("testplan add mark".split())
+        args = parser.parse_args("testplan add mark --order 2".split())
         args.func(args)
 
-        args = parser.parse_args("testplan test add mark ken".split())
+        args = parser.parse_args("testplan test add 2 ken".split())
         args.func(args)
 
         names = [item.name.name for item in Testsuite.objects.all()]
@@ -68,7 +68,7 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "testplan --context testplan test add testsuite1 test1"
+        cmd = "testplan --context testplan test add 1 test1"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
@@ -82,27 +82,27 @@ class TestsuiteTestCase(TestCase):
         """ Add a testsuite by context. """
         parser = TestsuiteTestCase.parser_create()
 
-        cmd = "testplan --context testplan1 add testsuite_bob1"
+        cmd = "testplan --context testplan1 add testsuite_bob1 --order 1"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "testplan --context testplan1 test add testsuite_bob1 test2"
+        cmd = "testplan --context testplan1 test add 1 test2"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "testplan --context testplan2 add testsuite_bob2"
+        cmd = "testplan --context testplan2 add testsuite_bob2 --order 2"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "testplan --context testplan2 test add testsuite_bob2 test3"
+        cmd = "testplan --context testplan2 test add 2 test3"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "testplan --context testplan2 add testsuite_ken1"
+        cmd = "testplan --context testplan2 add testsuite_ken1 --order 3"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "testplan --context testplan2 test add testsuite_ken1 test4"
+        cmd = "testplan --context testplan2 test add 3 test4"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
