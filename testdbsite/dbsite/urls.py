@@ -23,4 +23,5 @@ urlpatterns = patterns("",
     # Currently product view is the default entry point into our website.
     url(r'^$', RedirectView.as_view(permanent=False, url="/product")),
     url(r'^product/', include("view.product.urls")),
+    url(r'^branch/', include("view.branch.urls")),
 )

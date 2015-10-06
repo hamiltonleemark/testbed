@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<table>
+ <tr>
+  <th>#</th><th>Testsuite</th><th></th>
+ </tr>
+ {% for planorder in planorders %}
+  <tr>
+   <td>{{planorder.0}}</td>
+   <td>{{planorder.1.name}}</td>
+  </tr>
+ {% endfor %}
+</table>
+{% endblock %}

@@ -358,6 +358,11 @@ class Testplan(models.Model):
             yield (item.order, item.testsuite_set.all()[0])
 
     @staticmethod
+    def context_name_get(context):
+        """ Return the testplan full context name. """
+        return "testplan."+context
+
+    @staticmethod
     def get_or_create(context, testkeys=None):
         """ Get current or create new objects.
         @param testkeys Must be an instance of TestKey.

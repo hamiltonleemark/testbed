@@ -2,17 +2,15 @@
 
 {% block content %}
 
-<h1>Test Results</h1>
-
 <table>
  <tr>
-  <td>Product</td><td>Branch Name</td><td>Result</td>
+  <th>Product</th><th>Branch Name</th><th></th>
  </tr>
  {% for product in products %}
   <tr>
    <td>{{product.name}}</td>
    <td>{{product.branch}}</td>
-   <td><a href="/product/{{product.id}}">result</a></td>
+   <td><a href="/branch/testsuites/{{product.id}}">testsuite results</a></td>
   </tr>
  {% endfor %}
 </table>
