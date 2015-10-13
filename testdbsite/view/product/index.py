@@ -48,4 +48,3 @@ def view_product(_, pid):
 
     html_data = {}
     return render_to_response("products/index.html", html_data)
-    

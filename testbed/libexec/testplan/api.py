@@ -79,7 +79,7 @@ def planorder_get(context, testsuite_name, keys):
                                             testsuite__name=name)
 
 
-def remove(context, testsuite_name):
+def remove(context, order):
     """ Get or create a testplan in a certain order.
 
     @param context Testplan context organizes testplans in a logical group.
@@ -90,14 +90,13 @@ def remove(context, testsuite_name):
     @param testsuite_name The testsuite name for the testplan
     """
 
-    from testdb.models import Testplan
-    from testdb.models import Context
+    from testdb import models
 
-    planorder = planorder_get(context, testsuite_name, [])
-    planorder.delete()
-
-    (context, _) = Context.objects.get_or_create(name=context)
-    Testplan.objects.get(context=context)
+    (context, _) = models.Context.objects.get_or_create(name=context)
+    testplan = models.Testplan.objects.get(context=context)
+    order = testplan.testplanorder_set.get(order=order)
+    if order:
+        order.delete()
 
     return True
 

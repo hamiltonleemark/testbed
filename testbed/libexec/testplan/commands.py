@@ -32,7 +32,7 @@ def do_add(args):
 def do_remove(args):
     """ Add a testsuite to the database. """
 
-    return api.remove(args.context, args.testsuite)
+    return api.remove(args.context, args.order)
 
 
 def do_list(args):
@@ -48,24 +48,26 @@ def do_list(args):
         testkeys = {str(item.testkey.key): str(item.testkey.value)
                     for item in testplan.testplankeyset_set.all()}
 
-        testsuites = []
+        orders = []
         for plan in testplan.testplanorder_set.order_by("order"):
-            for testsuite in plan.testsuite_set.all():
+
+            testsuites = plan.testsuite_set.all()
+            for testsuite in testsuites:
                 testsuitekeys = {
                     str(item.testkey.key): str(item.testkey.value)
                     for item in testsuite.testsuitekeyset_set.all()
                     }
-                testsuites.append({
-                    "order": plan.order,
+                orders.append({
                     "name": str(testsuite.name_get()),
-                    "keys": testsuitekeys,
-                    "tests": [item for item in testsuite.test_set.all()]
+                    "order": plan.order,
+                    "tests": [item for item in testsuite.test_set.all()],
+                    "keys": testsuitekeys
                     })
 
         if testkeys:
             level["testkey"] = testkeys
         if testsuites:
-            level["testsuites"] = testsuites
+            level["testsuites"] = orders
         root[args.context] = level
     print yaml.dump(root, default_flow_style=False)
 
@@ -184,7 +186,7 @@ def add_subparser(subparser):
         "remove", description="Remove a testsuite from the testplan",
         help="Remove a testsuite.")
     parser.set_defaults(func=do_remove)
-    parser.add_argument("testsuite", type=str, help="Name of the testsuite.")
+    parser.add_argument("order", type=int, help="Remove plan based on order.")
 
     ##
     # List

@@ -1,35 +1,14 @@
 from django.shortcuts import render_to_response
 from testdb import models
 
-class ProductView(object):
-    def __init__(self, product):
+class View(object):
+    def __init__(self, planorder):
         """Contruct a product view. """
-        self.product = product
+        self.order = planorder[0]
+        self.testsuite = planorder[1]
 
-    def id(self):
-        """ Return the name of the product. """
-        return str(self.product.id)
-
-    def context(self):
-        """ Return the name of the product. """
-        return str(self.product.context.name)
-
-    def name(self):
-        """ Return the name of the product. """
-        return str(self.product.product)
-
-    def branch(self):
-        """ Return the name of the product branch. """
-        return str(self.product.branch)
-
-def view(_):
-    """ Summarize product information. """
-
-    testplans = models.TestProduct.filter(None, None)
-
-    products = [ProductView(item) for item in testplans]
-    html_data = {"products": products}
-    return render_to_response("products/index.html", html_data)
+        testkeys = self.testsuite.testsuitekeyset_set.all()
+        self.keys = [item.testkey for item in testkeys]
 
 def view(request, pid):
     """ Summarize product information. """
@@ -45,9 +24,12 @@ def view(request, pid):
     # retrieve the testplan value.
     try:
         testplans = models.Testplan.objects.get(context__name=context)
-        planorders = [item for item in testplans.testsuites_all()]
+        planorders = [View(item) for item in testplans.testsuites_all()]
     except models.Testplan.DoesNotExist:
         planorders = []
 
-    html_data = {"planorders": planorders}
+    html_data = {
+        "headers": ["key1", "key2"],
+        "planorders": planorders
+        }
     return render_to_response("branch/testsuites/index.html", html_data)
