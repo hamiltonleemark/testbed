@@ -19,22 +19,18 @@ CLI for tests.
 """
 import logging
 import yaml
+import argparse
 from . import api
 from testbed.core import config
 
 LOGGER = logging.getLogger(__name__)
 
 
-def do_set_result(args):
+def do_set(args):
     """ Add a test. """
 
-    keys = [
-        ("product", args.product),
-        ("branch", args.branch),
-        ("build", args.build)
-        ]
-
-    api.set_result(args.context, keys, args.testsuite, args.test, args.result)
+    api.set_result(args.context, args.product, args.branch, args.build,
+                   args.testsuite, args.test, args.keys, args.result)
 
 
 def do_list_result(args):
@@ -87,13 +83,15 @@ def add_subparser(subparser):
 
     parser = subparser.add_parser("set", help="set test result",
                                   description="set test result")
-    parser.set_defaults(func=do_set_result)
+    parser.set_defaults(func=do_set)
     parser.add_argument("product", type=str, help="Name of product.")
     parser.add_argument("branch", type=str, help="Product branch name.")
     parser.add_argument("build", type=str, help="build.")
     parser.add_argument("testsuite", type=str, help="Testsuite name.")
     parser.add_argument("test", type=str, help="test name")
     parser.add_argument("result", default=None, choices=["pass", "fail"],
+                        help="Specify result for a test.")
+    parser.add_argument("keys", default=[], nargs=argparse.REMAINDER,
                         help="Specify result for a test.")
 
     parser = subparser.add_parser("list",

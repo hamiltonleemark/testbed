@@ -4,16 +4,23 @@
 
 <table>
  <tr>
-  <th>#</th><th>Testsuite</th>
+  <th colspan="100%">Product {{product.product}} {{product.branch}}</th>
+ </tr>
+ <tr>
+  <th>#</th>
   {% for header in headers %}
   <th>{{header}}</th>
+  {% endfor %}
+  <th>Testsuite</th>
+  {% for build in builds %}
+   <th>{{build}}</th>
   {% endfor %}
  </tr>
  {% for planorder in planorders %}
   <tr>
    <td>{{planorder.order}}</td>
-   <td>{{planorder.testsuite.name}}</td>
    {% for key in planorder.keys %}<td>{{key.value}}</td> {% endfor %}
+   <td>{{planorder.testsuite.name}}</td>
   </tr>
  {% endfor %}
 </table>

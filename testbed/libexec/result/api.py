@@ -3,11 +3,14 @@ Functionality common to more than one command.
 """
 import logging
 from testbed.libexec import testsuite
+from testbed.libexec import product
+from testbed.libexec import testplan
 
 
 # pylint: disable=R0913
 # pylint: disable=R0914
-def set_result(context, testsuite_name, test_name, result, testkeys=None):
+def set_result(context, product_name, branch, build, testsuite_name, test_name,
+               keys, result):
     """ Get or create a testplan in a certain order.
 
     @param product_name Is the name of the product
@@ -17,17 +20,26 @@ def set_result(context, testsuite_name, test_name, result, testkeys=None):
     """
     from testdb import models
 
-    if not testkeys:
-        testkeys = []
+    logging.info("result for %s %s %s", testsuite_name, test_name, result)
+    context = models.Context.objects.get(name=context)
+    for proditem in product.api.filter(product_name, branch):
+        testplan_name = proditem.key_get("testplan", None)
+        if testplan_name is None:
+            continue
 
-    logging.info("result for %s %s %s", testsuite_name, test_name,
-                 result)
+        print "MARK: testplan_name", testplan_name
+        order = testplan.api.planorder_get("testplan.%s" % testplan_name,
+                                           testsuite_name, keys)
+        if order is None:
+            continue
 
-    (testsuite1, created) = testsuite.api.add_testsuite(context,
-                                                        testsuite_name,
-                                                        testkeys)
+        testkeys = [models.TestKey.get_or_create("build", build)[0]]
+        (testsuite1, _) = models.Testsuite.get_or_create(context,
+                                                         testsuite_name,
+                                                         order, testkeys)
+        print "MARK: testsuite1", testsuite1.id
 
-    (test, created) = models.Test.get_or_create(testsuite1, test_name, [])
+        (test, created) = models.Test.get_or_create(testsuite1, test_name, [])
 
     if result == "pass":
         test.status = 0

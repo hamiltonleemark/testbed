@@ -23,14 +23,14 @@ from . import api
 CONTEXT = "default"
 
 
-def add_testsuite(args):
+def do_add_testsuite(args):
     """ Add a testsuite to the database. """
 
     logging.info("adding testsuite %s", args.name)
     api.add_testsuite(args.context, args.name, [])
 
 
-def list_testsuite(args):
+def do_list_testsuite(args):
     """ List testsuites based on search criteria. """
 
     from testdb import models
@@ -53,7 +53,7 @@ def add_subparser(subparser):
     parser = subparser.add_parser("add",
                                   description="Add a testsuite",
                                   help="Add a testsuite.")
-    parser.set_defaults(func=add_testsuite)
+    parser.set_defaults(func=do_add_testsuite)
     parser.add_argument("name", type=str, help="Name of the testsuite.")
 
     ##
@@ -62,7 +62,7 @@ def add_subparser(subparser):
                                   description="List all of the testsuites.",
                                   help="List testsuite.")
     parser.add_argument("--filter", type=str, help="Filter testsuites")
-    parser.set_defaults(func=list_testsuite)
+    parser.set_defaults(func=do_list_testsuite)
 
     ##
     # CLI for adding testsuite keys

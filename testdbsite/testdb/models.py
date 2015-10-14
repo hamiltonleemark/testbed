@@ -355,9 +355,7 @@ class Testplan(models.Model):
         """ Testsuite set associated with this testplan.
         @return (order, testsuite)
         """
-        print "MARK: all"
         for item in self.testplanorder_set.all().order_by("order"):
-            print "MARK: items", item, item.testsuite_set.all()
             yield (item.order, item.testsuite_set.all()[0])
 
     @staticmethod

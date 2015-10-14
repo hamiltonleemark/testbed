@@ -4,13 +4,14 @@
 
 <table>
  <tr>
-  <th>Product</th><th>Branch Name</th><th></th>
+  <th>Product</th><th>Branch Name</th><th>Results</th>
  </tr>
  {% for product in products %}
   <tr>
    <td>{{product.name}}</td>
    <td>{{product.branch}}</td>
-   <td><a href="/branch/testsuites/{{product.id}}">testsuite results</a></td>
+   <td><a href="/branch/testsuites/{{product.id}}">testsuites</a></td>
+   <td><a href="/branch/tests/{{product.id}}">tests</a></td>
   </tr>
  {% endfor %}
 </table>

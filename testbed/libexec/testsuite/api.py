@@ -21,7 +21,7 @@ import logging
 from testbed.libexec import testplan
 
 
-def add_testsuite(context, testsuite_name, testkeys):
+def add_testsuite(context, testsuite_name, build, testkeys):
     """ Add a testsuite to the database. """
 
     from testdb import models
@@ -29,12 +29,9 @@ def add_testsuite(context, testsuite_name, testkeys):
 
     ##
     # \todo Keep only testkeys that are associated to a testplan
-    testplankeys = [item for item in testkeys if item[0] != "build"]
-
     testplanorder = testplan.api.planorder_get(testplan.api.CONTEXT,
-                                               testsuite_name, testplankeys)
-    testkeys = [models.TestKey.get_or_create(key, value)[0]
-                for (key, value) in testkeys if key == "build"]
+                                               testsuite_name, testkeys)
+    testkeys = [models.TestKey.get_or_create("build", build)]
     return models.Testsuite.get_or_create(context, testsuite_name,
                                           testplanorder, testkeys)
 

@@ -36,9 +36,11 @@ def do_build_list(args):
     """ List builds for a product.  """
 
     from testdb import models
+    from testdb import builds
+
     logging.info("listing builds")
 
-    (context, _) = models.Context.objects.get_or_create(name=api.CONTEXT)
+    (context, _) = models.Context.objects.get_or_create(name=builds.CONTEXT)
 
     find = models.Testsuite.objects.filter(context=context)
     if args.product:

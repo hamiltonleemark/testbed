@@ -5,9 +5,6 @@ import logging
 import datetime
 
 
-CONTEXT = "build.default"
-
-
 # pylint: disable=R0914
 def get_or_create(productname, branchname, buildname, when=None):
     """ Get or create a testplan in a certain order.
@@ -17,13 +14,14 @@ def get_or_create(productname, branchname, buildname, when=None):
                  appears on web pages.
     """
     from testdb import models
+    from testdb import builds
 
     if not when:
         when = datetime.datetime.now()
 
     logging.info("adding build %s %s %s %s", productname, branchname,
                  buildname, when)
-    (context, _) = models.Context.objects.get_or_create(name=CONTEXT)
+    (context, _) = models.Context.objects.get_or_create(name=builds.CONTEXT)
     (product, _) = models.TestKey.get_or_create("product", productname)
     (branch, _) = models.TestKey.get_or_create("branch", branchname)
     (build, _) = models.TestKey.get_or_create("build", buildname)
@@ -36,20 +34,12 @@ def get_or_create(productname, branchname, buildname, when=None):
     return results
 
 
-def build_list(productname, branchname=None):
+def build_list(product_name, branch_name=None):
     """ Return the list builds given the parameters. """
+    from testdb import builds
     from testdb import models
 
-    logging.info("list build %s %s", productname, branchname)
-    (context, _) = models.Context.objects.get_or_create(name=CONTEXT)
-    find = models.Testsuite.objects.filter(context=context)
+    (product_name, _) = models.TestKey.get_or_create("product", product_name)
+    (branch_name, _) = models.TestKey.get_or_create("branch", branch_name)
 
-    if productname:
-        (product, _) = models.TestKey.get_or_create("product", productname)
-        find = find.filter(keys=product)
-
-    if branchname:
-        (branch, _) = models.TestKey.get_or_create("branch", branchname)
-        find = find.filter(keys=branch)
-
-    return [item.key_get("build") for item in find]
+    return builds.list(product_name, branch_name)

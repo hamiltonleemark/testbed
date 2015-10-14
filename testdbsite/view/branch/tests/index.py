@@ -3,11 +3,13 @@ from testdb import models
 from testdb import builds
 
 class View(object):
-    def __init__(self, planorder):
+    def __init__(self, order, testsuite, test):
         """Contruct a product view. """
-        self.order = planorder[0]
-        self.testsuite = planorder[1]
+        self.order = order
+        self.testsuite = testsuite
+        self.test = test
 
+        # \todo consider removing this.
         testkeys = self.testsuite.testsuitekeyset_set.all()
         self.keys = [item.testkey for item in testkeys]
 
@@ -25,7 +27,11 @@ def view(request, pid):
     # retrieve the testplan value.
     try:
         testplans = models.Testplan.objects.get(context__name=context)
-        planorders = [View(item) for item in testplans.testsuites_all()]
+
+	    for testsuite in testplans.testsuites_all():
+	        for (order, testsuite) in testsuites.testset_all():
+                planorders = [View(order, testsuite, item)
+                              for item in testplans.testsuites_all()]
     except models.Testplan.DoesNotExist:
         planorders = []
 
@@ -40,4 +46,4 @@ def view(request, pid):
         "planorders": planorders,
         "builds": blist
         }
-    return render_to_response("branch/testsuites/index.html", html_data)
+    return render_to_response("branch/tests/index.html", html_data)

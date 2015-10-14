@@ -24,7 +24,6 @@ class ProductView(object):
 
 def view(_):
     """ Summarize product information. """
-
     testplans = models.TestProduct.filter(None, None)
 
     products = [ProductView(item) for item in testplans]
