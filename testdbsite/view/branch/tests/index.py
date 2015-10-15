@@ -27,9 +27,8 @@ def view(request, pid):
     # retrieve the testplan value.
     try:
         testplans = models.Testplan.objects.get(context__name=context)
-
-	    for testsuite in testplans.testsuites_all():
-	        for (order, testsuite) in testsuites.testset_all():
+        for testsuite in testplans.testsuites_all():
+            for (order, testsuite) in testsuites.testset_all():
                 planorders = [View(order, testsuite, item)
                               for item in testplans.testsuites_all()]
     except models.Testplan.DoesNotExist:
