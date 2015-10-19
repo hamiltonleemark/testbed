@@ -27,7 +27,7 @@ def do_add_testsuite(args):
     """ Add a testsuite to the database. """
 
     logging.info("adding testsuite %s", args.name)
-    api.add_testsuite(args.context, args.name, [])
+    api.add_testsuite(args.context, args.name, args.build, [])
 
 
 def do_list_testsuite(args):
@@ -55,6 +55,8 @@ def add_subparser(subparser):
                                   help="Add a testsuite.")
     parser.set_defaults(func=do_add_testsuite)
     parser.add_argument("name", type=str, help="Name of the testsuite.")
+    parser.add_argument("build", type=str,
+                        help="Build associated with the testsuite.")
 
     ##
     # List

@@ -26,14 +26,11 @@ class ProductView(object):
 def view(_):
     """ Summarize product information. """
 
-    print "MARK: index.view"
-
     testplans = models.TestProduct.filter(None, None)
 
     products = [ProductView(item) for item in testplans]
 
     blist = builds.list(product.product, product.branch)
-    print "MARK: blist", blist
 
     html_data = {"products": products}
     return render_to_response("products/index.html", html_data)

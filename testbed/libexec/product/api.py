@@ -8,24 +8,29 @@ CONTEXT = "product.default"
 
 
 # pylint: disable=R0914
-
-def filter(product_name, branch_name):
-    """ Return product based on context. """
+# pylint: disable=W0622
+# \todo this should be named branches
+def filter(product_name, branch_name=None):
+    """ Return list of products based on name and branch name. """
 
     from testdb.models import Context
     from testdb.models import Key
     from testdb.models import TestProduct
 
-    context = Context.objects.get(name=CONTEXT)
+    (context, _) = Context.objects.get_or_create(name=CONTEXT)
     product = Key.objects.get(value=product_name)
-    branch = Key.objects.get(value=branch_name)
 
-    return TestProduct.objects.filter(context=context, product=product,
-                                      branch=branch)
+    find = TestProduct.objects.filter(context=context, product=product)
+    if branch_name:
+        branch = Key.objects.get(value=branch_name)
+        find = find.filter(branch=branch)
+    return find
+# pylint: enable=W0622
 
 
 def get_or_create(productname, branchname, order=-1):
     """ Get or create a testplan in a certain order.
+
     @param product_name Is the name of the product
     @param order order is the location of the testplan in the list of
                  testplans. The order effects the location the testplan

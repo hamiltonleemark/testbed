@@ -25,7 +25,7 @@ pyflakes:: $(addsuffix .pyflakes,$(PYTHON_FILES))
 .PHONY: pylint
 %.pylint::
 	export PYTHONPATH=$(PYTHONPATH);pylint --reports=n --disable=I0011 \
-          --disable=R0801 --disable=E1101 \
+          --disable=R0801 --disable=E1101 --disable=I0012 \
           --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
 	  --generated-members=objects,MultipleObjectsReturned,get_or_create $*
 

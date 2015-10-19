@@ -27,13 +27,16 @@ def add_testsuite(context, testsuite_name, build, testkeys):
     from testdb import models
     logging.info("adding testsuite %s", testsuite_name)
 
+    if testkeys is None:
+        testkeys = []
+
     ##
     # \todo Keep only testkeys that are associated to a testplan
     testplanorder = testplan.api.planorder_get(testplan.api.CONTEXT,
                                                testsuite_name, testkeys)
-    testkeys = [models.TestKey.get_or_create("build", build)]
+    buildkey = models.TestKey.get_or_create("build", build)[0]
     return models.Testsuite.get_or_create(context, testsuite_name,
-                                          testplanorder, testkeys)
+                                          testplanorder, buildkey, [])
 
 
 # \todo This should be called filter

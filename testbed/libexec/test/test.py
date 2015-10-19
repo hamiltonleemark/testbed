@@ -46,10 +46,10 @@ class TestTestCase(TestCase):
 
         testplan.api.get_or_create(testplan.api.CONTEXT, "testsuite1",
                                    testplan.api.ORDER_NEXT)
-        args = parser.parse_args("test add testsuite1 test1".split())
+        args = parser.parse_args("test add build1 testsuite1 test1".split())
         args.func(args)
 
-        args = parser.parse_args("test add testsuite1 test2".split())
+        args = parser.parse_args("test add build1 testsuite1 test2".split())
         args.func(args)
 
         names = [item.name.name for item in Testsuite.contains("default",
@@ -70,7 +70,7 @@ class TestTestCase(TestCase):
 
         parser = TestTestCase.parser_create()
 
-        cmd = "test add testsuite1 test1 --context testplan1"
+        cmd = "test add build1 testsuite1 test1 --context testplan1"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
@@ -104,15 +104,15 @@ class TestTestCase(TestCase):
         testplan.api.get_or_create(testplan.api.CONTEXT, "testsuite3",
                                    testplan.api.ORDER_NEXT)
 
-        cmd = "test add testsuite2 test1"
+        cmd = "test add build1 testsuite2 test1"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "test add testsuite3 test2"
+        cmd = "test add build1 testsuite3 test2"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "test add testsuite3 test3"
+        cmd = "test add build1 testsuite3 test3"
         args = parser.parse_args(cmd.split())
         args.func(args)
 

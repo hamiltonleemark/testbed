@@ -44,10 +44,10 @@ class TestsuiteTestCase(TestCase):
                                    testplan.api.ORDER_NEXT)
         testplan.api.get_or_create(testplan.api.CONTEXT, "mark",
                                    testplan.api.ORDER_NEXT)
-        args = parser.parse_args("testsuite add bob".split())
+        args = parser.parse_args("testsuite add bob build1".split())
         args.func(args)
 
-        args = parser.parse_args("testsuite add mark".split())
+        args = parser.parse_args("testsuite add mark build1".split())
         args.func(args)
 
         names = [item.name.name for item in Testsuite.objects.all()]
@@ -64,7 +64,7 @@ class TestsuiteTestCase(TestCase):
         testplan.api.get_or_create(testplan.api.CONTEXT, "testsuite1",
                                    testplan.api.ORDER_NEXT)
 
-        cmd = "testsuite --context testplan add testsuite1"
+        cmd = "testsuite --context testplan add testsuite1 build1"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
@@ -84,15 +84,15 @@ class TestsuiteTestCase(TestCase):
         testplan.api.get_or_create(testplan.api.CONTEXT, "testsuite_ken1",
                                    testplan.api.ORDER_NEXT)
 
-        cmd = "testsuite add testsuite_bob1"
+        cmd = "testsuite add testsuite_bob1 build1"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "testsuite add testsuite_bob2"
+        cmd = "testsuite add testsuite_bob2 build1"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "testsuite add testsuite_ken1"
+        cmd = "testsuite add testsuite_ken1 build1"
         args = parser.parse_args(cmd.split())
         args.func(args)
 

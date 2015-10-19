@@ -29,14 +29,14 @@ class TestsuiteTestCase(TestCase):
 
     @staticmethod
     def parser_create():
-        """ Create sub parser. """
+        """ parser_create Create sub parser. """
         arg_parser = argparse.ArgumentParser(prog="tbd")
         subparser = arg_parser.add_subparsers(title="subcommands")
         commands.add_subparser(subparser)
         return arg_parser
 
     def test_commands_add(self):
-        """ Add a testsuite. """
+        """ test_commands_add. add a testsuite. """
         parser = TestsuiteTestCase.parser_create()
 
         args = parser.parse_args("build add product1 branch1 build1".split())
@@ -45,7 +45,7 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args("build add product1 branch1 build2".split())
         args.func(args)
 
-        builds = api.build_list("product1")
+        builds = api.filter("product1")
         self.assertEqual(len(builds), 2)
         self.assertTrue("build1" in builds)
         self.assertTrue("build2" in builds)

@@ -25,6 +25,7 @@ from . import api
 from testbed.libexec import build
 from testbed.libexec import testsuite
 from testbed.libexec import testplan
+from testbed.libexec import product
 
 
 # pylint: disable=R0914

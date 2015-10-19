@@ -9,8 +9,8 @@ from testbed.libexec import testplan
 
 # pylint: disable=R0913
 # pylint: disable=R0914
-def set_result(context, product_name, branch, build, testsuite_name, test_name,
-               keys, result):
+def set_result(context, product_name, branch_name, build, testsuite_name,
+               test_name, result, keys):
     """ Get or create a testplan in a certain order.
 
     @param product_name Is the name of the product
@@ -22,31 +22,29 @@ def set_result(context, product_name, branch, build, testsuite_name, test_name,
 
     logging.info("result for %s %s %s", testsuite_name, test_name, result)
     context = models.Context.objects.get(name=context)
-    for proditem in product.api.filter(product_name, branch):
-        testplan_name = proditem.key_get("testplan", None)
-        if testplan_name is None:
-            continue
+    (product1, _) = product.api.get_or_create(product_name, branch_name)
 
-        print "MARK: testplan_name", testplan_name
-        order = testplan.api.planorder_get("testplan.%s" % testplan_name,
-                                           testsuite_name, keys)
-        if order is None:
-            continue
+    testplan_name = product1.key_get("testplan", None)
+    if testplan_name is None:
+        testplan_name = "default"
+        (testplan_key, _) = models.TestKey.get_or_create("testplan",
+                                                         testplan_name)
+        models.TestProductKeySet.objects.create(testproduct=product1,
+                                                testkey=testplan_key)
 
-        testkeys = [models.TestKey.get_or_create("build", build)[0]]
-        (testsuite1, _) = models.Testsuite.get_or_create(context,
-                                                         testsuite_name,
-                                                         order, testkeys)
-        print "MARK: testsuite1", testsuite1.id
+    order = testplan.api.planorder_get_or_create(
+        "testplan.%s" % testplan_name, testsuite_name, keys)
 
-        (test, created) = models.Test.get_or_create(testsuite1, test_name, [])
+    build_key = models.TestKey.get_or_create("build", build)[0]
+    (testsuite1, _) = models.Testsuite.get_or_create(context, testsuite_name,
+                                                     order, build_key, [])
+    (test, created) = models.Test.get_or_create(testsuite1, test_name, [])
 
     if result == "pass":
         test.status = 0
     else:
         test.status = 1
-    test.save()
-
+        test.save()
     return (test, created)
 
 

@@ -18,27 +18,24 @@
 CLI for tests.
 """
 import logging
+from testbed.libexec import testsuite
 
 LOGGER = logging.getLogger(__name__)
 
 
-def add_test(args):
+def do_add_test(args):
     """ Add a test. """
 
     from testdb import models
-    from testbed.libexec import testplan
 
     LOGGER.info("adding test %s.%s", args.testsuite, args.name)
-
-    planorder = testplan.api.planorder_get(
-        testplan.api.ROOT + "." + args.context, args.testsuite, [])
-    (testsuite, _) = models.Testsuite.get_or_create(args.context,
-                                                    args.testsuite, planorder,
-                                                    [])
-    models.Test.get_or_create(testsuite, args.name, [])
+    (testsuite1, _) = testsuite.api.add_testsuite(args.context,
+                                                  args.testsuite, args.build,
+                                                  [])
+    models.Test.get_or_create(testsuite1, args.name, [])
 
 
-def list_test(args):
+def do_list_test(args):
     """ List testsuites based on search criteria. """
 
     from testdb import models
@@ -60,7 +57,8 @@ def add_subparser(subparser):
 
     parser = subparser.add_parser("add", help="add a test",
                                   description="add a test")
-    parser.set_defaults(func=add_test)
+    parser.set_defaults(func=do_add_test)
+    parser.add_argument("build", type=str, help="Build id")
     parser.add_argument("testsuite", type=str, help="Testsuite name.")
     parser.add_argument("name", type=str, help="test name")
     parser.add_argument("--context", default="default", type=str,
@@ -70,5 +68,5 @@ def add_subparser(subparser):
                                   description="List tests in their testsuit.",
                                   help="List test.")
     parser.add_argument("--filter", type=str, help="Filter testsuites")
-    parser.set_defaults(func=list_test)
+    parser.set_defaults(func=do_list_test)
     return subparser

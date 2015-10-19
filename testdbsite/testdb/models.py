@@ -252,7 +252,8 @@ class Testsuite(models.Model):
         return find.filter(name__name__contains=testsuite_name)
 
     @staticmethod
-    def get_or_create(context, testsuite_name, testplanorder, testkeys):
+    def get_or_create(context, testsuite_name, testplanorder, buildkey,
+                      testkeys):
         """ Get current or create new objects.
 
         @param testkeys Must be an instance of TestKey.
@@ -265,7 +266,8 @@ class Testsuite(models.Model):
 
         ##
         # Look for testsuite.
-        find = Testsuite.objects.filter(context=context, name=name)
+        find = Testsuite.objects.filter(context=context, name=name,
+                                        keys=buildkey)
         for testkey in testkeys:
             find = find.filter(keys=testkey)
 
@@ -277,7 +279,7 @@ class Testsuite(models.Model):
 
         testsuite = Testsuite.objects.create(name=name, context=context,
                                              testplanorder=testplanorder)
-        for testkey in testkeys:
+        for testkey in testkeys + [buildkey]:
             TestsuiteKeySet.objects.create(testsuite=testsuite,
                                            testkey=testkey)
         return (testsuite, True)
@@ -501,8 +503,7 @@ class TestProduct(models.Model):
                                                                   product,
                                                                   branch))
 
-        product = TestProduct.objects.create(context=context,
-                                             product=product,
+        product = TestProduct.objects.create(context=context, product=product,
                                              branch=branch)
         for testkey in testkeys:
             TestProductKeySet.objects.create(testproduct=product,

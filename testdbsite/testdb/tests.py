@@ -33,7 +33,7 @@ from .models import TestplanOrder
 class TestsuiteTestCase(TestCase):
     """ Test various aspects of a testsuite. """
 
-    def testsuite_create_basic(self):
+    def testsuite_basic(self):
         """ Test creating a testsuite. """
 
         start_time = timezone.now()
@@ -55,15 +55,16 @@ class TestsuiteTestCase(TestCase):
         # is working.
         self.assertTrue(testsuite.timestamp >= start_time)
 
-    def testsuite_create_method(self):
-        """ Test creating a testsuite. """
+    def testsuite_create(self):
+        """ testsuite_create Test creating a testsuite. """
 
         start_time = timezone.now()
 
-        keys = (TestKey.get_or_create("key1", "value1")[0],
-                TestKey.get_or_create("key2", "value2")[0])
+        keys = [TestKey.get_or_create("key1", "value1")[0],
+                TestKey.get_or_create("key2", "value2")[0]]
+        buildkey = TestKey.get_or_create("build", "build1")[0]
         (testsuite, _) = Testsuite.get_or_create("default", "testsuite_name",
-                                                 None, keys)
+                                                 None, buildkey, keys)
 
         ##
         # Making sure auto assignment of current time for the timestamp field
@@ -71,7 +72,7 @@ class TestsuiteTestCase(TestCase):
         self.assertTrue(testsuite.timestamp >= start_time)
 
         (testsuite1, _) = Testsuite.get_or_create("default", "testsuite_name",
-                                                  None, keys)
+                                                  None, buildkey, keys)
         self.assertTrue(testsuite1.timestamp >= start_time)
 
         self.assertTrue(testsuite.timestamp == testsuite1.timestamp)
@@ -80,21 +81,22 @@ class TestsuiteTestCase(TestCase):
     def test_create_method(self):
         """ Test creating a testsuite. """
 
-        keys = (TestKey.get_or_create("key1", "value1")[0],
-                TestKey.get_or_create("key2", "value2")[0])
+        keys = [TestKey.get_or_create("key1", "value1")[0],
+                TestKey.get_or_create("key2", "value2")[0]]
+        buildkey = TestKey.get_or_create("build", "build1")[0]
 
         (testsuite, _) = Testsuite.get_or_create("default", "testsuite_name1",
-                                                 None, keys)
-        (test1, _) = Test.get_or_create(testsuite, "test_name1", keys)
-        (test2, _) = Test.get_or_create(testsuite, "test_name2", keys)
+                                                 None, buildkey, keys)
+        (test1, _) = Test.get_or_create(testsuite, "test_name1", [])
+        (test2, _) = Test.get_or_create(testsuite, "test_name2", [])
 
         self.assertTrue(test1.id != test2.id)
 
     def testplan_order(self):
         """ Test the creation and order support of test plan. """
 
-        test_keys = [TestKey.get_or_create("key1", "value1.1")]
-        test_keys = [item[0] for item in test_keys]
+        test_keys = [TestKey.get_or_create("key1", "value1.1")[0]]
+        build_key = TestKey.get_or_create("build", "build1")[0]
 
         (testplan, rtc) = Testplan.get_or_create("testplan.default", test_keys)
         self.assertTrue(rtc, "testplan not created")
@@ -104,13 +106,13 @@ class TestsuiteTestCase(TestCase):
         self.assertTrue(rtc, "testplanorder not created")
 
         (_, rtc) = Testsuite.get_or_create("testplan.default", "testsuite1",
-                                           testplanorder, [])
+                                           testplanorder, build_key, [])
         self.assertTrue(rtc, "testsuite1 not created")
 
         (testplanorder, rtc) = TestplanOrder.objects.get_or_create(
             testplan=testplan, order=2)
         (_, rtc) = Testsuite.get_or_create("default", "testsuite2",
-                                           testplanorder, [])
+                                           testplanorder, build_key, [])
         self.assertTrue(rtc, "testsuite2 not created")
         testplans = TestplanOrder.objects.order_by("order")
         testsuites = [Testsuite.objects.get(testplanorder=item)

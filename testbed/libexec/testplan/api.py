@@ -9,7 +9,7 @@ ORDER_NEXT = -1
 
 
 # pylint: disable=R0914
-def get_or_create(context, testsuite_name, order):
+def get_or_create(context, testsuite_name, order=ORDER_NEXT):
     """ Get or create a testplan and set order.
 
     Order is just that the location of the testplan in the list of testplans.
@@ -61,9 +61,9 @@ def planorder_get(context, testsuite_name, keys):
     from testdb import models
 
     testkeys = [models.TestKey.get_or_create(key=key, value=value)[0]
-                for (key, value) in keys if key != "build"]
+                for (key, value) in keys]
 
-    context = models.Context.objects.get(name=context)
+    (context, _) = models.Context.objects.get_or_create(name=context)
     find = models.Testplan.objects.filter(context=context)
     for testkey in testkeys:
         find = find.filter(keys=testkey)
@@ -77,6 +77,30 @@ def planorder_get(context, testsuite_name, keys):
     return models.TestplanOrder.objects.get(testplan=testplans[0],
                                             testsuite__context=context,
                                             testsuite__name=name)
+
+
+def planorder_get_or_create(context, testsuite_name, keys):
+    """ Return TestplanOrder. """
+
+    from testdb import models
+
+    testkeys = [models.TestKey.get_or_create(key=key, value=value)[0]
+                for (key, value) in keys]
+
+    (context, _) = models.Context.objects.get_or_create(name=context)
+    find = models.Testplan.objects.filter(context=context)
+    for testkey in testkeys:
+        find = find.filter(keys=testkey)
+
+    testplans = [item for item in find]
+    if len(testplans) == 0:
+        return None
+
+    (name, _) = models.TestsuiteName.objects.get_or_create(name=testsuite_name)
+    # \todo deal with many test plan or zero.
+    return models.TestplanOrder.objects.get_or_create(
+        testplan=testplans[0], testsuite__context=context,
+        testsuite__name=name)
 
 
 def remove(context, order):

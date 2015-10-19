@@ -138,7 +138,6 @@ def do_test_add(args):
         raise argparse.ArgumentError("testplan %s does not contain %s",
                                      args.context, args.order)
 
-    print "MARK: adding test", testsuite, args.name
     models.Test.get_or_create(testsuite, args.name, [])
     logging.info("add test %s to testsuite %s.%s", args.name, planorder.order,
                  testsuite.name)

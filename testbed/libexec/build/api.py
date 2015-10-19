@@ -24,22 +24,27 @@ def get_or_create(productname, branchname, buildname, when=None):
     (context, _) = models.Context.objects.get_or_create(name=builds.CONTEXT)
     (product, _) = models.TestKey.get_or_create("product", productname)
     (branch, _) = models.TestKey.get_or_create("branch", branchname)
-    (build, _) = models.TestKey.get_or_create("build", buildname)
+    (build_key, _) = models.TestKey.get_or_create("build", buildname)
 
-    testkeys = [product, branch, build]
+    testkeys = [product, branch]
     name = "%s.%s" % (productname, branchname)
 
-    results = models.Testsuite.get_or_create(context, name, None, testkeys)
+    # \todo testsuite should point to product
+    results = models.Testsuite.get_or_create(context, name, None, build_key,
+                                             testkeys)
 
     return results
 
 
-def build_list(product_name, branch_name=None):
+# pylint: disable=W0622
+def filter(product_name, branch_name=None):
     """ Return the list builds given the parameters. """
     from testdb import builds
     from testdb import models
 
     (product_name, _) = models.TestKey.get_or_create("product", product_name)
-    (branch_name, _) = models.TestKey.get_or_create("branch", branch_name)
+    if branch_name:
+        (branch_name, _) = models.TestKey.get_or_create("branch", branch_name)
 
-    return builds.list(product_name, branch_name)
+    return builds.filter(product_name, branch_name)
+# pylint: enable=W0622
