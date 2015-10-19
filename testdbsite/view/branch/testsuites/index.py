@@ -29,9 +29,16 @@ def view(request, pid):
     except models.Testplan.DoesNotExist:
         planorders = []
 
+    # \todo product should hold TestKeys not keys
+    print "MARK: product", product.product.value
+    product_key = models.TestKey.objects.get(key__value="product",
+                                             value=str(product.product.value))
+    print "MARK: 2"
+    branch_key = models.TestKey.objects.get(key__value="branch",
+                                            value=product.branch.value)
     ##
     # retrieve build list.
-    blist = builds.list(product.product, product.branch)
+    blist = builds.filter(product_key, branch_key)
 
     html_data = {
         # \todo retrieve this from the testplan.
