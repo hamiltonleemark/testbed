@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<table>
+ <tr>
+  <th colspan="100%">Product {{product.product}} {{product.branch}}</th>
+ </tr>
+ <tr>
+  <th>#</th>
+  {% for header in headers %}
+  <th>{{header}}</th>
+  {% endfor %}
+  <th>Testsuite</th>
+  {% for build in builds %}
+   <th>{{build}}</th>
+  {% endfor %}
+ </tr>
+ {% for planorder in planorders %}
+  <tr>
+   <td>{{planorder.order}}</td>
+   {% for key in planorder.keys %}<td>{{key.value}}</td> {% endfor %}
+   <td>{{planorder.testsuite.name}}</td>
+  </tr>
+ {% endfor %}
+</table>
+{% endblock %}

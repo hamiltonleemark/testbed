@@ -35,7 +35,8 @@ def do_list_testsuite(args):
 
     from testdb import models
     logging.info("listing testsuites")
-    testsuites = models.Testsuite.filter(args.context, args.filter, keys=[])
+    context = models.Context.objects.get(name=args.context)
+    testsuites = models.Testsuite.filter(context, args.filter, keys=[])
     for testsuite in testsuites:
         print testsuite
 

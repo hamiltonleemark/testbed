@@ -25,18 +25,23 @@ def view(request, pid):
     ##
     # To view a products specific test plan. Retrieve the product and then
     # retrieve the testplan value.
+    planorders = []
     try:
         testplans = models.Testplan.objects.get(context__name=context)
-        for testsuite in testplans.testsuites_all():
-            for (order, testsuite) in testsuites.testset_all():
-                planorders = [View(order, testsuite, item)
-                              for item in testplans.testsuites_all()]
+        for (order, testsuite1) in testplans.testsuites_all():
+            for test in testsuite1.test_set.all():
+                planorders += [View(order, testsuite, item)
+                               for item in testplans.testsuites_all()]
     except models.Testplan.DoesNotExist:
         planorders = []
 
     ##
     # retrieve build list.
-    blist = builds.list(product.product, product.branch)
+    product_key = models.TestKey.objects.get(key__value="product",
+                                             value=str(product.product.value))
+    branch_key = models.TestKey.objects.get(key__value="branch",
+                                            value=product.branch.value)
+    blist = builds.filter(product_key, branch_key)
 
     html_data = {
         # \todo retrieve this from the testplan.
