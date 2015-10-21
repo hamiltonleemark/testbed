@@ -30,7 +30,7 @@ def do_set(args):
     """ Add a test. """
 
     api.set_result(args.context, args.product, args.branch, args.build,
-                   args.testsuite, args.test, args.keys, args.result)
+                   args.testsuite, args.test, args.result, args.keys)
 
 
 def do_list_result(args):
@@ -63,8 +63,7 @@ def do_list_result(args):
             result = "fail"
 
         data.add([args.context, key, str(build), testsuite_name,
-                  str(test.name)],
-                 result)
+                  str(test.name)], result)
 
     print yaml.dump(data.root, default_flow_style=False)
 

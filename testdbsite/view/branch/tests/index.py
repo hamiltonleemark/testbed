@@ -3,11 +3,16 @@ from testdb import models
 from testdb import builds
 
 class View(object):
-    def __init__(self, order, testsuite, test):
+    order = 1
+    
+    def __init__(self, plan, testsuite, test):
         """Contruct a product view. """
-        self.order = order
+        self.order = View.order
+        View.order += 1
+        self.plan = plan
         self.testsuite = testsuite
         self.test = test
+        self.results = []
 
         # \todo consider removing this.
         testkeys = self.testsuite.testsuitekeyset_set.all()
@@ -17,23 +22,29 @@ def view(request, pid):
     """ Summarize product information. """
 
     context = request.GET.get("context", "default")
-    context = models.Testplan.context_name_get(context)
+    context = models.Context.objects.get(name=context)
 
     product = models.TestProduct.objects.get(id=pid)
-    testplan = product.key_get("testplan", None)
+    testplan_name = product.key_get("testplan", None)
 
     ##
+    # Retrieve the test plan.
     # To view a products specific test plan. Retrieve the product and then
     # retrieve the testplan value.
-    planorders = []
-    try:
-        testplans = models.Testplan.objects.get(context__name=context)
-        for (order, testsuite1) in testplans.testsuites_all():
-            for test in testsuite1.test_set.all():
-                planorders += [View(order, testsuite, item)
-                               for item in testplans.testsuites_all()]
-    except models.Testplan.DoesNotExist:
-        planorders = []
+    planorders = {}
+
+    testplan_context = models.Testplan.context_get(testplan_name)
+    testplan = models.Testplan.objects.get(context=testplan_context)
+
+    testplans = testplan.testplanorder_set.order_by("order")
+    for plan in testplans:
+        testsuites = plan.testsuite_set.filter(context=testplan.context)
+        for testsuite1 in testsuites:
+            for test1 in testsuite1.test_set.all():
+                key = (testsuite1.name.name, test1.name.name)
+                planorders[key] = View(plan, testsuite1, test1)
+
+    ##
 
     ##
     # retrieve build list.
@@ -42,6 +53,19 @@ def view(request, pid):
     branch_key = models.TestKey.objects.get(key__value="branch",
                                             value=product.branch.value)
     blist = builds.filter(product_key, branch_key)
+
+    for testplan in testplans:
+        for buildid in blist:
+            testsuites = testplan.testsuite_set.filter(context=context,
+                                                       keys=buildid)
+            for testsuite1 in testsuites:
+                for test1 in testsuite1.test_set.all():
+                    key = (testsuite1.name.name, test1.name.name)
+                    planorders[key].results.append(test1.status)
+
+    planorders = [(item.order, item) for item in planorders.values()]
+    planorders.sort()
+    planorders = [item[1] for item in planorders]
 
     html_data = {
         # \todo retrieve this from the testplan.

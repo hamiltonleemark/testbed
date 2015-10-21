@@ -98,11 +98,7 @@ class TestplanAdmin(admin.ModelAdmin):
     model = models.Testplan
     extra = 0
 
-    list_display = ("order", "context")
-
-    def order(self, testplan):
-        """ Return the testplan order. """
-        return testplan.order
+    list_display = ("context",)
 
     def context(self, testplan):
         """ Return testplan context. """

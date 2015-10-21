@@ -87,6 +87,7 @@ class TestKey(models.Model):
             models.Q(value__contains=contains))
 
 
+# \todo Look at making testName a TestKey.
 class TestName(models.Model):
     """ Name of testsuite."""
     name = models.CharField(max_length=128, unique=True)
@@ -104,14 +105,20 @@ class Test(models.Model):
     keys = models.ManyToManyField(TestKey, through="TestKeySet")
     status = models.IntegerField(default=-1, blank=True, null=True)
 
+    # \todo key_get should return only Testkey to make effecient.
     def key_get(self, key):
         """ Return value given key. """
         return self.keys.get(key__value=key).value
+
+    def name_get(self):
+        """ Return test name. """
+        return self.name.name
 
     def __str__(self):
         """ User representation. """
         return "%s" % self.name
 
+    # \todo This should be named contains
     @staticmethod
     def filter(contains):
         """ Filter testsuite against a single string. """
@@ -131,6 +138,8 @@ class Test(models.Model):
         @return (obj, created) created is a boolean. True if newly created.
         """
 
+        ##
+        # \todo should be pulled out.
         (name, _) = TestName.objects.get_or_create(name=name)
 
         ##
@@ -235,6 +244,12 @@ class Testsuite(models.Model):
 
     def key_get(self, key):
         """ Return value given key. """
+
+        return self.keys.get(key__value=key)
+
+    def value_get(self, key):
+        """ Return value given key. """
+
         return self.keys.get(key__value=key).value
 
     @staticmethod
@@ -361,9 +376,9 @@ class Testplan(models.Model):
             yield (item.order, item.testsuite_set.all()[0])
 
     @staticmethod
-    def context_name_get(context):
+    def context_get(context):
         """ Return the testplan full context name. """
-        return "testplan."+context
+        return Context.objects.get_or_create(name="testplan."+context)[0]
 
     @staticmethod
     def get_or_create(context, testkeys=None):
