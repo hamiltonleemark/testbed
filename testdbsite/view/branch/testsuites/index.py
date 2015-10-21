@@ -29,6 +29,11 @@ def view(request, pid):
     except models.Testplan.DoesNotExist:
         planorders = []
 
+    # \todo product should hold TestKeys not keys
+    product_key = models.TestKey.objects.get(key__value="product",
+                                             value=str(product.product.value))
+    branch_key = models.TestKey.objects.get(key__value="branch",
+                                            value=product.branch.value)
     ##
     # retrieve build list.
     blist = builds.list(product.product, product.branch)

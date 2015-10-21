@@ -35,7 +35,8 @@ def do_remove(args):
     return api.remove(args.context, args.order)
 
 
-def do_list(args):
+# \todo args is missing
+def do_list(_):
     """ List testsuites based on search criteria. """
 
     from testdb import models
@@ -47,28 +48,29 @@ def do_list(args):
         level = {}
         testkeys = {str(item.testkey.key): str(item.testkey.value)
                     for item in testplan.testplankeyset_set.all()}
-
         orders = []
         for plan in testplan.testplanorder_set.order_by("order"):
-
-            testsuites = plan.testsuite_set.all()
+            testsuites = plan.testsuite_set.filter(context=testplan.context)
             for testsuite in testsuites:
                 testsuitekeys = {
                     str(item.testkey.key): str(item.testkey.value)
                     for item in testsuite.testsuitekeyset_set.all()
                     }
+
                 orders.append({
                     "name": str(testsuite.name_get()),
                     "order": plan.order,
-                    "tests": [item for item in testsuite.test_set.all()],
+                    "tests": [str(item.name_get())
+                              for item in testsuite.test_set.all()],
                     "keys": testsuitekeys
                     })
 
         if testkeys:
             level["testkey"] = testkeys
+
         if testsuites:
             level["testsuites"] = orders
-        root[args.context] = level
+        root[str(testplan.context.name)] = level
     print yaml.dump(root, default_flow_style=False)
 
 
@@ -77,7 +79,7 @@ def do_key_add(args):
 
     from testdb import models
 
-    (context, _) = models.Context.objects.get_or_create(name=args.context)
+    context = models.Testplan.context_get(args.context)
     testplan = models.Testplan.objects.get(context=context)
     planorder = testplan.testplanorder_set.get(order=args.order)
     testsuite = models.Testsuite.objects.get(context=context,
@@ -96,7 +98,7 @@ def do_key_remove(args):
     """ Add a key to a testsuite. """
 
     from testdb import models
-    context = models.Context.objects.get_or_create(name=args.context)
+    context = models.Testplan.context_get(args.context)
     (testplan, _) = models.Testplan.get(testsuite__context=context)
     logging.info("remove key %s from testsuite %s", args.key, args.context)
     testkey = testplan.testplankeyset_set.get(testkey__key=args.key)
@@ -109,7 +111,8 @@ def do_testplan_key_list(args):
     from testdb import models
 
     logging.info("list testplan keys")
-    (testplan, _) = models.Testplan.get(context=args.context)
+    context = models.Testplan.context_get(args.context)
+    (testplan, _) = models.Testplan.get(context=context)
     testkeys = testplan.testplankeyset_set.filter(args.filter).order_by("key")
     for testkey in testkeys:
         print testkey

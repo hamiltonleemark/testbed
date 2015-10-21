@@ -23,7 +23,6 @@ def set_result(context, product_name, branch_name, build, testsuite_name,
     logging.info("result for %s %s %s", testsuite_name, test_name, result)
     context = models.Context.objects.get(name=context)
     (product1, _) = product.api.get_or_create(product_name, branch_name)
-
     testplan_name = product1.key_get("testplan", None)
     if testplan_name is None:
         testplan_name = "default"
@@ -32,8 +31,13 @@ def set_result(context, product_name, branch_name, build, testsuite_name,
         models.TestProductKeySet.objects.create(testproduct=product1,
                                                 testkey=testplan_key)
 
-    order = testplan.api.planorder_get_or_create(
-        "testplan.%s" % testplan_name, testsuite_name, keys)
+    (order, _) = testplan.api.planorder_get_or_create(testplan_name,
+                                                      testsuite_name, keys)
+    ##
+    # check to see if we should insert the test into the testplan.
+    for testsuite1 in order.testsuite_set.all():
+        test = models.Test.get_or_create(testsuite1, test_name, [])
+    ##
 
     build_key = models.TestKey.get_or_create("build", build)[0]
     (testsuite1, _) = models.Testsuite.get_or_create(context, testsuite_name,

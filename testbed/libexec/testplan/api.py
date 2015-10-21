@@ -4,7 +4,7 @@ Functionality common to more than one command.
 import logging
 
 ROOT = "testplan"
-CONTEXT = "testplan.default"
+CONTEXT = "default"
 ORDER_NEXT = -1
 
 
@@ -13,7 +13,8 @@ def get_or_create(context, testsuite_name, order=ORDER_NEXT):
     """ Get or create a testplan and set order.
 
     Order is just that the location of the testplan in the list of testplans.
-    The order effects the location the testplan appears on web pages.
+   The order effects the location the testplan appears on web pages.
+    When complete testplan order number is sequential with no gaps.
     @param testsuite_name The testsuite name for the testplan
     @param context Testplan context organizes testplans in a logical group.
                    Testplans with the same context are in the same group.
@@ -26,9 +27,8 @@ def get_or_create(context, testsuite_name, order=ORDER_NEXT):
     from testdb.models import Testplan
     from testdb.models import TestplanOrder
     from testdb.models import TestsuiteName
-    from testdb.models import Context
 
-    (context, _) = Context.objects.get_or_create(name=context)
+    context = Testplan.context_get(context)
     (testplan, created) = Testplan.objects.get_or_create(context=context)
 
     if order == ORDER_NEXT:
@@ -52,6 +52,17 @@ def get_or_create(context, testsuite_name, order=ORDER_NEXT):
 
     (name, _) = TestsuiteName.objects.get_or_create(name=testsuite_name)
     (_, created) = TestplanOrder.get_or_create(testplan, name, order)
+
+    ##
+    # Make sure test plan order entries are sequential with no gaps.
+    order = 1
+    for planorder in testplan.testplanorder_set.all():
+        if int(order) != int(planorder.order):
+            planorder.order = order
+            planorder.save()
+        order += 1
+    ##
+
     return (testplan, created)
 
 
@@ -63,7 +74,7 @@ def planorder_get(context, testsuite_name, keys):
     testkeys = [models.TestKey.get_or_create(key=key, value=value)[0]
                 for (key, value) in keys]
 
-    (context, _) = models.Context.objects.get_or_create(name=context)
+    context = models.Testplan.context_get(context)
     find = models.Testplan.objects.filter(context=context)
     for testkey in testkeys:
         find = find.filter(keys=testkey)
@@ -87,14 +98,14 @@ def planorder_get_or_create(context, testsuite_name, keys):
     testkeys = [models.TestKey.get_or_create(key=key, value=value)[0]
                 for (key, value) in keys]
 
-    (context, _) = models.Context.objects.get_or_create(name=context)
+    context = models.Testplan.context_get(context)
     find = models.Testplan.objects.filter(context=context)
     for testkey in testkeys:
         find = find.filter(keys=testkey)
 
     testplans = [item for item in find]
     if len(testplans) == 0:
-        return None
+        return (None, False)
 
     (name, _) = models.TestsuiteName.objects.get_or_create(name=testsuite_name)
     # \todo deal with many test plan or zero.
@@ -116,12 +127,20 @@ def remove(context, order):
 
     from testdb import models
 
-    (context, _) = models.Context.objects.get_or_create(name=context)
+    context = models.Testplan.context_get(context)
     testplan = models.Testplan.objects.get(context=context)
     order = testplan.testplanorder_set.get(order=order)
     if order:
         order.delete()
-
+    ##
+    # Make sure test plan order entries are sequential with no gaps.
+    order = 1
+    for planorder in testplan.testplanorder_set.all():
+        if int(order) != int(planorder.order):
+            planorder.order = order
+            planorder.save()
+        order += 1
+    ##
     return True
 
 
@@ -129,9 +148,8 @@ def get(context, testkeys):
     """ Get testplan. """
 
     from testdb.models import Testplan
-    from testdb.models import Context
 
-    (context, _) = Context.objects.get_or_create(name=context)
+    context = Testplan.context_get(context)
     if len(testkeys) == 0:
         return Testplan.objects.get(context=context)
     else:
@@ -160,9 +178,8 @@ def add(context, testsuite_name, order):
     from testdb.models import Testplan
     from testdb.models import TestplanOrder
     from testdb.models import TestsuiteName
-    from testdb.models import Context
 
-    (context, _) = Context.objects.get_or_create(name=context)
+    context = Testplan.context_get(context)
     (testplan, created) = Testplan.objects.get_or_create(context=context)
 
     if order == ORDER_NEXT:
