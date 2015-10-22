@@ -48,7 +48,7 @@ def view(request, pid):
 
     ##
     # retrieve build list.
-    blist = builds.list(product.product, product.branch)
+    blist = builds.filter(product.product, product.branch)
 
     for testplan in testplans:
         for buildid in blist:
