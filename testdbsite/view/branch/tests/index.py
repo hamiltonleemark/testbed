@@ -48,11 +48,7 @@ def view(request, pid):
 
     ##
     # retrieve build list.
-    product_key = models.TestKey.objects.get(key__value="product",
-                                             value=str(product.product.value))
-    branch_key = models.TestKey.objects.get(key__value="branch",
-                                            value=product.branch.value)
-    blist = builds.filter(product_key, branch_key)
+    blist = builds.filter(product.product, product.branch)
 
     for testplan in testplans:
         for buildid in blist:
