@@ -24,7 +24,7 @@ from .models import Testsuite
 from .models import TestsuiteName
 from .models import TestsuiteKeySet
 from .models import Key
-from .models import TestKey
+from .models import KVP
 from .models import Context
 from .models import Testplan
 from .models import TestplanOrder
@@ -41,8 +41,8 @@ class TestsuiteTestCase(TestCase):
         context = Context.objects.create(name="default")
         key1 = Key.objects.create(value="key1")
         key2 = Key.objects.create(value="key2")
-        keys = (TestKey.objects.create(key=key1, value="value1"),
-                TestKey.objects.create(key=key2, value="value2"))
+        keys = (KVP.objects.create(key=key1, value="value1"),
+                KVP.objects.create(key=key2, value="value2"))
 
         name = TestsuiteName.objects.create(name="testsuite_name")
         testsuite = Testsuite.objects.create(name=name, context=context)
@@ -60,9 +60,9 @@ class TestsuiteTestCase(TestCase):
 
         start_time = timezone.now()
 
-        keys = [TestKey.get_or_create("key1", "value1")[0],
-                TestKey.get_or_create("key2", "value2")[0]]
-        buildkey = TestKey.get_or_create("build", "build1")[0]
+        keys = [KVP.get_or_create("key1", "value1")[0],
+                KVP.get_or_create("key2", "value2")[0]]
+        buildkey = KVP.get_or_create("build", "build1")[0]
         (testsuite, _) = Testsuite.get_or_create("default", "testsuite_name",
                                                  None, buildkey, keys)
 
@@ -81,9 +81,9 @@ class TestsuiteTestCase(TestCase):
     def test_create_method(self):
         """ Test creating a testsuite. """
 
-        keys = [TestKey.get_or_create("key1", "value1")[0],
-                TestKey.get_or_create("key2", "value2")[0]]
-        buildkey = TestKey.get_or_create("build", "build1")[0]
+        keys = [KVP.get_or_create("key1", "value1")[0],
+                KVP.get_or_create("key2", "value2")[0]]
+        buildkey = KVP.get_or_create("build", "build1")[0]
 
         (testsuite, _) = Testsuite.get_or_create("default", "testsuite_name1",
                                                  None, buildkey, keys)
@@ -95,8 +95,8 @@ class TestsuiteTestCase(TestCase):
     def testplan_order(self):
         """ Test the creation and order support of test plan. """
 
-        test_keys = [TestKey.get_or_create("key1", "value1.1")[0]]
-        build_key = TestKey.get_or_create("build", "build1")[0]
+        test_keys = [KVP.get_or_create("key1", "value1.1")[0]]
+        build_key = KVP.get_or_create("build", "build1")[0]
 
         (testplan, rtc) = Testplan.get_or_create("testplan.default", test_keys)
         self.assertTrue(rtc, "testplan not created")

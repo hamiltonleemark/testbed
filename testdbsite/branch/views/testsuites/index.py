@@ -30,10 +30,10 @@ def view(request, pid):
         planorders = []
 
     # \todo product should hold TestKeys not keys
-    product_key = models.TestKey.objects.get(key__value="product",
-                                             value=str(product.product.value))
-    branch_key = models.TestKey.objects.get(key__value="branch",
-                                            value=product.branch.value)
+    product_key = models.KVP.objects.get(key__value="product",
+                                         value=str(product.product.value))
+    branch_key = models.KVP.objects.get(key__value="branch",
+                                        value=product.branch.value)
     ##
     # retrieve build list.
     blist = builds.filter(product_key, branch_key)

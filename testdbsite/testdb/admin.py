@@ -34,9 +34,9 @@ class KeyAdmin(admin.ModelAdmin):
     list_display = ("value", "config_type", )
 
 
-class TestKeyAdmin(admin.ModelAdmin):
+class KVPAdmin(admin.ModelAdmin):
     """ View Test Key. """
-    model = models.TestKey
+    model = models.KVP
     list_display = ("key", "value", )
 
 
@@ -121,7 +121,7 @@ class ProductAdmin(admin.ModelAdmin):
 admin.site.register(models.Context, ContextAdmin)
 admin.site.register(models.Key, KeyAdmin)
 admin.site.register(models.Test, TestAdmin)
-admin.site.register(models.TestKey, TestKeyAdmin)
+admin.site.register(models.KVP, KVPAdmin)
 admin.site.register(models.TestsuiteName, TestsuiteNameAdmin)
 admin.site.register(models.TestProduct, ProductAdmin)
 admin.site.register(models.Testsuite, TestsuiteAdmin)

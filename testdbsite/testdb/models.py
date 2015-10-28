@@ -23,7 +23,11 @@ from django.db import models
 
 # pylint: disable=E1101
 class Key(models.Model):
-    """ Key refers to a generic way to retrieve a value."""
+    """ Identifies an associated list of values.
+
+    For example, the key product could have the values ipod, ipad and walkman.
+    The set of values are stored in the Values table.
+    """
 
     CONFIG_TYPE_ANY = 0
     CONFIG_TYPE_STRICT = 1
@@ -38,21 +42,12 @@ class Key(models.Model):
 
     def __str__(self):
         """ Return testsuite name. """
+
         return str(self.value)
 
 
-class TestResult(models.Model):
-    """ Define a single result. """
-    context = models.ForeignKey(Key, related_name="test_context", null=True,
-                                blank=True, default=None)
-    key = models.ForeignKey(Key, related_name="test_key", null=True,
-                            blank=True, default=None)
-    value = models.DecimalField(max_digits=24, decimal_places=6)
-    test = models.ForeignKey("Test", null=True, blank=True, default=None)
-
-
-class TestKey(models.Model):
-    """ Tests are associated to a set of keys. """
+class KVP(models.Model):
+    """ Key-Value Pair associate a key to a single value. """
 
     key = models.ForeignKey(Key)
     value = models.CharField(max_length=128)
@@ -66,28 +61,38 @@ class TestKey(models.Model):
         """ Create a single test key objects. """
         (key, _) = Key.objects.get_or_create(value=key)
         try:
-            testkey = TestKey.objects.get(key=key, value=value)
+            testkey = KVP.objects.get(key=key, value=value)
             if testkey:
                 return (testkey, False)
-        except TestKey.DoesNotExist:
+        except KVP.DoesNotExist:
             pass
         if key.config_type != Key.CONFIG_TYPE_ANY:
-            raise TestKey.DoesNotExist("key %s is strict" % key)
-        return TestKey.objects.get_or_create(key=key, value=value)
+            raise KVP.DoesNotExist("key %s is strict" % key)
+        return KVP.objects.get_or_create(key=key, value=value)
 
     @staticmethod
     def filter(contains):
         """ Filter testsuite against a single string. """
 
         if not contains:
-            return TestKey.objects.all()
+            return KVP.objects.all()
 
-        return TestKey.objects.filter(
+        return KVP.objects.filter(
             models.Q(key__value__contains=contains) |
             models.Q(value__contains=contains))
 
 
-# \todo Look at making testName a TestKey.
+class TestResult(models.Model):
+    """ Define a single result. """
+    context = models.ForeignKey(Key, related_name="test_context", null=True,
+                                blank=True, default=None)
+    key = models.ForeignKey(Key, related_name="test_key", null=True,
+                            blank=True, default=None)
+    value = models.DecimalField(max_digits=24, decimal_places=6)
+    test = models.ForeignKey("Test", null=True, blank=True, default=None)
+
+
+# \todo Look at making testName a KVP.
 class TestName(models.Model):
     """ Name of testsuite."""
     name = models.CharField(max_length=128, unique=True)
@@ -102,7 +107,7 @@ class Test(models.Model):
     testsuite = models.ForeignKey("Testsuite", null=True, blank=True,
                                   default=None)
     name = models.ForeignKey(TestName)
-    keys = models.ManyToManyField(TestKey, through="TestKeySet")
+    keys = models.ManyToManyField(KVP, through="TestKeySet")
     status = models.IntegerField(default=-1, blank=True, null=True)
 
     # \todo key_get should return only Testkey to make effecient.
@@ -134,7 +139,7 @@ class Test(models.Model):
     @staticmethod
     def get_or_create(testsuite, name, keys):
         """ Get current or create new objects.
-        @param testkeys Must be an instance of TestKey.
+        @param testkeys Must be an instance of KVP.
         @return (obj, created) created is a boolean. True if newly created.
         """
 
@@ -163,14 +168,14 @@ class Test(models.Model):
 class TestFile(models.Model):
     """ Hold a single file related to a testsuite. """
     testsuite = models.ForeignKey(Test, null=True, blank=True, default=None)
-    key = models.ForeignKey(TestKey)
+    key = models.ForeignKey(KVP)
     path = models.CharField(max_length=256, unique=True)
 
 
 class TestKeySet(models.Model):
     """ Links a test to a set of keys. """
     test = models.ForeignKey(Test)
-    testkey = models.ForeignKey(TestKey)
+    testkey = models.ForeignKey(KVP)
 
 
 class TestsuiteName(models.Model):
@@ -205,7 +210,7 @@ class Context(models.Model):
 class TestsuiteKeySet(models.Model):
     """ Testsuites are associated to a set of keys. """
     testsuite = models.ForeignKey("Testsuite")
-    testkey = models.ForeignKey(TestKey)
+    testkey = models.ForeignKey(KVP)
 
     def __str__(self):
         """ User representation. """
@@ -218,7 +223,7 @@ class Testsuite(models.Model):
     context = models.ForeignKey(Context, null=True, blank=True, default=None)
     name = models.ForeignKey(TestsuiteName)
     timestamp = models.DateTimeField(default=timezone.now)
-    keys = models.ManyToManyField(TestKey, through="TestsuiteKeySet")
+    keys = models.ManyToManyField(KVP, through="TestsuiteKeySet")
     testplanorder = models.ForeignKey("TestplanOrder", null=True, blank=True,
                                       default=None)
 
@@ -271,7 +276,7 @@ class Testsuite(models.Model):
                       testkeys):
         """ Get current or create new objects.
 
-        @param testkeys Must be an instance of TestKey.
+        @param testkeys Must be an instance of KVP.
         """
         if not testkeys:
             testkeys = []
@@ -345,7 +350,7 @@ class TestplanKeySet(models.Model):
     """ Testsuites are associated to a set of keys. """
 
     testplan = models.ForeignKey("Testplan")
-    testkey = models.ForeignKey(TestKey)
+    testkey = models.ForeignKey(KVP)
 
 
 class Testplan(models.Model):
@@ -353,7 +358,7 @@ class Testplan(models.Model):
     A test plan governs which testsuites should be run their results shown.
     """
     context = models.ForeignKey(Context)
-    keys = models.ManyToManyField(TestKey, through="TestplanKeySet")
+    keys = models.ManyToManyField(KVP, through="TestplanKeySet")
 
     def serialize(self, serializer):
         """ Serialize and instance of this model. """
@@ -383,7 +388,7 @@ class Testplan(models.Model):
     @staticmethod
     def get_or_create(context, testkeys=None):
         """ Get current or create new objects.
-        @param testkeys Must be an instance of TestKey.
+        @param testkeys Must be an instance of KVP.
         """
         if not testkeys:
             testkeys = []
@@ -458,7 +463,7 @@ class TestsuiteFile(models.Model):
     """ Hold a single file related to a testsuite. """
     testsuite = models.ForeignKey(Testsuite, null=True, blank=True,
                                   default=None)
-    key = models.ForeignKey(TestKey)
+    key = models.ForeignKey(KVP)
     path = models.CharField(max_length=256, unique=True)
 
 
@@ -466,7 +471,7 @@ class TestProductKeySet(models.Model):
     """ Testsuites are associated to a set of keys. """
 
     testproduct = models.ForeignKey("TestProduct")
-    testkey = models.ForeignKey(TestKey)
+    testkey = models.ForeignKey(KVP)
 
 
 class TestProduct(models.Model):
@@ -477,7 +482,7 @@ class TestProduct(models.Model):
     context = models.ForeignKey(Context)
     product = models.ForeignKey(Key, related_name="product")
     branch = models.ForeignKey(Key, related_name="branch")
-    keys = models.ManyToManyField(TestKey, through="TestProductKeySet")
+    keys = models.ManyToManyField(KVP, through="TestProductKeySet")
     order = models.IntegerField(default=0)
 
     def __str__(self):
@@ -489,13 +494,13 @@ class TestProduct(models.Model):
         """ Return value given key. """
         try:
             return self.keys.get(key__value=key).value
-        except TestKey.DoesNotExist:
+        except KVP.DoesNotExist:
             return default
 
     @staticmethod
     def get_or_create(context, product, branch, testkeys=None):
         """ Get current or create new objects.
-        @param testkeys Must be an instance of TestKey.
+        @param testkeys Must be an instance of KVP.
         """
         if not testkeys:
             testkeys = []

@@ -48,9 +48,9 @@ def view(request, pid):
 
     ##
     # retrieve build list.
-    product_key = models.TestKey.objects.get(key__value="product",
+    product_key = models.KVP.objects.get(key__value="product",
                                              value=str(product.product.value))
-    branch_key = models.TestKey.objects.get(key__value="branch",
+    branch_key = models.KVP.objects.get(key__value="branch",
                                             value=product.branch.value)
     blist = builds.filter(product_key, branch_key)
 
