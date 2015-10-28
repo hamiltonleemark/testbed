@@ -39,6 +39,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.core.management',
     'testdb',
+    'product',
+    'branch',
 )
 
 #TEMPLATE_LOADERS = (

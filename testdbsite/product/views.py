@@ -22,15 +22,15 @@ class ProductView(object):
         """ Return the name of the product branch. """
         return str(self.product.branch)
 
-def view(_):
+def index(_):
     """ Summarize product information. """
     testplans = models.TestProduct.filter(None, None)
 
     products = [ProductView(item) for item in testplans]
     html_data = {"products": products}
-    return render_to_response("products/index.html", html_data)
+    return render_to_response("product/index.html", html_data)
 
-def view_product(_, pid):
+def index_product(_, pid):
     """ Summarize product information. """
 
     product = models.TestProduct.objects.get(id=pid)
@@ -46,4 +46,4 @@ def view_product(_, pid):
         testplans = []
 
     html_data = {}
-    return render_to_response("products/index.html", html_data)
+    return render_to_response("product/index.html", html_data)

@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
-from . import testsuites
-from . import tests
+from .views import testsuites
+from .views import tests
 
 urlpatterns = patterns(
   "branch",

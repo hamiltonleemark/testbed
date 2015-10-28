@@ -1,8 +1,8 @@
 from django.conf.urls import patterns, url
-from . import index 
+from . import views
 
 urlpatterns = patterns(
   "product",
-  url(r"^$", index.view),
-  url(r"^(?P<pid>[\d]+)", index.view_product)
+  url(r"^$", views.index),
+  url(r"^(?P<pid>[\d]+)", views.index_product)
 )
