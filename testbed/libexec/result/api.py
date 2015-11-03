@@ -20,30 +20,34 @@ def set_result(context, product_name, branch_name, build, testsuite_name,
     """
     from testdb import models
 
+    print "  MARK: set_result 1"
+
     logging.info("result for %s %s %s", testsuite_name, test_name, result)
     context = models.Context.objects.get(name=context)
     (product1, _) = product.api.get_or_create(product_name, branch_name)
     testplan_name = product1.key_get("testplan", None)
     if testplan_name is None:
         testplan_name = "default"
-        (testplan_key, _) = models.TestKey.get_or_create("testplan",
-                                                         testplan_name)
+        (testplan_key, _) = models.KVP.get_or_create("testplan", testplan_name)
         models.TestProductKeySet.objects.create(testproduct=product1,
                                                 testkey=testplan_key)
 
     (order, _) = testplan.api.planorder_get_or_create(testplan_name,
                                                       testsuite_name, keys)
+    print "  MARK: set_result 2"
     ##
     # check to see if we should insert the test into the testplan.
     for testsuite1 in order.testsuite_set.all():
         test = models.Test.get_or_create(testsuite1, test_name, [])
     ##
 
-    build_key = models.TestKey.get_or_create("build", build)[0]
+    build_key = models.KVP.get_or_create("build", build)[0]
     (testsuite1, _) = models.Testsuite.get_or_create(context, testsuite_name,
                                                      order, build_key, [])
+    print "  MARK: set_result 3", testsuite1, test_name
     (test, created) = models.Test.get_or_create(testsuite1, test_name, [])
 
+    print "  MARK: set_result 4", test, created
     if result == "pass":
         test.status = 0
     else:

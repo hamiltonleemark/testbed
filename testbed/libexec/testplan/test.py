@@ -21,6 +21,7 @@ import argparse
 from django.test import TestCase
 from testdb.models import Testsuite
 from testdb.models import TestplanOrder
+from testdb.models import Testplan
 from . import commands
 from . import api
 
@@ -94,7 +95,7 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "testplan --context testplan2 test add 2 test3"
+        cmd = "testplan --context testplan2 test add 1 test3"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
@@ -102,11 +103,12 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "testplan --context testplan2 test add 3 test4"
+        cmd = "testplan --context testplan2 test add 1 test4"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        testsuites = Testsuite.objects.filter(context__name="testplan2")
+        context = Testplan.context_get("testplan2")
+        testsuites = Testsuite.objects.filter(context=context)
         names = [item.name.name for item in testsuites]
         self.assertTrue(len(names) == 2)
         self.assertTrue(any("bob2" in name for name in names))
@@ -206,4 +208,4 @@ class TestsuiteTestCase(TestCase):
         args.func(args)
         testplans = TestplanOrder.objects.all()
         self.assertEqual(testplans.count(), 1)
-        self.assertEqual(testplans[0].order, 2)
+        self.assertEqual(testplans[0].order, 1)

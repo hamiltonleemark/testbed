@@ -388,6 +388,8 @@ class Testplan(models.Model):
     @staticmethod
     def get_or_create(context, testkeys=None):
         """ Get current or create new objects.
+        @param context is a reference to a Context object returned from
+               context_get.
         @param testkeys Must be an instance of KVP.
         """
         if not testkeys:
@@ -426,7 +428,7 @@ class TestplanOrder(models.Model):
 
     def __str__(self):
         """ User representation. """
-        return "%d: %s" % (self.order, self.testplan.context)
+        return "%d: %s:" % (self.order, self.testplan.context)
 
     @staticmethod
     def get_or_create(testplan, testsuite_name, order):

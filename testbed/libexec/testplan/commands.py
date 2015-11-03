@@ -126,11 +126,10 @@ def do_test_add(args):
     ##
     # Make sure testsuite is part of the test plan.
     try:
-        context = models.Context.objects.get(name=args.context)
+        context = models.Testplan.context_get(args.context)
         testplan = models.Testplan.objects.get(context=context)
     except (models.Context.DoesNotExist, models.Testplan.DoesNotExist):
-        raise argparse.ArgumentError("testplan for context %s missing",
-                                     args.context)
+        raise ValueError("testplan with context %s missing" % args.context)
 
     try:
         planorder = testplan.testplanorder_set.get(order=args.order,
@@ -138,8 +137,8 @@ def do_test_add(args):
         testsuite = models.Testsuite.objects.get(context=context,
                                                  testplanorder=planorder)
     except (models.Testsuite.DoesNotExist, models.TestplanOrder.DoesNotExist):
-        raise argparse.ArgumentError("testplan %s does not contain %s",
-                                     args.context, args.order)
+        raise ValueError("testplan %s does not contain %s" % (args.context,
+                                                              args.order))
 
     models.Test.get_or_create(testsuite, args.name, [])
     logging.info("add test %s to testsuite %s.%s", args.name, planorder.order,

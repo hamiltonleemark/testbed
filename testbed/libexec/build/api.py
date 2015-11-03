@@ -22,9 +22,9 @@ def get_or_create(productname, branchname, buildname, when=None):
     logging.info("adding build %s %s %s %s", productname, branchname,
                  buildname, when)
     (context, _) = models.Context.objects.get_or_create(name=builds.CONTEXT)
-    (product, _) = models.TestKey.get_or_create("product", productname)
-    (branch, _) = models.TestKey.get_or_create("branch", branchname)
-    (build_key, _) = models.TestKey.get_or_create("build", buildname)
+    (product, _) = models.KVP.get_or_create("product", productname)
+    (branch, _) = models.KVP.get_or_create("branch", branchname)
+    (build_key, _) = models.KVP.get_or_create("build", buildname)
 
     testkeys = [product, branch]
     name = "%s.%s" % (productname, branchname)
@@ -42,9 +42,11 @@ def filter(product_name, branch_name=None):
     from testdb import builds
     from testdb import models
 
-    (product_name, _) = models.TestKey.get_or_create("product", product_name)
+    (product_name, _) = models.KVP.get_or_create("product", product_name)
     if branch_name:
-        (branch_name, _) = models.TestKey.get_or_create("branch", branch_name)
+        (branch_name, _) = models.KVP.get_or_create("branch", branch_name)
 
-    return builds.filter(product_name, branch_name)
+    builds = builds.filter(product_name, branch_name)
+
+    return [item.value for item in builds]
 # pylint: enable=W0622

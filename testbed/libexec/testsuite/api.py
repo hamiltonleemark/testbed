@@ -34,7 +34,7 @@ def add_testsuite(context, testsuite_name, build, testkeys):
     # \todo Keep only testkeys that are associated to a testplan
     testplanorder = testplan.api.planorder_get(testplan.api.CONTEXT,
                                                testsuite_name, testkeys)
-    buildkey = models.TestKey.get_or_create("build", build)[0]
+    buildkey = models.KVP.get_or_create("build", build)[0]
     return models.Testsuite.get_or_create(context, testsuite_name,
                                           testplanorder, buildkey, [])
 

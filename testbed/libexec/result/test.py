@@ -28,6 +28,7 @@ from testbed.libexec import testplan
 
 
 # pylint: disable=R0914
+# pylint: disable=R0915
 class TestTestCase(TestCase):
     """ Tests for Django backend.
 
@@ -63,20 +64,21 @@ class TestTestCase(TestCase):
         ##
         # Create testplan.
         for item in range(0, testsuite_count):
+            name = "testsuite%d" % item
             (_, created) = testplan.api.get_or_create(testplan.api.CONTEXT,
-                                                      "testsuite%d" % item,
-                                                      item)
+                                                      name, item)
             self.assertTrue(created, "created testsuite%d" % item)
 
-        context = models.Context.objects.get(name=testplan.api.CONTEXT)
+        print "MARK:testplan", testplan.api.CONTEXT
+        context = models.Testplan.context_get(testplan.api.CONTEXT)
         testplan1 = models.Testplan.objects.get(context=context)
 
         find = testplan1.testplanorder_set.all()
         self.assertEqual(find.count(), testsuite_count)
 
         for testkey in testkeys:
-            (testkey, _) = models.TestKey.get_or_create(key=testkey[0],
-                                                        value=testkey[1])
+            (testkey, _) = models.KVP.get_or_create(key=testkey[0],
+                                                    value=testkey[1])
             testplan1.testplankeyset_set.get_or_create(testplan=testplan1,
                                                        testkey=testkey)
 
@@ -100,11 +102,13 @@ class TestTestCase(TestCase):
                                                        buildid, testkeys)
                 self.assertTrue(rtc, "new test not created")
                 for testitem in range(0, test_count):
+                    print "MARK: testitem", testitem
                     (_, rtc) = api.set_result("default", "product1", "branch1",
                                               buildid, "testsuite%d" % titem,
                                               "test%d" % testitem, "pass",
                                               testkeys)
-                self.assertTrue(rtc, "result not created")
+                    print "MARK: rtc", rtc
+                    self.assertTrue(rtc, "result not created")
         end = datetime.datetime.now()
 
         duration = end - start
@@ -119,7 +123,7 @@ class TestTestCase(TestCase):
         start = datetime.datetime.now()
         testkeys = [item.testkey
                     for item in testplan1.testplankeyset_set.all()]
-        (buildkey, _) = models.TestKey.get_or_create("build", "build1")
+        (buildkey, _) = models.KVP.get_or_create("build", "build1")
 
         testkeys.append(buildkey)
         self.assertEqual(len(orders), testsuite_count)

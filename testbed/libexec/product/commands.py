@@ -47,7 +47,7 @@ def product_testplan_add(args):
     product = models.TestProduct.objects.get(context__name=api.CONTEXT,
                                              product__value=args.product,
                                              branch__value=args.branch)
-    (testplan, _) = models.TestKey.get_or_create("testplan", args.testplan)
+    (testplan, _) = models.KVP.get_or_create("testplan", args.testplan)
     models.TestProductKeySet.objects.create(testproduct=product,
                                             testkey=testplan)
 

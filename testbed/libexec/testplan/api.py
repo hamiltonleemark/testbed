@@ -43,12 +43,9 @@ def get_or_create(context, testsuite_name, order=ORDER_NEXT):
     # Assert order is not -1.
     # Order is specified so now we have to move something.
     planorders = testplan.testplanorder_set.filter(order__gte=order)
-    current_order = order
-    for prevplan in planorders.order_by("order"):
-        if prevplan.order == current_order:
-            prevplan.order += 1
-            prevplan.save()
-            current_order = prevplan.order
+    for item in planorders.order_by("order"):
+        item.order += 1
+        item.save()
 
     (name, _) = TestsuiteName.objects.get_or_create(name=testsuite_name)
     (_, created) = TestplanOrder.get_or_create(testplan, name, order)
@@ -56,7 +53,7 @@ def get_or_create(context, testsuite_name, order=ORDER_NEXT):
     ##
     # Make sure test plan order entries are sequential with no gaps.
     order = 1
-    for planorder in testplan.testplanorder_set.all():
+    for planorder in testplan.testplanorder_set.all().order_by("order"):
         if int(order) != int(planorder.order):
             planorder.order = order
             planorder.save()
@@ -71,7 +68,7 @@ def planorder_get(context, testsuite_name, keys):
 
     from testdb import models
 
-    testkeys = [models.TestKey.get_or_create(key=key, value=value)[0]
+    testkeys = [models.KVP.get_or_create(key=key, value=value)[0]
                 for (key, value) in keys]
 
     context = models.Testplan.context_get(context)
@@ -95,7 +92,7 @@ def planorder_get_or_create(context, testsuite_name, keys):
 
     from testdb import models
 
-    testkeys = [models.TestKey.get_or_create(key=key, value=value)[0]
+    testkeys = [models.KVP.get_or_create(key=key, value=value)[0]
                 for (key, value) in keys]
 
     context = models.Testplan.context_get(context)

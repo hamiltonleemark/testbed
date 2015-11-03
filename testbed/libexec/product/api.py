@@ -96,11 +96,11 @@ def remove(product, branch):
 
     from testdb.models import Testplan
     from testdb.models import Context
-    from testdb.models import TestKey
+    from testdb.models import KVP
 
     try:
-        branch_key = TestKey.objects.get(key__value="branch", value=branch)
-    except TestKey.DoesNotExist, arg:
+        branch_key = KVP.objects.get(key__value="branch", value=branch)
+    except KVP.DoesNotExist, arg:
         raise Testplan.DoesNotExist(arg)
 
     try:
