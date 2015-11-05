@@ -19,6 +19,7 @@ CLI for testsuites.
 """
 import logging
 from testbed.libexec import testplan
+from testbed.libexec import planorder
 
 
 def add_testsuite(context, testsuite_name, build, testkeys):
@@ -32,8 +33,8 @@ def add_testsuite(context, testsuite_name, build, testkeys):
 
     ##
     # \todo Keep only testkeys that are associated to a testplan
-    testplanorder = testplan.api.planorder_get(testplan.api.CONTEXT,
-                                               testsuite_name, testkeys)
+    testplanorder = planorder.api.get(testplan.api.CONTEXT, testsuite_name,
+                                      testkeys)
     buildkey = models.KVP.get_or_create("build", build)[0]
     return models.Testsuite.get_or_create(context, testsuite_name,
                                           testplanorder, buildkey, [])
@@ -41,7 +42,7 @@ def add_testsuite(context, testsuite_name, build, testkeys):
 
 # \todo This should be called filter
 def list_testsuite(context, testkeys, testsuite_name=None):
-    """ Retrieve the list of testsuite testkeys. """
+    """ Retrieve the list of testsuites by tesykeys and name. """
 
     from testdb import models
 

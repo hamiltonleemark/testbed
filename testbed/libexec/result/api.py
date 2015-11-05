@@ -4,7 +4,7 @@ Functionality common to more than one command.
 import logging
 from testbed.libexec import testsuite
 from testbed.libexec import product
-from testbed.libexec import testplan
+from testbed.libexec import planorder
 
 
 # pylint: disable=R0913
@@ -37,9 +37,9 @@ def set_result(context, product_name, branch_name, build, testsuite_name,
 
     ##
     # Make sure testsuite is part of the test plan.
-    (order, critem) = testplan.api.planorder_get_or_create(testplan_name,
-                                                           testsuite_name,
-                                                           test_name, keys)
+    (order, critem) = planorder.api.get_or_create(testplan_name,
+                                                  testsuite_name, test_name,
+                                                  keys)
     created = created or critem
     ##
 
