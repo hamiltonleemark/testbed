@@ -48,7 +48,7 @@ python27:: $(addsuffix .python27,$(PYTHON_FILES))
 .PHONY: test
 test::
 
-check:: pep8 pylint subdirs python27 test
+check:: test pep8 pylint subdirs python27
 clean::
 	find . -name "#*" -delete
 	find . -name ".#*" -delete

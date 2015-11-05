@@ -145,7 +145,7 @@ class Test(models.Model):
 
         ##
         # \todo should be pulled out.
-        (name, _) = TestName.objects.get_or_create(name=name)
+        (name, created) = TestName.objects.get_or_create(name=name)
 
         ##
         # Look for test.
@@ -154,7 +154,7 @@ class Test(models.Model):
             find = find.filter(keys=key)
 
         if find.count() == 1:
-            return ([item for item in find][0], False)
+            return ([item for item in find][0], created)
         elif find.count() > 1:
             raise Test.MultipleObjectsReturned(name)
 
@@ -281,25 +281,30 @@ class Testsuite(models.Model):
         if not testkeys:
             testkeys = []
 
-        (context, _) = Context.objects.get_or_create(name=context)
-        (name, _) = TestsuiteName.objects.get_or_create(name=testsuite_name)
+        (context, created) = Context.objects.get_or_create(name=context)
+        (name, critem) = TestsuiteName.objects.get_or_create(
+            name=testsuite_name)
+        created = created or critem
 
         ##
-        # Look for testsuite.
+        # Look for testsuite
         find = Testsuite.objects.filter(context=context, name=name,
+                                        testplanorder=testplanorder,
                                         keys=buildkey)
         for testkey in testkeys:
             find = find.filter(keys=testkey)
 
         if find.count() == 1:
-            results = ([item for item in find][0], False)
+            testsuite = find[0]
+            results = (testsuite, created)
             return results
         elif find.count() > 1:
             raise Testsuite.MultipleObjectsReturned("%s %s" % (context, name))
 
         testsuite = Testsuite.objects.create(name=name, context=context,
                                              testplanorder=testplanorder)
-        for testkey in testkeys + [buildkey]:
+        testkeys.append(buildkey)
+        for testkey in testkeys:
             TestsuiteKeySet.objects.create(testsuite=testsuite,
                                            testkey=testkey)
         return (testsuite, True)

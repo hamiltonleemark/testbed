@@ -69,7 +69,6 @@ class TestTestCase(TestCase):
                                                       name, item)
             self.assertTrue(created, "created testsuite%d" % item)
 
-        print "MARK:testplan", testplan.api.CONTEXT
         context = models.Testplan.context_get(testplan.api.CONTEXT)
         testplan1 = models.Testplan.objects.get(context=context)
 
@@ -97,17 +96,16 @@ class TestTestCase(TestCase):
             build.api.get_or_create("product1", "branch1", buildid)
 
             for titem in range(0, testsuite_count):
+                testsuite_name = "testsuite%d" % titem
                 (_, rtc) = testsuite.api.add_testsuite("default",
-                                                       "testsuite%d" % titem,
+                                                       testsuite_name,
                                                        buildid, testkeys)
                 self.assertTrue(rtc, "new test not created")
                 for testitem in range(0, test_count):
-                    print "MARK: testitem", testitem
+                    test_name = "test%d" % testitem
                     (_, rtc) = api.set_result("default", "product1", "branch1",
-                                              buildid, "testsuite%d" % titem,
-                                              "test%d" % testitem, "pass",
-                                              testkeys)
-                    print "MARK: rtc", rtc
+                                              buildid, testsuite_name,
+                                              test_name, "pass", testkeys)
                     self.assertTrue(rtc, "result not created")
         end = datetime.datetime.now()
 
