@@ -105,8 +105,6 @@ def remove(product, branch):
     from testdb.models import Context
     from testdb.models import KVP
 
-    print "MARK: remove product", product, branch
-
     try:
         branch_key = KVP.objects.get(key__value="branch", value=branch)
     except KVP.DoesNotExist, arg:
@@ -122,3 +120,14 @@ def remove(product, branch):
                                    testsuite__keys=branch_key)
     for item in find:
         item.delete()
+
+
+def add_testplan(product, branch, testplan_name):
+    """ Add testplan to product. """
+    from testdb.models import Testplan
+
+    (product1, _) = get_or_create(product, branch)
+
+    context = Testplan.context_get(testplan_name)
+    (testplan, created) = Testplan.objects.get_or_create(context=context)
+    product1.key_get_or_create("testplan", testplan_name)

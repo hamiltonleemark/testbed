@@ -25,6 +25,7 @@ from . import api
 from testbed.libexec import build
 from testbed.libexec import testsuite
 from testbed.libexec import testplan
+from testbed.libexec import product
 
 
 # pylint: disable=R0914
@@ -48,8 +49,10 @@ class TestTestCase(TestCase):
         """
         from testdb import models
 
-        build_count = 10
-        testsuite_count = 100
+        #build_count = 10
+        #testsuite_count = 100
+        build_count = 2 
+        testsuite_count = 2
         test_count = 1
 
         testkeys = [
@@ -57,20 +60,20 @@ class TestTestCase(TestCase):
             ("key2", "value2"),
             ("key3", "value3"),
             ("key4", "value4"),
-            ("product", "product1"),
-            ("branch", "branch1"),
+            ("product", "tproduct1"),
+            ("branch", "tbranch1"),
         ]
 
         ##
         # Create testplan.
         for item in range(0, testsuite_count):
             name = "testsuite%d" % item
-            (_, created) = testplan.api.get_or_create(testplan.api.CONTEXT,
-                                                      name, item)
+            (_, created) = testplan.api.get_or_create("default", name, item)
             self.assertTrue(created, "created testsuite%d" % item)
 
-        context = models.Testplan.context_get(testplan.api.CONTEXT)
+        context = models.Testplan.context_get("default")
         testplan1 = models.Testplan.objects.get(context=context)
+        self.assertTrue(testplan1 is not None, "testplan not created")
 
         find = testplan1.testplanorder_set.all()
         self.assertEqual(find.count(), testsuite_count)
@@ -87,6 +90,11 @@ class TestTestCase(TestCase):
             self.assertEqual(order.testsuite_set.all().count(), 1)
         #
         ##
+
+        ##
+        # Create product and associate default test plan to product.
+        product.api.get_or_create("product1", "branch1")
+        product.api.testplan_add("product1", "branch1", "default")
 
         ##
         # Create build content as in a history.

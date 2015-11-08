@@ -20,6 +20,7 @@ def set_result(context, product_name, branch_name, build, testsuite_name,
                  appears on web pages.
     """
     from testdb import models
+    print "MARK: set_result 1"
 
     logging.debug("result for %s %s %s", testsuite_name, test_name, result)
 
@@ -27,13 +28,16 @@ def set_result(context, product_name, branch_name, build, testsuite_name,
 
     testplan_name = product1.key_get("testplan", None)
     if testplan_name is None:
-        testplan_name = "default"
-        testplan.api.get_or_create(testplan_name, testsuite_name)
-        (testplan_key, _) = models.KVP.get_or_create("testplan",
-                                                     testplan_name)
-        models.TestProductKeySet.objects.create(testproduct=product1,
-                                                testkey=testplan_key)
-        created = True
+        raise ValueError("product %s %s missing testplan" % (product_name,
+                                                             branch_name))
+        #testplan_name = "default"
+        #print "  MARK", testplan_name, testsuite_name
+        #testplan.api.get_or_create(testplan_name, testsuite_name)
+        #(testplan_key, _) = models.KVP.get_or_create("testplan",
+                                                     #testplan_name)
+        #models.TestProductKeySet.objects.create(testproduct=product1,
+                                                #testkey=testplan_key)
+        #created = True
 
     ##
     # Make sure testsuite is part of the test plan.

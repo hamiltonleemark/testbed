@@ -48,6 +48,8 @@ def get_or_create(context, testsuite_name, order=ORDER_NEXT):
         item.save()
 
     (name, _) = TestsuiteName.objects.get_or_create(name=testsuite_name)
+    print "MARK: 1", testplan, name, order
+    print "MARK: list", TestplanOrder.objects.all()
     (_, created) = TestplanOrder.get_or_create(testplan, name, order)
 
     ##

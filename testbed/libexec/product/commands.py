@@ -44,11 +44,7 @@ def do_product_testplan_add(args):
 
     logging.info("adding testplan %s to product %s %s", args.testplan,
                  args.product, args.branch)
-    (product, _) = api.get_or_create(args.product, args.branch)
-    product.key_get_or_create("testplan", args.testplan)
-
-    context = models.Testplan.context_get(args.testplan)
-    (testplan, created) = models.Testplan.objects.get_or_create(context=context)
+    api.add_testplan(args.product, args.branch, args.testplan)
 
 
 def product_list(args):
