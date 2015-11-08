@@ -41,10 +41,11 @@ def add_testsuite(context, testsuite_name, build, testkeys):
 
 
 # \todo This should be called filter
-def list_testsuite(context, testkeys, testsuite_name=None):
+def list_testsuite(context, testkeys, build=None, testsuite_name=None):
     """ Retrieve the list of testsuites by tesykeys and name. """
 
     from testdb import models
+
 
     ##
     # First find the testplan and the order in which test tests  should be
@@ -52,9 +53,11 @@ def list_testsuite(context, testkeys, testsuite_name=None):
 
     ##
     # \todo Keep only testkeys that are associated to a testplan
-    testplankeys = [item for item in testkeys if item.key.value != "build"]
-    testplan1 = testplan.api.get(testplan.api.CONTEXT, testplankeys)
-    testkeys = [item for item in testkeys if item.key.value == "build"]
+    print "MARK: testkeys", testkeys
+    testplankeys = [models.KVP.get(key, value) for (key, value) in testkeys]
+    print "MARK: testplankeys", testplankeys
+    testplan1 = testplan.api.get(testplan.api.CONTEXT, testkeys)
+    testkeys = [models.KVP.get("build", build)]
 
     if testsuite_name:
         orders = testplan1.testplanorder_set.filter(name__name=testsuite_name)
