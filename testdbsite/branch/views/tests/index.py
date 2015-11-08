@@ -3,12 +3,9 @@ from testdb import models
 from testdb import builds
 
 class View(object):
-    order = 1
-    
-    def __init__(self, plan, testsuite, test):
+    def __init__(self, order, plan, testsuite, test):
         """Contruct a product view. """
-        self.order = View.order
-        View.order += 1
+        self.order = order 
         self.plan = plan
         self.testsuite = testsuite
         self.test = test
@@ -22,10 +19,11 @@ def view(request, pid):
     """ Summarize product information. """
 
     context = request.GET.get("context", "default")
-    context = models.Context.objects.get(name=context)
 
     product = models.TestProduct.objects.get(id=pid)
     testplan_name = product.key_get("testplan", None)
+    testplan_name = models.Testplan.context_get(testplan_name)
+    testplan_context = models.Context.objects.get(name=testplan_name)
 
     ##
     # Retrieve the test plan.
@@ -33,35 +31,44 @@ def view(request, pid):
     # retrieve the testplan value.
     planorders = {}
 
-    testplan_context = models.Testplan.context_get(testplan_name)
+    print "MARK: context", testplan_context
+    print "MARK: testplan", models.Testplan.objects.all()
+
     testplan = models.Testplan.objects.get(context=testplan_context)
 
     testplans = testplan.testplanorder_set.order_by("order")
+    order = 1
     for plan in testplans:
+        print "MARK: plan ", plan.order
         testsuites = plan.testsuite_set.filter(context=testplan.context)
         for testsuite1 in testsuites:
-            for test1 in testsuite1.test_set.all():
+            for test1 in testsuite1.test_set.all().order_by("name"):
                 key = (testsuite1.name.name, test1.name.name)
-                planorders[key] = View(plan, testsuite1, test1)
+                print "MARK: key", key
+                planorders[key] = View(order, plan, testsuite1, test1)
+                order += 1
 
     ##
 
     ##
     # retrieve build list.
     product_key = models.KVP.objects.get(key__value="product",
-                                             value=str(product.product.value))
+                                         value=str(product.product.value))
     branch_key = models.KVP.objects.get(key__value="branch",
                                             value=product.branch.value)
     blist = builds.filter(product_key, branch_key)
 
+    context = models.Context.objects.get(name=context)
     for testplan in testplans:
         for buildid in blist:
             testsuites = testplan.testsuite_set.filter(context=context,
                                                        keys=buildid)
+            print "MARK: blist", testsuites
             for testsuite1 in testsuites:
                 for test1 in testsuite1.test_set.all():
                     key = (testsuite1.name.name, test1.name.name)
-                    planorders[key].results.append(test1.status)
+                    if key in planorders:
+                        planorders[key].results.append(test1.status)
 
     planorders = [(item.order, item) for item in planorders.values()]
     planorders.sort()
@@ -74,4 +81,4 @@ def view(request, pid):
         "planorders": planorders,
         "builds": blist
         }
-    return render_to_response("branch/tests/index.html", html_data)
+    return render_to_response("tests/index.html", html_data)
