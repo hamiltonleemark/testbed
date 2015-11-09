@@ -105,9 +105,11 @@ def get(context, testkeys):
         return Testplan.objects.get(context=context)
     else:
         find = Testplan.objects.filter(context=context)
+        print "MARK: get count", find.count()
 
         for testkey in testkeys[:-1]:
             find = find.filter(keys=testkey)
+            print "MARK: get count", testkey, find.count()
 
         return find.get(keys=testkeys[-1])
 

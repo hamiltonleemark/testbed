@@ -129,5 +129,5 @@ def add_testplan(product, branch, testplan_name):
     (product1, _) = get_or_create(product, branch)
 
     context = Testplan.context_get(testplan_name)
-    (testplan, created) = Testplan.objects.get_or_create(context=context)
+    Testplan.objects.get_or_create(context=context)
     product1.key_get_or_create("testplan", testplan_name)

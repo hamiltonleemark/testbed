@@ -145,6 +145,7 @@ def do_test_add(args):
                  testsuite.name)
     return True
 
+
 def do_test_remove(args):
     """ Remove a test from a testplan. """
 
@@ -259,14 +260,14 @@ def add_subparser(subparser):
                                    help="Modify test in testsuite.")
     subparser = parser.add_subparsers()
     tparser = subparser.add_parser("add", description="Add key",
-                                  help="add test.")
+                                   help="add test.")
 
     tparser.set_defaults(func=do_test_add)
     tparser.add_argument("order", type=valid_order, help="testsuite name")
     tparser.add_argument("name", type=str, help="name of test")
 
     tparser = subparser.add_parser("remove", description="Add key",
-                                  help="add test.")
+                                   help="add test.")
     tparser.set_defaults(func=do_test_remove)
     tparser.add_argument("order", type=valid_order, help="testsuite name")
     tparser.add_argument("name", type=str, help="name of test")

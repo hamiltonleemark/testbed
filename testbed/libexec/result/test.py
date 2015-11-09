@@ -49,9 +49,9 @@ class TestTestCase(TestCase):
         """
         from testdb import models
 
-        #build_count = 10
-        #testsuite_count = 100
-        build_count = 2 
+        # build_count = 10
+        # testsuite_count = 100
+        build_count = 2
         testsuite_count = 2
         test_count = 1
 
@@ -94,7 +94,7 @@ class TestTestCase(TestCase):
         ##
         # Create product and associate default test plan to product.
         product.api.get_or_create("product1", "branch1")
-        product.api.testplan_add("product1", "branch1", "default")
+        product.api.add_testplan("product1", "branch1", "default")
 
         ##
         # Create build content as in a history.
@@ -125,7 +125,7 @@ class TestTestCase(TestCase):
         ##
 
         ##
-        # Time retrieving all testsuites.
+        # Time retrieving all testsuites for a build.
         start = datetime.datetime.now()
         testkeys = [item.testkey
                     for item in testplan1.testplankeyset_set.all()]
@@ -133,6 +133,7 @@ class TestTestCase(TestCase):
 
         testkeys.append(buildkey)
         self.assertEqual(len(orders), testsuite_count)
+        testkeys = [("build", "build1")]
         results = [item for item in testsuite.api.list_testsuite("default",
                                                                  testkeys)]
         end = datetime.datetime.now()

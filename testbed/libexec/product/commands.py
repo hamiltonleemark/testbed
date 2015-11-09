@@ -25,7 +25,6 @@ in various ways such as defining the priority of branches that need testing.
 import logging
 import yaml
 from . import api
-from testbed.libexec import testplan
 
 
 def product_add(args):
@@ -40,8 +39,6 @@ def product_remove(args):
 
 def do_product_testplan_add(args):
     """ Add a testplan to the database. """
-    from testdb import models
-
     logging.info("adding testplan %s to product %s %s", args.testplan,
                  args.product, args.branch)
     api.add_testplan(args.product, args.branch, args.testplan)

@@ -5,7 +5,6 @@ import logging
 from testbed.libexec import testsuite
 from testbed.libexec import product
 from testbed.libexec import planorder
-from testbed.libexec import testplan
 
 
 # pylint: disable=R0913
@@ -30,15 +29,6 @@ def set_result(context, product_name, branch_name, build, testsuite_name,
     if testplan_name is None:
         raise ValueError("product %s %s missing testplan" % (product_name,
                                                              branch_name))
-        #testplan_name = "default"
-        #print "  MARK", testplan_name, testsuite_name
-        #testplan.api.get_or_create(testplan_name, testsuite_name)
-        #(testplan_key, _) = models.KVP.get_or_create("testplan",
-                                                     #testplan_name)
-        #models.TestProductKeySet.objects.create(testproduct=product1,
-                                                #testkey=testplan_key)
-        #created = True
-
     ##
     # Make sure testsuite is part of the test plan.
     (order, critem) = planorder.api.get_or_create(testplan_name,

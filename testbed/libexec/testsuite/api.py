@@ -46,18 +46,18 @@ def list_testsuite(context, testkeys, build=None, testsuite_name=None):
 
     from testdb import models
 
-
     ##
-    # First find the testplan and the order in which test tests  should be
+    # First find the testplan and the order in which test tests should be
     # presented.
 
     ##
     # \todo Keep only testkeys that are associated to a testplan
-    print "MARK: testkeys", testkeys
-    testplankeys = [models.KVP.get(key, value) for (key, value) in testkeys]
-    print "MARK: testplankeys", testplankeys
-    testplan1 = testplan.api.get(testplan.api.CONTEXT, testkeys)
-    testkeys = [models.KVP.get("build", build)]
+    testkeys = [models.KVP.get_or_create(key, value)[0]
+                for (key, value) in testkeys]
+    print "MARK: list_testsuite", context
+    testplan1 = testplan.api.get(context, testkeys)
+    if build:
+        testkeys += [models.KVP.get_or_create("build", build)[0]]
 
     if testsuite_name:
         orders = testplan1.testplanorder_set.filter(name__name=testsuite_name)
