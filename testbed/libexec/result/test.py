@@ -126,6 +126,13 @@ class TestTestCase(TestCase):
         ##
 
         ##
+        # These builds should not 
+        buildid = "build99"
+        results = [item for item in testsuite.api.list_testsuite(
+                "default", [], "build99")]
+        self.assertEqual(len(results), 0)
+
+        ##
         # Time retrieving all testsuites for a build.
         start = datetime.datetime.now()
         testkeys = [item.testkey
@@ -144,18 +151,30 @@ class TestTestCase(TestCase):
         ##
 
         ##
+        # Time retrieving all testsuites from multiple builds.
+        start = datetime.datetime.now()
+        results = []
+        for bitem in range(0, 5):
+            buildid = "build%d" % bitem
+            results += [item for item in testsuite.api.list_testsuite(
+                "default", [], buildid)]
+            print "MARK: length", len(results)
+        end = datetime.datetime.now()
+        duration = end - start
+        self.assertEqual(len(results), 5*testsuite_count)
+        self.assertTrue(duration.seconds <= 1.0,
+                        "query is taking too long %f." % duration.seconds)
+        print "search 5 builds %d duration %s" % (testsuite_count, duration)
+
+        ##
+
+        ##
         # Time to retrieving all test results
-        testkeys = [
-            ("key1", "value1"),
-            ("key2", "value2"),
-            ("key3", "value3"),
-            ("key4", "value4"),
-            ]
         start = datetime.datetime.now()
         results = [item for item in api.list_result("default", [])]
         end = datetime.datetime.now()
         duration = end - start
         print "test search %d duration %s" % (testsuite_count, duration)
-        self.assertTrue(duration.seconds < 1.0,
+        self.assertTrue(duration.seconds <= 1.0,
                         "query is taking too long %f." % duration.seconds)
         self.assertEqual(len(results), testsuite_count*test_count*build_count)
