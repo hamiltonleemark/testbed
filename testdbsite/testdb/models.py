@@ -499,10 +499,17 @@ class TestProduct(models.Model):
 
     def key_get(self, key, default=None):
         """ Return value given key. """
+
         try:
             return self.keys.get(key__value=key).value
         except KVP.DoesNotExist:
             return default
+
+    def key_get_or_create(self, key, value):
+        """ Add key to product. """
+
+        (kvp, _) = KVP.get_or_create(key, value)
+        return self.testproductkeyset_set.get_or_create(testkey=kvp)
 
     @staticmethod
     def get_or_create(context, product, branch, testkeys=None):

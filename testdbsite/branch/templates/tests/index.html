@@ -1,6 +1,8 @@
 {% extends "base.html" %}
+{% load branch_tags %}
 
 {% block content %}
+
 
 <table>
  <tr>
@@ -23,8 +25,8 @@
    {% for key in planorder.keys %}<td>{{key.value}}</td>{% endfor %}
    <td>{{planorder.testsuite.name}}</td>
    <td>{{planorder.test.name}}</td>
-  {% for result in planorder.results %}
-    <td>{{result}}</td>
+  {% for build in builds %}
+    <td>{{result}} {% view_cell build.value planorder.testsuite.name.name planorder.test.name.name %}</td>
   {% endfor %}
   </tr>
  {% endfor %}

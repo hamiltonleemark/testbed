@@ -30,7 +30,6 @@ def get(context, testsuite_name, keys):
 # pylint: disable=W0611
 def get_or_create(context, testsuite_name, test_name, keys):
     """ Get or create testplan order. """
-
     from testdb import models
 
     testkeys = [models.KVP.get_or_create(key=key, value=value)[0]

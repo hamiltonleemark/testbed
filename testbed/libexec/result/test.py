@@ -25,6 +25,7 @@ from . import api
 from testbed.libexec import build
 from testbed.libexec import testsuite
 from testbed.libexec import testplan
+from testbed.libexec import product
 
 
 # pylint: disable=R0914
@@ -57,20 +58,23 @@ class TestTestCase(TestCase):
             ("key2", "value2"),
             ("key3", "value3"),
             ("key4", "value4"),
-            ("product", "product1"),
-            ("branch", "branch1"),
+            ("product", "tproduct1"),
+            ("branch", "tbranch1"),
         ]
 
         ##
         # Create testplan.
         for item in range(0, testsuite_count):
             name = "testsuite%d" % item
-            (_, created) = testplan.api.get_or_create(testplan.api.CONTEXT,
-                                                      name, item)
+            (_, created) = testplan.api.get_or_create("default", name, item)
             self.assertTrue(created, "created testsuite%d" % item)
 
-        context = models.Testplan.context_get(testplan.api.CONTEXT)
+            for testkey in testkeys:
+                testplan.api.add_key("default", item+1, testkey[0], testkey[1])
+
+        context = models.Testplan.context_get("default")
         testplan1 = models.Testplan.objects.get(context=context)
+        self.assertTrue(testplan1 is not None, "testplan not created")
 
         find = testplan1.testplanorder_set.all()
         self.assertEqual(find.count(), testsuite_count)
@@ -87,6 +91,11 @@ class TestTestCase(TestCase):
             self.assertEqual(order.testsuite_set.all().count(), 1)
         #
         ##
+
+        ##
+        # Create product and associate default test plan to product.
+        product.api.get_or_create("product1", "branch1")
+        product.api.add_testplan("product1", "branch1", "default")
 
         ##
         # Create build content as in a history.
@@ -117,7 +126,14 @@ class TestTestCase(TestCase):
         ##
 
         ##
-        # Time retrieving all testsuites.
+        # These builds should not 
+        buildid = "build99"
+        results = [item for item in testsuite.api.list_testsuite(
+                "default", [], "build99")]
+        self.assertEqual(len(results), 0)
+
+        ##
+        # Time retrieving all testsuites for a build.
         start = datetime.datetime.now()
         testkeys = [item.testkey
                     for item in testplan1.testplankeyset_set.all()]
@@ -125,8 +141,8 @@ class TestTestCase(TestCase):
 
         testkeys.append(buildkey)
         self.assertEqual(len(orders), testsuite_count)
-        results = [item for item in testsuite.api.list_testsuite("default",
-                                                                 testkeys)]
+        results = [item for item in testsuite.api.list_testsuite("default", [],
+                                                                 "build1")]
         end = datetime.datetime.now()
         duration = end - start
         self.assertEqual(len(results), testsuite_count)
@@ -135,11 +151,30 @@ class TestTestCase(TestCase):
         ##
 
         ##
+        # Time retrieving all testsuites from multiple builds.
+        start = datetime.datetime.now()
+        results = []
+        for bitem in range(0, 5):
+            buildid = "build%d" % bitem
+            results += [item for item in testsuite.api.list_testsuite(
+                "default", [], buildid)]
+            print "MARK: length", len(results)
+        end = datetime.datetime.now()
+        duration = end - start
+        self.assertEqual(len(results), 5*testsuite_count)
+        self.assertTrue(duration.seconds <= 1.0,
+                        "query is taking too long %f." % duration.seconds)
+        print "search 5 builds %d duration %s" % (testsuite_count, duration)
+
+        ##
+
+        ##
         # Time to retrieving all test results
         start = datetime.datetime.now()
-        results = [item for item in api.list_result("default", testkeys)]
+        results = [item for item in api.list_result("default", [])]
         end = datetime.datetime.now()
         duration = end - start
         print "test search %d duration %s" % (testsuite_count, duration)
-        self.assertTrue(duration.seconds < 1.0, "query is taking too long.")
-        self.assertEqual(len(results), testsuite_count*test_count)
+        self.assertTrue(duration.seconds <= 1.0,
+                        "query is taking too long %f." % duration.seconds)
+        self.assertEqual(len(results), testsuite_count*test_count*build_count)

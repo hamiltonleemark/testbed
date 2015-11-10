@@ -37,19 +37,11 @@ def product_remove(args):
     return api.remove(args.product, args.branch)
 
 
-def product_testplan_add(args):
+def do_product_testplan_add(args):
     """ Add a testplan to the database. """
-
-    from testdb import models
-
     logging.info("adding testplan %s to product %s %s", args.testplan,
                  args.product, args.branch)
-    product = models.TestProduct.objects.get(context__name=api.CONTEXT,
-                                             product__value=args.product,
-                                             branch__value=args.branch)
-    (testplan, _) = models.KVP.get_or_create("testplan", args.testplan)
-    models.TestProductKeySet.objects.create(testproduct=product,
-                                            testkey=testplan)
+    api.add_testplan(args.product, args.branch, args.testplan)
 
 
 def product_list(args):
@@ -109,7 +101,7 @@ def add_subparser(subparser):
         description="Remove a product to the database",
         help="Remove a product.")
     parser.set_defaults(func=product_remove)
-    parser.add_argument("name", type=str, help="Name of the product.")
+    parser.add_argument("product", type=str, help="Name of the product.")
     parser.add_argument("branch", type=str, help="Branch name of the product.")
 
     ##
@@ -131,7 +123,7 @@ def add_subparser(subparser):
         "add", description="Associate testplan to a product",
         help="add testplan to product.")
 
-    parser.set_defaults(func=product_testplan_add)
+    parser.set_defaults(func=do_product_testplan_add)
     parser.add_argument("product", type=str, help="Product name.")
     parser.add_argument("branch", type=str, help="Branch name.")
     parser.add_argument("testplan", type=str, help="Name of testplan.")

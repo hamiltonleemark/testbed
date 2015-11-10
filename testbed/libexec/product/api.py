@@ -37,8 +37,15 @@ def get_or_create(productname, branchname, order=-1):
                  appears on web pages.
     """
     from testdb.models import TestProduct
+    from testdb.models import KVP
 
     logging.info("adding product %s %s", productname, branchname)
+
+    ##
+    # Make sure to track branch and product against KVP. This is done
+    # incase user decides to make these keys strict.
+    KVP.get_or_create("branch", branchname)
+    KVP.get_or_create("product", productname)
 
     if order == -1:
         find = TestProduct.objects.filter(context__name=CONTEXT)
@@ -113,3 +120,14 @@ def remove(product, branch):
                                    testsuite__keys=branch_key)
     for item in find:
         item.delete()
+
+
+def add_testplan(product, branch, testplan_name):
+    """ Add testplan to product. """
+    from testdb.models import Testplan
+
+    (product1, _) = get_or_create(product, branch)
+
+    context = Testplan.context_get(testplan_name)
+    Testplan.objects.get_or_create(context=context)
+    product1.key_get_or_create("testplan", testplan_name)

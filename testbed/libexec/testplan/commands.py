@@ -76,20 +76,7 @@ def do_list(_):
 
 def do_key_add(args):
     """ Add test key and value to plan testsuite. """
-
-    from testdb import models
-
-    context = models.Testplan.context_get(args.context)
-    testplan = models.Testplan.objects.get(context=context)
-    planorder = testplan.testplanorder_set.get(order=args.order)
-    testsuite = models.Testsuite.objects.get(context=context,
-                                             testplanorder=planorder)
-    logging.info("add %s=%s to testsuite %s %s.%s", args.name, args.value,
-                 args.context, args.order, testsuite.name)
-    (testkey, _) = models.TestKey.get_or_create(key=args.name,
-                                                value=args.value)
-    testsuite.testsuitekeyset_set.get_or_create(testsuite=testsuite,
-                                                testkey=testkey)
+    api.add_key(args.context, args.order, args.name, args.value)
 
     return True
 
@@ -143,6 +130,35 @@ def do_test_add(args):
     models.Test.get_or_create(testsuite, args.name, [])
     logging.info("add test %s to testsuite %s.%s", args.name, planorder.order,
                  testsuite.name)
+    return True
+
+
+def do_test_remove(args):
+    """ Remove a test from a testplan. """
+
+    from testdb import models
+
+    ##
+    # Make sure testsuite is part of the test plan.
+    try:
+        context = models.Testplan.context_get(args.context)
+        testplan = models.Testplan.objects.get(context=context)
+    except (models.Context.DoesNotExist, models.Testplan.DoesNotExist):
+        raise ValueError("testplan with context %s missing" % args.context)
+
+    try:
+        planorder = testplan.testplanorder_set.get(order=args.order,
+                                                   testplan=testplan)
+        testsuite = models.Testsuite.objects.get(context=context,
+                                                 testplanorder=planorder)
+    except (models.Testsuite.DoesNotExist, models.TestplanOrder.DoesNotExist):
+        raise ValueError("testplan %s does not contain %s" % (args.context,
+                                                              args.order))
+
+    test = testsuite.test_set.get(name__name=args.name)
+    test.delete()
+    logging.info("removing test %s from testsuite %s.%s", args.name,
+                 planorder.order, testsuite.name)
     return True
 
 
@@ -230,12 +246,18 @@ def add_subparser(subparser):
                                    description="Modify tests in testsuite.",
                                    help="Modify test in testsuite.")
     subparser = parser.add_subparsers()
-    parser = subparser.add_parser("add", description="Add key",
-                                  help="add test.")
+    tparser = subparser.add_parser("add", description="Add key",
+                                   help="add test.")
 
-    parser.set_defaults(func=do_test_add)
-    parser.add_argument("order", type=valid_order, help="testsuite name")
-    parser.add_argument("name", type=str, help="name of test")
+    tparser.set_defaults(func=do_test_add)
+    tparser.add_argument("order", type=valid_order, help="testsuite name")
+    tparser.add_argument("name", type=str, help="name of test")
+
+    tparser = subparser.add_parser("remove", description="Add key",
+                                   help="add test.")
+    tparser.set_defaults(func=do_test_remove)
+    tparser.add_argument("order", type=valid_order, help="testsuite name")
+    tparser.add_argument("name", type=str, help="name of test")
     #
     ##
 

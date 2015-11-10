@@ -12,16 +12,16 @@ ORDER_NEXT = -1
 def get_or_create(context, testsuite_name, order=ORDER_NEXT):
     """ Get or create a testplan and set order.
 
-    Order is just that the location of the testplan in the list of testplans.
-   The order effects the location the testplan appears on web pages.
-    When complete testplan order number is sequential with no gaps.
+    Order is just that the location of the testplan in the list of
+    testplans. The order effects the location the testplan appears on web
+    pages.  When complete testplan order number is sequential with no gaps.
     @param testsuite_name The testsuite name for the testplan
     @param context Testplan context organizes testplans in a logical group.
                    Testplans with the same context are in the same group.
                    The order indicates the order of the testplan in the
                    context.
-    @param order the location of testsuite in the testplan. To change the order
-                 of an existing testplan pass in a different number.
+    @param order the location of testsuite in the testplan. To change the
+                 order of an existing testplan pass in a different number.
     """
 
     from testdb.models import Testplan
@@ -103,10 +103,8 @@ def get(context, testkeys):
         return Testplan.objects.get(context=context)
     else:
         find = Testplan.objects.filter(context=context)
-
         for testkey in testkeys[:-1]:
             find = find.filter(keys=testkey)
-
         return find.get(keys=testkeys[-1])
 
 
@@ -153,3 +151,22 @@ def add(context, testsuite_name, order):
     (name, _) = TestsuiteName.objects.get_or_create(name=testsuite_name)
     (_, created) = TestplanOrder.create(testplan, name, order)
     return (testplan, created)
+
+
+def add_key(context, order, key, value):
+    """ Add a key into the testplan. """
+
+    from testdb.models import Testplan
+    logging.info("add %s=%s to testsuite %s %s", key, value, context, order)
+    from testdb.models import Testsuite
+    from testdb.models import KVP
+
+    context = Testplan.context_get(context)
+    testplan = Testplan.objects.get(context=context)
+    planorder = testplan.testplanorder_set.get(order=order)
+    testsuite = Testsuite.objects.get(context=context, testplanorder=planorder)
+    (testkey, _) = KVP.get_or_create(key=key, value=value)
+    testsuite.testsuitekeyset_set.get_or_create(testsuite=testsuite,
+                                                testkey=testkey)
+
+    return (testsuite, testkey)

@@ -146,3 +146,23 @@ class TestsuiteTestCase(TestCase):
         self.assertEqual(str(products[0].product), "product_order1")
         self.assertEqual(str(products[1].product), "product_order2")
         self.assertEqual(str(products[2].product), "product_order3")
+
+    def test_add_testplan(self):
+        """ test_add_testplan test add_testplan. """
+
+        parser = TestsuiteTestCase.parser_create()
+
+        cmd = "product add product1 branch1"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+
+        cmd = "product testplan add product1 branch1 default"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+
+        (product1, critem) = TestProduct.get_or_create("product.default",
+                                                       "product1", "branch1")
+        self.assertFalse(critem)
+        self.assertTrue(product1)
+
+        self.assertEqual(product1.key_get("testplan"), "default")
