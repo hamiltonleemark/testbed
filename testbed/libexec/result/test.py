@@ -126,10 +126,11 @@ class TestTestCase(TestCase):
         ##
 
         ##
-        # These builds should not 
+        # These builds should not
         buildid = "build99"
-        results = [item for item in testsuite.api.list_testsuite(
-                "default", [], "build99")]
+        results = [item for item in testsuite.api.list_testsuite("default",
+                                                                 [],
+                                                                 "build99")]
         self.assertEqual(len(results), 0)
 
         ##
@@ -158,7 +159,10 @@ class TestTestCase(TestCase):
             buildid = "build%d" % bitem
             results += [item for item in testsuite.api.list_testsuite(
                 "default", [], buildid)]
+<<<<<<< HEAD
             print "MARK: length", len(results)
+=======
+>>>>>>> master_dev
         end = datetime.datetime.now()
         duration = end - start
         self.assertEqual(len(results), 5*testsuite_count)
