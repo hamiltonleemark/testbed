@@ -509,7 +509,6 @@ class TestProduct(models.Model):
         """ Add key to product. """
 
         (kvp, _) = KVP.get_or_create(key, value)
-        print "MARK: kvp", kvp
         return self.testproductkeyset_set.get_or_create(testkey=kvp)
 
     @staticmethod

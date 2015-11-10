@@ -76,20 +76,7 @@ def do_list(_):
 
 def do_key_add(args):
     """ Add test key and value to plan testsuite. """
-
-    from testdb import models
-
-    context = models.Testplan.context_get(args.context)
-    testplan = models.Testplan.objects.get(context=context)
-    planorder = testplan.testplanorder_set.get(order=args.order)
-    testsuite = models.Testsuite.objects.get(context=context,
-                                             testplanorder=planorder)
-    logging.info("add %s=%s to testsuite %s %s.%s", args.name, args.value,
-                 args.context, args.order, testsuite.name)
-    (testkey, _) = models.KVP.get_or_create(key=args.name,
-                                            value=args.value)
-    testsuite.testsuitekeyset_set.get_or_create(testsuite=testsuite,
-                                                testkey=testkey)
+    api.add_key(args.context, args.order, args.name, args.value)
 
     return True
 

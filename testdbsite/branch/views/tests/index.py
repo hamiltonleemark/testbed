@@ -32,9 +32,6 @@ def view(request, pid):
     # retrieve the testplan value.
     planorders = {}
 
-    print "MARK: context", testplan_context
-    print "MARK: testplan", models.Testplan.objects.all()
-
     testplan = models.Testplan.objects.get(context=testplan_context)
 
     testplans = testplan.testplanorder_set.order_by("order")
@@ -45,7 +42,6 @@ def view(request, pid):
         for testsuite1 in testsuites:
             for test1 in testsuite1.test_set.all().order_by("name"):
                 key = (testsuite1.name.name, test1.name.name)
-                print "MARK: key", key
                 planorders[key] = ViewRow(order, plan, testsuite1, test1)
                 order += 1
     ##

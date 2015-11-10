@@ -49,10 +49,8 @@ class TestTestCase(TestCase):
         """
         from testdb import models
 
-        # build_count = 10
-        # testsuite_count = 100
-        build_count = 2
-        testsuite_count = 2
+        build_count = 10
+        testsuite_count = 100
         test_count = 1
 
         testkeys = [
@@ -70,6 +68,9 @@ class TestTestCase(TestCase):
             name = "testsuite%d" % item
             (_, created) = testplan.api.get_or_create("default", name, item)
             self.assertTrue(created, "created testsuite%d" % item)
+
+            for testkey in testkeys:
+                testplan.api.add_key("default", item+1, testkey[0], testkey[1])
 
         context = models.Testplan.context_get("default")
         testplan1 = models.Testplan.objects.get(context=context)
@@ -133,9 +134,8 @@ class TestTestCase(TestCase):
 
         testkeys.append(buildkey)
         self.assertEqual(len(orders), testsuite_count)
-        testkeys = [("build", "build1")]
-        results = [item for item in testsuite.api.list_testsuite("default",
-                                                                 testkeys)]
+        results = [item for item in testsuite.api.list_testsuite("default", [],
+                                                                 "build1")]
         end = datetime.datetime.now()
         duration = end - start
         self.assertEqual(len(results), testsuite_count)
@@ -145,10 +145,17 @@ class TestTestCase(TestCase):
 
         ##
         # Time to retrieving all test results
+        testkeys = [
+            ("key1", "value1"),
+            ("key2", "value2"),
+            ("key3", "value3"),
+            ("key4", "value4"),
+            ]
         start = datetime.datetime.now()
-        results = [item for item in api.list_result("default", testkeys)]
+        results = [item for item in api.list_result("default", [])]
         end = datetime.datetime.now()
         duration = end - start
         print "test search %d duration %s" % (testsuite_count, duration)
-        self.assertTrue(duration.seconds < 1.0, "query is taking too long.")
-        self.assertEqual(len(results), testsuite_count*test_count)
+        self.assertTrue(duration.seconds < 1.0,
+                        "query is taking too long %f." % duration.seconds)
+        self.assertEqual(len(results), testsuite_count*test_count*build_count)

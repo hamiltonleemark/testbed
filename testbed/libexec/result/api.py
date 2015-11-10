@@ -19,7 +19,6 @@ def set_result(context, product_name, branch_name, build, testsuite_name,
                  appears on web pages.
     """
     from testdb import models
-    print "MARK: set_result 1"
 
     logging.debug("result for %s %s %s", testsuite_name, test_name, result)
 
@@ -34,7 +33,6 @@ def set_result(context, product_name, branch_name, build, testsuite_name,
     (order, critem) = planorder.api.get_or_create(testplan_name,
                                                   testsuite_name, test_name,
                                                   keys)
-    print "MARK: planorder", testplan_name, testsuite_name, test_name, keys
     created = created or critem
     ##
 
@@ -43,12 +41,10 @@ def set_result(context, product_name, branch_name, build, testsuite_name,
     (testsuite2, critem) = models.Testsuite.get_or_create(context,
                                                           testsuite_name,
                                                           order, build_key, [])
-    print "MARK: tetsuite2", testsuite2, critem
     created = created or critem
 
     (test, critem) = models.Test.get_or_create(testsuite2, test_name, [])
     created = created or critem
-    print "MARK: created", created
 
     if result == "pass":
         test.status = 0
@@ -67,7 +63,7 @@ def list_result(context, testkeys, build=None, testsuite_name=None,
                                               testsuite_name)
     for testsuite_item in testsuites:
         if test_name:
-            find = testsuite_item.filter(test__name=test_name)
+            find = testsuite_item.test_set.filter(test__name=test_name)
         else:
             find = testsuite_item.test_set.all()
 

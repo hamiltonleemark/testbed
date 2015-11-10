@@ -155,7 +155,6 @@ class TestsuiteTestCase(TestCase):
         cmd = "product add product1 branch1"
         args = parser.parse_args(cmd.split())
         args.func(args)
-        print "MARK", TestProduct.objects.all()
 
         cmd = "product testplan add product1 branch1 default"
         args = parser.parse_args(cmd.split())
