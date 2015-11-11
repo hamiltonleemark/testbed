@@ -129,9 +129,11 @@ class TestTestCase(TestCase):
         ##
         # These builds should not exist. Results should be zero.
         buildid = "build99"
+        build.api.get_or_create("product1", "branch1", buildid)
         results = [item for item in testplan.api.list_testsuite("default", [],
                                                                 buildid)]
-        self.assertEqual(len(results), 0, "build99 should not exist.")
+        self.assertEqual(len(results), 0, "%s found %d." % (buildid,
+                                                            len(results)))
         ##
 
         ##

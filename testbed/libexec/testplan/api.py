@@ -190,8 +190,11 @@ def list_testsuite(testplan_name, testkeys, build=None,
     ##
     # Given the order now find the list of testsuites.
     (context, _) = models.Context.objects.get_or_create(name=testsuite_context)
-    if build:
-        testkeys += [models.KVP.get_or_create("build", build)[0]]
+
+    try:
+        testkeys = [models.KVP.get("build", build)]
+    except models.KVP.DoesNotExist:
+        testkeys = []
 
     for order in orders:
         testsuites = models.Testsuite.filter(context, order, testkeys)

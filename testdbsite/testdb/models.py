@@ -57,6 +57,12 @@ class KVP(models.Model):
         return "%s=%s" % (self.key, self.value)
 
     @staticmethod
+    def get(key, value):
+        """ Retrieve KVP. """
+        (key, _) = Key.objects.get_or_create(value=key)
+        return KVP.objects.get(key=key, value=value)
+
+    @staticmethod
     def get_or_create(key, value):
         """ Create a single test key objects. """
         (key, _) = Key.objects.get_or_create(value=key)
