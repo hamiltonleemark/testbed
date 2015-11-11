@@ -46,7 +46,7 @@ def do_list_result(args):
     if args.build:
         testkeys += [("build", args.build)]
 
-    tests = api.list_result(args.context, testkeys, args.testsuite, args.test)
+    tests = api.list_result(args.context, testkeys)
 
     data = config.DataTree()
     for test in tests:
@@ -99,7 +99,5 @@ def add_subparser(subparser):
     parser.add_argument("product", type=str, help="Name of product.")
     parser.add_argument("branch", type=str, help="Product branch name.")
     parser.add_argument("--build", type=str, help="build.")
-    parser.add_argument("--testsuite", type=str, help="Testsuite name.")
-    parser.add_argument("--test", type=str, help="test name")
     parser.set_defaults(func=do_list_result)
     return subparser

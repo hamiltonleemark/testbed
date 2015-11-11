@@ -128,9 +128,8 @@ class TestTestCase(TestCase):
         ##
         # These builds should not
         buildid = "build99"
-        results = [item for item in testsuite.api.list_testsuite("default",
-                                                                 [],
-                                                                 "build99")]
+        results = [item for item in testplan.api.list_testsuite("default", [],
+                                                                "build99")]
         self.assertEqual(len(results), 0)
 
         ##
@@ -142,8 +141,8 @@ class TestTestCase(TestCase):
 
         testkeys.append(buildkey)
         self.assertEqual(len(orders), testsuite_count)
-        results = [item for item in testsuite.api.list_testsuite("default", [],
-                                                                 "build1")]
+        results = [item for item in testplan.api.list_testsuite("default", [],
+                                                                "build1")]
         end = datetime.datetime.now()
         duration = end - start
         self.assertEqual(len(results), testsuite_count)
@@ -157,12 +156,8 @@ class TestTestCase(TestCase):
         results = []
         for bitem in range(0, 5):
             buildid = "build%d" % bitem
-            results += [item for item in testsuite.api.list_testsuite(
+            results += [item for item in testplan.api.list_testsuite(
                 "default", [], buildid)]
-<<<<<<< HEAD
-            print "MARK: length", len(results)
-=======
->>>>>>> master_dev
         end = datetime.datetime.now()
         duration = end - start
         self.assertEqual(len(results), 5*testsuite_count)
@@ -178,7 +173,7 @@ class TestTestCase(TestCase):
         results = [item for item in api.list_result("default", [])]
         end = datetime.datetime.now()
         duration = end - start
-        print "test search %d duration %s" % (testsuite_count, duration)
+        print "search all results duration %s" % (duration)
         self.assertTrue(duration.seconds <= 1.0,
                         "query is taking too long %f." % duration.seconds)
         self.assertEqual(len(results), testsuite_count*test_count*build_count)

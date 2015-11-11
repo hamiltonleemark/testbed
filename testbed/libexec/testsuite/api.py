@@ -38,38 +38,3 @@ def add_testsuite(context, testsuite_name, build, testkeys):
     buildkey = models.KVP.get_or_create("build", build)[0]
     return models.Testsuite.get_or_create(context, testsuite_name,
                                           testplanorder, buildkey, [])
-
-
-# \todo This should be called filter
-def list_testsuite(context, testkeys, build=None, testsuite_name=None):
-    """ Retrieve the list of testsuites by tesykeys and name. """
-
-    from testdb import models
-
-    ##
-    # First find the testplan and the order in which test tests should be
-    # presented.
-
-    ##
-    # \todo Keep only testkeys that are associated to a testplan
-    testkeys = [models.KVP.get_or_create(key, value)[0]
-                for (key, value) in testkeys]
-    testplan1 = testplan.api.get(context, testkeys)
-    if build:
-        testkeys += [models.KVP.get_or_create("build", build)[0]]
-
-    if testsuite_name:
-        orders = testplan1.testplanorder_set.filter(name__name=testsuite_name)
-    else:
-        orders = testplan1.testplanorder_set.all()
-
-    orders = orders.order_by("order")
-
-    ##
-    # Given the order now find the list of testsuites.
-    (context, _) = models.Context.objects.get_or_create(name=context)
-    for order in orders:
-        testsuites = models.Testsuite.filter(context=context, order=order,
-                                             keys=testkeys)
-        for item in testsuites:
-            yield item

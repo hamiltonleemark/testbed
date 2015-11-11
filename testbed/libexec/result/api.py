@@ -2,9 +2,9 @@
 Functionality common to more than one command.
 """
 import logging
-from testbed.libexec import testsuite
 from testbed.libexec import product
 from testbed.libexec import planorder
+from testbed.libexec import testplan
 
 
 # pylint: disable=R0913
@@ -55,17 +55,10 @@ def set_result(context, product_name, branch_name, build, testsuite_name,
 
 
 # pylint: disable=W0622
-def list_result(context, testkeys, build=None, testsuite_name=None,
-                test_name=None):
+def list_result(context, testkeys, build=None):
     """ Retrieve the list of products based on product and or branch_name. """
 
-    testsuites = testsuite.api.list_testsuite(context, testkeys, build,
-                                              testsuite_name)
+    testsuites = testplan.api.list_testsuite(context, testkeys, build)
     for testsuite_item in testsuites:
-        if test_name:
-            find = testsuite_item.test_set.filter(test__name=test_name)
-        else:
-            find = testsuite_item.test_set.all()
-
-        for test in find:
+        for test in testsuite_item.test_set.all():
             yield (testsuite_item, test)
