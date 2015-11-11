@@ -32,7 +32,7 @@ def do_add_test(args):
     (testsuite1, _) = testsuite.api.add_testsuite(args.context,
                                                   args.testsuite, args.build,
                                                   [])
-    models.Test.get_or_create(testsuite1, args.name, [])
+    models.Test.get_or_create(testsuite1, args.name, args.status, [])
 
 
 def do_list_test(args):
@@ -61,6 +61,8 @@ def add_subparser(subparser):
     parser.add_argument("build", type=str, help="Build id")
     parser.add_argument("testsuite", type=str, help="Testsuite name.")
     parser.add_argument("name", type=str, help="test name")
+    parser.add_argument("--status", default="pass", type=str,
+                        help="Test status.")
     parser.add_argument("--context", default="default", type=str,
                         help="Testsuite context.")
 

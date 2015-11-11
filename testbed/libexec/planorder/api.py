@@ -52,6 +52,7 @@ def get_or_create(context, testsuite_name, test_name, keys):
         testsuite__name=name)
 
     for testsuite1 in order.testsuite_set.filter(context=context):
-        (_, critem) = models.Test.get_or_create(testsuite1, test_name, [])
+        (_, critem) = models.Test.get_or_create(testsuite1, test_name, "pass",
+                                                [])
         return (order, critem)
     return (None, False)

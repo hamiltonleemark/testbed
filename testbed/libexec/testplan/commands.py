@@ -127,7 +127,7 @@ def do_test_add(args):
         raise ValueError("testplan %s does not contain %s" % (args.context,
                                                               args.order))
 
-    models.Test.get_or_create(testsuite, args.name, [])
+    models.Test.get_or_create(testsuite, args.name, "pass", [])
     logging.info("add test %s to testsuite %s.%s", args.name, planorder.order,
                  testsuite.name)
     return True

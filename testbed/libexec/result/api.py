@@ -20,7 +20,8 @@ def set_result(context, product_name, branch_name, build, testsuite_name,
     """
     from testdb import models
 
-    logging.debug("result for %s %s %s", testsuite_name, test_name, result)
+    logging.debug("%s %s %s %s", product_name, branch_name, build,
+                  testsuite_name)
 
     (product1, created) = product.api.get_or_create(product_name, branch_name)
 
@@ -29,7 +30,7 @@ def set_result(context, product_name, branch_name, build, testsuite_name,
         raise ValueError("product %s %s missing testplan" % (product_name,
                                                              branch_name))
     ##
-    # Make sure testsuite is part of the test plan.
+    # Make sure testsuite and test are part of the test plan.
     (order, critem) = planorder.api.get_or_create(testplan_name,
                                                   testsuite_name, test_name,
                                                   keys)
@@ -38,19 +39,14 @@ def set_result(context, product_name, branch_name, build, testsuite_name,
 
     build_key = models.KVP.get_or_create("build", build)[0]
     (context, _) = models.Context.objects.get_or_create(name=context)
-    (testsuite2, critem) = models.Testsuite.get_or_create(context,
+    (testsuite1, critem) = models.Testsuite.get_or_create(context,
                                                           testsuite_name,
                                                           order, build_key, [])
     created = created or critem
 
-    (test, critem) = models.Test.get_or_create(testsuite2, test_name, [])
+    (test, critem) = models.Test.get_or_create(testsuite1, test_name, result,
+                                               [])
     created = created or critem
-
-    if result == "pass":
-        test.status = 0
-    else:
-        test.status = 1
-    test.save()
     return (test, created)
 
 

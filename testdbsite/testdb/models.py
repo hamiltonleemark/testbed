@@ -123,6 +123,14 @@ class Test(models.Model):
         """ User representation. """
         return "%s" % self.name
 
+    @staticmethod
+    def status_map(status):
+        """ Return status. """
+        if status == "pass":
+            return 0
+        elif status == "fail":
+            return 1
+
     # \todo This should be named contains
     @staticmethod
     def filter(contains):
@@ -137,11 +145,13 @@ class Test(models.Model):
             models.Q(name__name__contains=contains))
 
     @staticmethod
-    def get_or_create(testsuite, name, keys):
+    def get_or_create(testsuite, name, status, keys):
         """ Get current or create new objects.
         @param testkeys Must be an instance of KVP.
         @return (obj, created) created is a boolean. True if newly created.
         """
+
+        status = Test.status_map(status)
 
         ##
         # \todo should be pulled out.
@@ -158,11 +168,20 @@ class Test(models.Model):
         elif find.count() > 1:
             raise Test.MultipleObjectsReturned(name)
 
-        test = Test.objects.create(testsuite=testsuite, name=name)
+        test = Test.objects.create(testsuite=testsuite, name=name,
+                                   status=status)
 
         for key in keys:
             TestKeySet.objects.create(test=test, testkey=key)
+
         return (test, True)
+
+    def set_status(self, status):
+        """ Set status. """
+        if status == "pass":
+            self.status = 0
+        elif status == "fail":
+            self.status = 1
 
 
 class TestFile(models.Model):

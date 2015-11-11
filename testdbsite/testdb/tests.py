@@ -87,8 +87,8 @@ class TestsuiteTestCase(TestCase):
 
         (testsuite, _) = Testsuite.get_or_create("default", "testsuite_name1",
                                                  None, buildkey, keys)
-        (test1, _) = Test.get_or_create(testsuite, "test_name1", [])
-        (test2, _) = Test.get_or_create(testsuite, "test_name2", [])
+        (test1, _) = Test.get_or_create(testsuite, "test_name1", "pass", [])
+        (test2, _) = Test.get_or_create(testsuite, "test_name2", "pass", [])
 
         self.assertTrue(test1.id != test2.id)
 

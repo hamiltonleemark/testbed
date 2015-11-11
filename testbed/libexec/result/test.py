@@ -51,7 +51,7 @@ class TestTestCase(TestCase):
 
         build_count = 10
         testsuite_count = 100
-        test_count = 1
+        test_count = 5
 
         testkeys = [
             ("key1", "value1"),
@@ -103,12 +103,13 @@ class TestTestCase(TestCase):
         for bitem in range(0, build_count):
             buildid = "build%d" % bitem
             build.api.get_or_create("product1", "branch1", buildid)
+            print "MARK: build", buildid
 
             for titem in range(0, testsuite_count):
                 testsuite_name = "testsuite%d" % titem
                 (_, rtc) = testsuite.api.add_testsuite("default",
-                                                       testsuite_name,
-                                                       buildid, testkeys)
+                                                       testsuite_name, buildid,
+                                                       testkeys)
                 self.assertTrue(rtc, "new test not created")
                 for testitem in range(0, test_count):
                     test_name = "test%d" % testitem
@@ -126,14 +127,15 @@ class TestTestCase(TestCase):
         ##
 
         ##
-        # These builds should not
+        # These builds should not exist. Results should be zero.
         buildid = "build99"
         results = [item for item in testplan.api.list_testsuite("default", [],
-                                                                "build99")]
-        self.assertEqual(len(results), 0)
+                                                                buildid)]
+        self.assertEqual(len(results), 0, "build99 should not exist.")
+        ##
 
         ##
-        # Time retrieving all testsuites for a build.
+        # Time retrieving all testsuites for a build1.
         start = datetime.datetime.now()
         testkeys = [item.testkey
                     for item in testplan1.testplankeyset_set.all()]
@@ -145,8 +147,9 @@ class TestTestCase(TestCase):
                                                                 "build1")]
         end = datetime.datetime.now()
         duration = end - start
-        self.assertEqual(len(results), testsuite_count)
-        self.assertTrue(duration.seconds < 1.0, "query is taking too long.")
+        self.assertEqual(len(results), testsuite_count,
+                         "build1 missing results")
+        self.assertTrue(duration.seconds < 0.6, "query is taking too long.")
         print "testsuite search %d duration %s" % (testsuite_count, duration)
         ##
 
@@ -160,11 +163,10 @@ class TestTestCase(TestCase):
                 "default", [], buildid)]
         end = datetime.datetime.now()
         duration = end - start
-        self.assertEqual(len(results), 5*testsuite_count)
-        self.assertTrue(duration.seconds <= 1.0,
+        self.assertEqual(len(results), 5*testsuite_count, "5 build results")
+        self.assertTrue(duration.seconds <= 0.6,
                         "query is taking too long %f." % duration.seconds)
-        print "search 5 builds %d duration %s" % (testsuite_count, duration)
-
+        print "search 5 builds %d duration %s" % (len(results), duration)
         ##
 
         ##
@@ -174,6 +176,6 @@ class TestTestCase(TestCase):
         end = datetime.datetime.now()
         duration = end - start
         print "search all results duration %s" % (duration)
-        self.assertTrue(duration.seconds <= 1.0,
+        self.assertTrue(duration.seconds <= 0.6,
                         "query is taking too long %f." % duration.seconds)
         self.assertEqual(len(results), testsuite_count*test_count*build_count)
