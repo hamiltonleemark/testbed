@@ -364,7 +364,10 @@ class Testsuite(models.Model):
         @return Return a single Testsuite object.
         """
 
-        find = Testsuite.objects.filter(context=context, testplanorder=order)
+        find = Testsuite.objects.filter(context=context)
+
+        if order:
+            find = find.filter(testplanorder=order)
 
         if not keys:
             return find
@@ -470,14 +473,17 @@ class TestplanOrder(models.Model):
                 testplan=testplan, testsuite__name=testsuite_name)
             testplanorder.order = order
             testplanorder.save()
+
+            testsuite = Testsuite.objects.get(context=testplan.context,
+                                              testplanorder=testplanorder)
         except TestplanOrder.DoesNotExist:
             testplanorder = TestplanOrder.objects.create(testplan=testplan,
                                                          order=order)
-            Testsuite.objects.create(context=testplan.context,
-                                     name=testsuite_name,
-                                     testplanorder=testplanorder)
+            testsuite = Testsuite.objects.create(context=testplan.context,
+                                                 name=testsuite_name,
+                                                 testplanorder=testplanorder)
             created = True
-        return (testplanorder, created)
+        return (testplanorder, testsuite, created)
 
     @staticmethod
     def create(testplan, testsuite_name, order):

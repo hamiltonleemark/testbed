@@ -105,7 +105,7 @@ def do_testplan_key_list(args):
         print testkey
 
 
-def do_test_add(args):
+def do_add_test(args):
     """ Add a test to a testplan. """
 
     from testdb import models
@@ -249,7 +249,7 @@ def add_subparser(subparser):
     tparser = subparser.add_parser("add", description="Add key",
                                    help="add test.")
 
-    tparser.set_defaults(func=do_test_add)
+    tparser.set_defaults(func=do_add_test)
     tparser.add_argument("order", type=valid_order, help="testsuite name")
     tparser.add_argument("name", type=str, help="name of test")
 

@@ -9,17 +9,17 @@ ORDER_NEXT = -1
 
 
 # pylint: disable=R0914
-def get_or_create(context, testsuite_name, order=ORDER_NEXT):
+def get_or_create(testplan_name, testsuite_name, order=ORDER_NEXT):
     """ Get or create a testplan and set order.
 
     Order is just that the location of the testplan in the list of
     testplans. The order effects the location the testplan appears on web
     pages.  When complete testplan order number is sequential with no gaps.
     @param testsuite_name The testsuite name for the testplan
-    @param context Testplan context organizes testplans in a logical group.
-                   Testplans with the same context are in the same group.
-                   The order indicates the order of the testplan in the
-                   context.
+    @param testplan_name Testplan context organizes testplans in a logical
+                         group. Testplans with the same context are in the
+                         same group. The order indicates the order of the
+                         testplan.
     @param order the location of testsuite in the testplan. To change the
                  order of an existing testplan pass in a different number.
     """
@@ -28,8 +28,8 @@ def get_or_create(context, testsuite_name, order=ORDER_NEXT):
     from testdb.models import TestplanOrder
     from testdb.models import TestsuiteName
 
-    context = Testplan.context_get(context)
-    (testplan, created) = Testplan.objects.get_or_create(context=context)
+    testplan_name = Testplan.context_get(testplan_name)
+    (testplan, _) = Testplan.objects.get_or_create(context=testplan_name)
 
     if order == ORDER_NEXT:
         find = testplan.testplanorder_set.all()
@@ -48,7 +48,8 @@ def get_or_create(context, testsuite_name, order=ORDER_NEXT):
         item.save()
 
     (name, _) = TestsuiteName.objects.get_or_create(name=testsuite_name)
-    (_, created) = TestplanOrder.get_or_create(testplan, name, order)
+    (_, testsuite, created) = TestplanOrder.get_or_create(testplan, name,
+                                                          order)
 
     ##
     # Make sure test plan order entries are sequential with no gaps.
@@ -60,7 +61,7 @@ def get_or_create(context, testsuite_name, order=ORDER_NEXT):
         order += 1
     ##
 
-    return (testplan, created)
+    return (testplan, testsuite, created)
 
 
 def remove(context, order):
@@ -185,18 +186,20 @@ def list_testsuite(testplan_name, testkeys, build=None,
     testkeys = [models.KVP.get_or_create(key, value)[0]
                 for (key, value) in testkeys]
     testplan1 = get(testplan_name, testkeys)
-    orders = testplan1.testplanorder_set.all().order_by("order")
+    orders = testplan1.testplanorder_set.filter().order_by("order")
+    for testkey in testkeys:
+        orders = orders.filter(testsuite__testkey=testkey)
 
     ##
     # Given the order now find the list of testsuites.
     (context, _) = models.Context.objects.get_or_create(name=testsuite_context)
 
     try:
-        testkeys = [models.KVP.get("build", build)]
+        buildkeys = [models.KVP.get("build", build)]
     except models.KVP.DoesNotExist:
-        testkeys = []
+        buildkeys = []
 
+    testsuites = models.Testsuite.filter(context, None, buildkeys)
     for order in orders:
-        testsuites = models.Testsuite.filter(context, order, testkeys)
-        for item in testsuites:
+        for item in testsuites.filter(testplanorder=order):
             yield item

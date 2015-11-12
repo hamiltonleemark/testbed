@@ -16,12 +16,6 @@ $(SUBMODULES):
 subdirs: $(SUBMODULES)
 
 
-.PHONY: pyflakes
-%.pyflakes:: 
-	pyflakes $*
-
-pyflakes:: $(addsuffix .pyflakes,$(PYTHON_FILES))
-
 .PHONY: pylint
 %.pylint::
 	export PYTHONPATH=$(PYTHONPATH);pylint --reports=n --disable=I0011 \
@@ -48,7 +42,14 @@ python27:: $(addsuffix .python27,$(PYTHON_FILES))
 .PHONY: test
 test::
 
-check:: pep8 pylint subdirs python27 test
+# Check for debug statements written by mark
+%.debug_mark:
+	grep -Hn MARK $* && exit 1 || exit 0
+
+.PHONY: debug_mark
+debug_mark:: $(addsuffix .debug_mark,$(PYTHON_FILES))
+
+check:: pep8 pylint subdirs python27 test debug_mark
 clean::
 	find . -name "#*" -delete
 	find . -name ".#*" -delete

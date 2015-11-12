@@ -65,12 +65,17 @@ class TestTestCase(TestCase):
         ##
         # Create testplan.
         for item in range(0, testsuite_count):
-            name = "testsuite%d" % item
-            (_, created) = testplan.api.get_or_create("default", name, item)
+            testsuite_name = "testsuite%d" % item
+            (_, testsuite1, created) = testplan.api.get_or_create(
+                "default", testsuite_name, item)
             self.assertTrue(created, "created testsuite%d" % item)
 
             for testkey in testkeys:
                 testplan.api.add_key("default", item+1, testkey[0], testkey[1])
+
+            for testitem in range(0, test_count):
+                test_name = "test%d" % testitem
+                models.Test.get_or_create(testsuite1, test_name, "pass", [])
 
         context = models.Testplan.context_get("default")
         testplan1 = models.Testplan.objects.get(context=context)
@@ -103,19 +108,16 @@ class TestTestCase(TestCase):
         for bitem in range(0, build_count):
             buildid = "build%d" % bitem
             build.api.get_or_create("product1", "branch1", buildid)
-            print "MARK: build", buildid
 
             for titem in range(0, testsuite_count):
                 testsuite_name = "testsuite%d" % titem
-                (_, rtc) = testsuite.api.add_testsuite("default",
-                                                       testsuite_name, buildid,
-                                                       testkeys)
+                (testsuite1, rtc) = testsuite.api.add_testsuite(
+                    "default", testsuite_name, buildid, testkeys)
                 self.assertTrue(rtc, "new test not created")
                 for testitem in range(0, test_count):
                     test_name = "test%d" % testitem
-                    (_, rtc) = api.set_result("default", "product1", "branch1",
-                                              buildid, testsuite_name,
-                                              test_name, "pass", testkeys)
+                    (_, rtc) = models.Test.get_or_create(testsuite1, test_name,
+                                                         "pass", [])
                     self.assertTrue(rtc, "result not created")
         end = datetime.datetime.now()
 
@@ -178,6 +180,6 @@ class TestTestCase(TestCase):
         end = datetime.datetime.now()
         duration = end - start
         print "search all results duration %s" % (duration)
-        self.assertTrue(duration.seconds <= 0.6,
+        self.assertTrue(duration.seconds <= 1.5,
                         "query is taking too long %f." % duration.seconds)
         self.assertEqual(len(results), testsuite_count*test_count*build_count)

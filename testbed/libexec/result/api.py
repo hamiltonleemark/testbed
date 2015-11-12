@@ -31,10 +31,7 @@ def set_result(context, product_name, branch_name, build, testsuite_name,
                                                              branch_name))
     ##
     # Make sure testsuite and test are part of the test plan.
-    (order, critem) = planorder.api.get_or_create(testplan_name,
-                                                  testsuite_name, test_name,
-                                                  keys)
-    created = created or critem
+    order = planorder.api.get(testplan_name, testsuite_name, keys)
     ##
 
     build_key = models.KVP.get_or_create("build", build)[0]
