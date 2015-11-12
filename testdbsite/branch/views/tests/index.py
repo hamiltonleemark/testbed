@@ -23,6 +23,9 @@ def view(request, pid):
 
     product = models.TestProduct.objects.get(id=pid)
     testplan_name = product.key_get("testplan", None)
+    if not testplan_name:
+        return render_to_response("tests/index.html", {})
+
     testplan_name = models.Testplan.context_get(testplan_name)
     testplan_context = models.Context.objects.get(name=testplan_name)
 
@@ -54,22 +57,25 @@ def view(request, pid):
                                         value=product.branch.value)
     blist = builds.filter(product_key, branch_key)
 
-    context = models.Context.objects.get(name=context)
     results = {}
+    try:
+        context = models.Context.objects.get(name=context)
 
-    for testplan in testplans:
-        for buildid in blist:
-            testsuites = testplan.testsuite_set.filter(context=context,
-                                                       keys=buildid)
-            for testsuite1 in testsuites:
-                for test1 in testsuite1.test_set.all():
-                    key = (buildid.value, testsuite1.name.name,
-                           test1.name.name)
-                    results[key] = test1.status
-
-    planorders = [(item.order, item) for item in planorders.values()]
-    planorders.sort()
-    planorders = [item[1] for item in planorders]
+        for testplan in testplans:
+            for buildid in blist:
+                testsuites = testplan.testsuite_set.filter(context=context,
+                                                           keys=buildid)
+                for testsuite1 in testsuites:
+                    for test1 in testsuite1.test_set.all():
+                        key = (buildid.value, testsuite1.name.name,
+                               test1.name.name)
+                        results[key] = test1.status
+    
+        planorders = [(item.order, item) for item in planorders.values()]
+        planorders.sort()
+        planorders = [item[1] for item in planorders]
+    except models.Context.DoesNotExist:
+        planorders = []
 
     html_data = {
         # \todo retrieve this from the testplan.
