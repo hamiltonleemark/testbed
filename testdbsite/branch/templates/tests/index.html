@@ -22,7 +22,7 @@
  {% for planorder in planorders %}
   <tr>
    <td>{{planorder.order}}</td>
-   {% for key in planorder.keys %}<td>{{key.value}}</td>{% endfor %}
+   {% for key in planorder.keys %}<td>{{key}}</td>{% endfor %}
    <td>{{planorder.testsuite.name}}</td>
    <td>{{planorder.test.name}}</td>
   {% for build in builds %}

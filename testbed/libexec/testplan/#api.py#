@@ -194,7 +194,7 @@ def add_key(context, order, key, value):
     print "MARK: test key add"
     (testkey, _) = KVP.get_or_create(key=key, value="NA")
     print "MARK: test key add", testkey
-    testplan.testplankeyset_set.get_or_create(testkey=testkey)
+    testplan..get_or_create(testkey=testkey)
     print "MARK: test key add"
 
     #

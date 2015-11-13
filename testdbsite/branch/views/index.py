@@ -44,6 +44,5 @@ def view(_, pid):
     
     plans = [item for item in plans.testsuites_all()] if plans else []
 
-
     html_data = {"plans" : plans}
     return render_to_response("products/index.html", html_data)

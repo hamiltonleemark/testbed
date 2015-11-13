@@ -65,7 +65,9 @@ class KVP(models.Model):
     @staticmethod
     def get_or_create(key, value):
         """ Create a single test key objects. """
+
         (key, _) = Key.objects.get_or_create(value=key)
+
         try:
             testkey = KVP.objects.get(key=key, value=value)
             if testkey:
@@ -245,6 +247,7 @@ class TestsuiteKeySet(models.Model):
 
 class Testsuite(models.Model):
     """ A Testsuite holds a set of tests. """
+
     context = models.ForeignKey(Context, null=True, blank=True, default=None)
     name = models.ForeignKey(TestsuiteName)
     timestamp = models.DateTimeField(default=timezone.now)
@@ -274,13 +277,42 @@ class Testsuite(models.Model):
 
     def key_get(self, key):
         """ Return value given key. """
-
         return self.keys.get(key__value=key)
 
-    def value_get(self, key):
-        """ Return value given key. """
+    def key_remove(self, key):
+        """ Remove key and return True if key exists and is removed. """
+        try:
+            keys = self.keys.filter(key__value=key)
+            key = keys.first()
+            key.delete()
+            key.save()
+            return True
+        except Key.DoesNotExist:
+            return False
 
-        return self.keys.get(key__value=key).value
+    def key_change(self, testkey):
+        """ Get/create/change KVP associated with this testsuite.
+         Using the key either return the existing KVP if value matches,
+         create a new KVP if one does not exist or change the existing key
+         to the new value.
+         """
+
+        try:
+            current_key = self.key_get(testkey.key.value)
+            if current_key.value != testkey.value:
+                current_key.delete()
+                current_key.save()
+                self.testsuitekeyset_set.create(testkey=testkey)
+        except KVP.DoesNotExist:
+            self.testsuitekeyset_set.create(testkey=testkey)
+
+    def value_get(self, key, default=None):
+        """ Return value given key. """
+        try:
+            testkeyset = self.testsuitekeyset_set.get(testkey__key__value=key)
+            return testkeyset.testkey.value
+        except TestsuiteKeySet.DoesNotExist:
+            return default
 
     @staticmethod
     def contains(context, testsuite_name):
@@ -418,6 +450,7 @@ class Testplan(models.Model):
         """ Return the testplan full context name. """
         return Context.objects.get_or_create(name="testplan."+context)[0]
 
+    # \todo remove testkeys. This will not be used as a KVP.
     @staticmethod
     def get_or_create(context, testkeys=None):
         """ Get current or create new objects.
@@ -444,6 +477,7 @@ class Testplan(models.Model):
         testplan = Testplan.objects.create(context=context)
         for testkey in testkeys:
             TestplanKeySet.objects.create(testplan=testplan, testkey=testkey)
+
         return (testplan, True)
 
 

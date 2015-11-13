@@ -36,9 +36,8 @@ def set_result(context, product_name, branch_name, build, testsuite_name,
 
     build_key = models.KVP.get_or_create("build", build)[0]
     (context, _) = models.Context.objects.get_or_create(name=context)
-    (testsuite1, critem) = models.Testsuite.get_or_create(context,
-                                                          testsuite_name,
-                                                          order, build_key, [])
+    (testsuite1, critem) = models.Testsuite.get_or_create(
+        context, testsuite_name, order, build_key, [])
     created = created or critem
 
     (test, critem) = models.Test.get_or_create(testsuite1, test_name, result,

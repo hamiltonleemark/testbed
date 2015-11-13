@@ -36,7 +36,7 @@ def do_remove(args):
 
 
 # \todo args is missing
-def do_list(_):
+def do_list(args):
     """ List testsuites based on search criteria. """
 
     from testdb import models
@@ -51,11 +51,12 @@ def do_list(_):
         orders = []
         for plan in testplan.testplanorder_set.order_by("order"):
             testsuites = plan.testsuite_set.filter(context=testplan.context)
+            if args.testsuite:
+                testsuites = testsuites.filter(name__name=args.testsuite)
+
             for testsuite in testsuites:
-                testsuitekeys = {
-                    str(item.testkey.key): str(item.testkey.value)
-                    for item in testsuite.testsuitekeyset_set.all()
-                    }
+                testsuitekeys = testsuite.testsuitekeyset_set.all()
+                testsuitekeys = [str(item.testkey) for item in testsuitekeys]
 
                 orders.append({
                     "name": str(testsuite.name_get()),
@@ -68,28 +69,24 @@ def do_list(_):
         if testkeys:
             level["testkey"] = testkeys
 
-        if testsuites:
+        if orders:
             level["testsuites"] = orders
         root[str(testplan.context.name)] = level
     print yaml.dump(root, default_flow_style=False)
 
 
-def do_key_add(args):
+def do_add_key(args):
     """ Add test key and value to plan testsuite. """
-    api.add_key(args.context, args.order, args.name, args.value)
 
+    api.add_key(args.context, args.order, args.name, args.value)
     return True
 
 
-def do_key_remove(args):
+def do_remove_key(args):
     """ Add a key to a testsuite. """
 
-    from testdb import models
-    context = models.Testplan.context_get(args.context)
-    (testplan, _) = models.Testplan.get(testsuite__context=context)
-    logging.info("remove key %s from testsuite %s", args.key, args.context)
-    testkey = testplan.testplankeyset_set.get(testkey__key=args.key)
-    testkey.delete()
+    api.remove_key(args.context, args.order, args.name)
+    return True
 
 
 def do_testplan_key_list(args):
@@ -211,7 +208,7 @@ def add_subparser(subparser):
                                    description="List all of the testsuites.",
                                    help="List testsuite.")
     parser.set_defaults(func=do_list)
-    parser.add_argument("--filter", type=str, help="Filter testsuites")
+    parser.add_argument("--testsuite", help="Filter testsuite")
 
     ##
     # Key
@@ -223,7 +220,7 @@ def add_subparser(subparser):
                                   description="Add key and value to testplan",
                                   help="Add key and value to testplan.")
 
-    parser.set_defaults(func=do_key_add)
+    parser.set_defaults(func=do_add_key)
     parser.add_argument("order", type=valid_order,
                         help="Order of testsuite as viewed on the website.")
     parser.add_argument("name", type=str, help="Name of the key to add")
@@ -232,7 +229,7 @@ def add_subparser(subparser):
     parser = subparser.add_parser("remove",
                                   description="Remove a testsuite key",
                                   help="Add a testsuite key")
-    parser.set_defaults(func=do_key_remove)
+    parser.set_defaults(func=do_remove_key)
     parser.add_argument("order", type=valid_order,
                         help="Order of testsuite as viewed on the website.")
     parser.add_argument("name", type=str, help="Name of the key")
