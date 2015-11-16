@@ -176,6 +176,7 @@ def add_key(context, order, key, value):
 
     from testdb.models import Testplan
     from testdb.models import Testsuite
+    from testdb.models import Key
     from testdb.models import KVP
 
     logging.info("add %s=%s to testsuite %s %s", key, value, context, order)
@@ -191,11 +192,8 @@ def add_key(context, order, key, value):
     ##
     #
 
-    print "MARK: test key add"
-    (testkey, _) = KVP.get_or_create(key=key, value="NA")
-    print "MARK: test key add", testkey
-    testplan.testplankeyset_set.get_or_create(testkey=testkey)
-    print "MARK: test key add"
+    (key, _) = Key.objects.get_or_create(value=key)
+    testplan.testplankeyset_set.get_or_create(key=key)
 
     #
     ##

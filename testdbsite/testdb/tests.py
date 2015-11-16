@@ -95,17 +95,18 @@ class TestsuiteTestCase(TestCase):
     def testplan_order(self):
         """ Test the creation and order support of test plan. """
 
-        test_keys = [KVP.get_or_create("key1", "value1.1")[0]]
+        keys = [Key.objects.get_or_create(value="key1")[0]]
         build_key = KVP.get_or_create("build", "build1")[0]
 
-        (testplan, rtc) = Testplan.get_or_create("testplan.default", test_keys)
+        context = Testplan.context_get("default")
+        (testplan, rtc) = Testplan.get_or_create(context, keys)
         self.assertTrue(rtc, "testplan not created")
 
         (testplanorder, rtc) = TestplanOrder.objects.get_or_create(
             testplan=testplan, order=1)
         self.assertTrue(rtc, "testplanorder not created")
 
-        (_, rtc) = Testsuite.get_or_create("testplan.default", "testsuite1",
+        (_, rtc) = Testsuite.get_or_create(context, "testsuite1",
                                            testplanorder, build_key, [])
         self.assertTrue(rtc, "testsuite1 not created")
 

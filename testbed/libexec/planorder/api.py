@@ -8,13 +8,13 @@ def get(context, testsuite_name, keys):
 
     from testdb import models
 
-    testkeys = [models.KVP.get_or_create(key=key, value=value)[0]
-                for (key, value) in keys]
+    keys = [models.Key.objects.get_or_create(value=key)[0]
+            for (key, _) in keys]
 
     context = models.Testplan.context_get(context)
     find = models.Testplan.objects.filter(context=context)
-    for testkey in testkeys:
-        find = find.filter(keys=testkey)
+    for key in keys:
+        find = find.filter(keys=key)
 
     testplans = [item for item in find]
     if len(testplans) == 0:

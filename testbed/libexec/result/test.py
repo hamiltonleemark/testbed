@@ -85,10 +85,9 @@ class TestTestCase(TestCase):
         self.assertEqual(find.count(), testsuite_count)
 
         for testkey in testkeys:
-            (testkey, _) = models.KVP.get_or_create(key=testkey[0],
-                                                    value=testkey[1])
+            (key, _) = models.Key.objects.get_or_create(value=testkey[0])
             testplan1.testplankeyset_set.get_or_create(testplan=testplan1,
-                                                       testkey=testkey)
+                                                       key=key)
 
         orders = testplan1.testplanorder_set.all().order_by("order")
         self.assertEqual(len(orders), testsuite_count)
@@ -141,8 +140,7 @@ class TestTestCase(TestCase):
         ##
         # Time retrieving all testsuites for a build1.
         start = datetime.datetime.now()
-        testkeys = [item.testkey
-                    for item in testplan1.testplankeyset_set.all()]
+        testkeys = [item.key for item in testplan1.testplankeyset_set.all()]
         (buildkey, _) = models.KVP.get_or_create("build", "build1")
 
         testkeys.append(buildkey)

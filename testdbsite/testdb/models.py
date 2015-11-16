@@ -42,7 +42,6 @@ class Key(models.Model):
 
     def __str__(self):
         """ Return testsuite name. """
-
         return str(self.value)
 
 
@@ -415,7 +414,7 @@ class TestplanKeySet(models.Model):
     """ Testsuites are associated to a set of keys. """
 
     testplan = models.ForeignKey("Testplan")
-    testkey = models.ForeignKey(KVP)
+    key = models.ForeignKey(Key)
 
 
 class Testplan(models.Model):
@@ -423,7 +422,7 @@ class Testplan(models.Model):
     A test plan governs which testsuites should be run their results shown.
     """
     context = models.ForeignKey(Context)
-    keys = models.ManyToManyField(KVP, through="TestplanKeySet")
+    keys = models.ManyToManyField(Key, through="TestplanKeySet")
 
     def serialize(self, serializer):
         """ Serialize and instance of this model. """
@@ -434,12 +433,9 @@ class Testplan(models.Model):
         """ User representation. """
         return str(self.context)
 
-    def key_get(self, key):
-        """ Return value given key. """
-        return self.testsuite.key_get(key)
-
     def testsuites_all(self):
         """ Testsuite set associated with this testplan.
+
         @return (order, testsuite)
         """
         for item in self.testplanorder_set.all().order_by("order"):
@@ -450,35 +446,22 @@ class Testplan(models.Model):
         """ Return the testplan full context name. """
         return Context.objects.get_or_create(name="testplan."+context)[0]
 
-    # \todo remove testkeys. This will not be used as a KVP.
+    # /todo this should be named update_or_create
     @staticmethod
-    def get_or_create(context, testkeys=None):
+    def get_or_create(context, keys=None):
         """ Get current or create new objects.
         @param context is a reference to a Context object returned from
                context_get.
         @param testkeys Must be an instance of KVP.
         """
-        if not testkeys:
-            testkeys = []
+        (testplan, critem) = Testplan.objects.get_or_create(context=context)
 
-        (context, _) = Context.objects.get_or_create(name=context)
+        if not critem:
+            return (testplan, critem)
 
-        ##
-        # Look for testsuite.
-        find = Testplan.objects.filter(context=context)
-        for testkey in testkeys:
-            find = find.filter(keys=testkey)
-
-        if find.count() == 1:
-            return ([item for item in find][0], False)
-        elif find.count() > 1:
-            raise Testsuite.MultipleObjectsReturned(str(context))
-
-        testplan = Testplan.objects.create(context=context)
-        for testkey in testkeys:
-            TestplanKeySet.objects.create(testplan=testplan, testkey=testkey)
-
-        return (testplan, True)
+        for key in keys:
+            testplan.testplankeyset_set.create(key=key)
+        return (testplan, critem)
 
 
 class TestplanOrder(models.Model):
