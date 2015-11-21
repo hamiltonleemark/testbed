@@ -27,7 +27,7 @@ def do_add_testsuite(args):
     """ Add a testsuite to the database. """
 
     logging.info("adding testsuite %s", args.name)
-    api.add_testsuite(args.context, args.name, args.build, [])
+    api.add_testsuite(args.testplan, args.context, args.name, args.build, [])
 
 
 def do_list_testsuite(args):

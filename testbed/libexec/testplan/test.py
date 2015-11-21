@@ -40,18 +40,19 @@ class TestsuiteTestCase(TestCase):
 
     def test_commands_add(self):
         """ Add a testsuite. """
+
         parser = TestsuiteTestCase.parser_create()
 
-        args = parser.parse_args("testplan add bob --order 1".split())
+        args = parser.parse_args("testplan add bob --order 0".split())
+        args.func(args)
+
+        args = parser.parse_args("testplan test add 0 ken".split())
+        args.func(args)
+
+        args = parser.parse_args("testplan add mark --order 1".split())
         args.func(args)
 
         args = parser.parse_args("testplan test add 1 ken".split())
-        args.func(args)
-
-        args = parser.parse_args("testplan add mark --order 2".split())
-        args.func(args)
-
-        args = parser.parse_args("testplan test add 2 ken".split())
         args.func(args)
 
         names = [item.name.name for item in Testsuite.objects.all()]
@@ -69,7 +70,7 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "testplan --context testplan test add 1 test1"
+        cmd = "testplan --context testplan test add 0 test1"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
@@ -83,15 +84,15 @@ class TestsuiteTestCase(TestCase):
         """ Add a testsuite by context. """
         parser = TestsuiteTestCase.parser_create()
 
-        cmd = "testplan --context testplan1 add testsuite_bob1 --order 1"
+        cmd = "testplan --context testplan1 add testsuite_bob1 --order 0"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "testplan --context testplan1 test add 1 test2"
+        cmd = "testplan --context testplan1 test add 0 test2"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "testplan --context testplan2 add testsuite_bob2 --order 2"
+        cmd = "testplan --context testplan2 add testsuite_bob2 --order 1"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
@@ -99,11 +100,11 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "testplan --context testplan2 add testsuite_ken1 --order 3"
+        cmd = "testplan --context testplan2 add testsuite_ken1 --order 2"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "testplan --context testplan2 test add 1 test4"
+        cmd = "testplan --context testplan2 test add 2 test4"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
@@ -114,20 +115,61 @@ class TestsuiteTestCase(TestCase):
         self.assertTrue(any("bob2" in name for name in names))
         self.assertTrue(any("ken1" in name for name in names))
 
+    def test_pack(self):
+        """ Pack content. """
+
+        parser = TestsuiteTestCase.parser_create()
+
+        cmd = "testplan add testsuite_order1 --order 10"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+
+        cmd = "testplan add testsuite_order2 --order 11"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+
+        cmd = "testplan add testsuite_order3 --order 12"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+
+        testplan1 = api.get(api.CONTEXT, [])
+        orders = [item for item in testplan1.testsuites_all()]
+        self.assertEqual(len(orders), 3)
+
+        self.assertEqual(orders[0][1].name.name, "testsuite_order1")
+        self.assertEqual(orders[1][1].name.name, "testsuite_order2")
+        self.assertEqual(orders[2][1].name.name, "testsuite_order3")
+
+        cmd = "testplan pack"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+        self.assertEqual(len(orders), 3)
+
+        testplan1 = api.get(api.CONTEXT, [])
+        orders = [item for item in testplan1.testsuites_all()]
+        self.assertEqual(orders[0][0], 0)
+        self.assertEqual(orders[1][0], 1)
+        self.assertEqual(orders[2][0], 2)
+
+        self.assertEqual(orders[0][1].name.name, "testsuite_order1")
+        self.assertEqual(orders[1][1].name.name, "testsuite_order2",
+                         "%s != testsuite_order2" % orders[1][1].name.name)
+        self.assertEqual(orders[2][1].name.name, "testsuite_order3")
+
     def test_order1(self):
         """ Confirm order works. """
 
         parser = TestsuiteTestCase.parser_create()
 
-        cmd = "testplan add testsuite_order1 --order 1"
+        cmd = "testplan add testsuite_order1 --order 0"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "testplan add testsuite_order2 --order 2"
+        cmd = "testplan add testsuite_order2 --order 1"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "testplan add testsuite_order3 --order 3"
+        cmd = "testplan add testsuite_order3 --order 2"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
@@ -144,15 +186,15 @@ class TestsuiteTestCase(TestCase):
 
         parser = TestsuiteTestCase.parser_create()
 
-        cmd = "testplan add testsuite_order3 --order 3"
+        cmd = "testplan add testsuite_order3 --order 2"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "testplan add testsuite_order2 --order 1"
+        cmd = "testplan add testsuite_order2 --order 0"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        cmd = "testplan add testsuite_order1 --order 1"
+        cmd = "testplan add testsuite_order1 --order 0"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
@@ -187,7 +229,17 @@ class TestsuiteTestCase(TestCase):
 
         self.assertEqual(len(orders), 3)
         self.assertEqual(orders[0][1].name.name, "testsuite_order1")
-        self.assertEqual(orders[1][1].name.name, "testsuite_order2")
+        self.assertEqual(orders[1][1].name.name, "testsuite_order2",
+                         "%s != testsuite_order2" % orders[1][1].name.name)
+        self.assertEqual(orders[2][1].name.name, "testsuite_order3")
+
+        cmd = "testplan pack"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+        self.assertEqual(len(orders), 3)
+        self.assertEqual(orders[0][1].name.name, "testsuite_order1")
+        self.assertEqual(orders[1][1].name.name, "testsuite_order2",
+                         "%s != testsuite_order2" % orders[1][1].name.name)
         self.assertEqual(orders[2][1].name.name, "testsuite_order3")
 
     def test_order_one(self):
@@ -201,11 +253,37 @@ class TestsuiteTestCase(TestCase):
 
         testplans = TestplanOrder.objects.all()
         self.assertEqual(testplans.count(), 1)
-        self.assertEqual(testplans[0].order, 1)
+        self.assertEqual(testplans[0].order, api.ORDER_FIRST,
+                         "order is wrong %s" % testplans[0].order)
 
         cmd = "testplan add testsuite_order_one --order 2"
         args = parser.parse_args(cmd.split())
         args.func(args)
         testplans = TestplanOrder.objects.all()
         self.assertEqual(testplans.count(), 1)
-        self.assertEqual(testplans[0].order, 1)
+        self.assertNotEqual(testplans[0].order, api.ORDER_FIRST)
+
+        cmd = "testplan pack"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+        testplans = TestplanOrder.objects.all()
+        self.assertEqual(testplans.count(), 1)
+        self.assertEqual(testplans[0].order, api.ORDER_FIRST)
+
+    def test_inorder(self):
+        """ test_in_order. Insert testsuites in order."""
+        testsuite_count = 2
+
+        for item in range(0, testsuite_count):
+            testsuite_name = "testsuite%d" % item
+            (_, _, created) = api.get_or_create("default", testsuite_name,
+                                                item)
+            self.assertTrue(created, "created testsuite%d" % item)
+
+        testplan1 = api.get("default", [])
+        orders = [item for item in testplan1.testsuites_all()]
+        self.assertEqual(len(orders), testsuite_count, "missing testsuite")
+        for (order, testsuite) in orders:
+            expected_name = "testsuite%d" % order
+            self.assertEqual(expected_name, testsuite.name.name,
+                             "testsuite names do not match")

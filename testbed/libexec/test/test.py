@@ -63,14 +63,17 @@ class TestTestCase(TestCase):
         self.assertTrue(any("test2" in name for name in names))
 
     def test_context_add(self):
-        """ Add a testsuite by context. """
+        """ Add a testsuite ignoring context.
+        Testplan is created called testplan1. Adding a testsuite which is
+        not part of the default testplan should still work.
+        """
 
         testplan.api.get_or_create("testplan.testplan1", "testsuite1",
                                    testplan.api.ORDER_NEXT)
 
         parser = TestTestCase.parser_create()
 
-        cmd = "test add build1 testsuite1 test1 --context testplan1"
+        cmd = "test add build1 testsuite1 test1 --context testschedule1"
         args = parser.parse_args(cmd.split())
         args.func(args)
 
@@ -83,11 +86,11 @@ class TestTestCase(TestCase):
         names = [item.testsuite.name.name for item in tests]
         self.assertTrue("testsuite1" in names)
 
-        tests = Test.filter("testplan1")
+        tests = Test.filter("testschedule1")
         self.assertTrue(len(tests) == 1)
 
         context = [item.testsuite.context.name for item in tests]
-        self.assertTrue("testplan1" in context)
+        self.assertTrue("testschedule1" in context)
 
         names = [item.name.name for item in tests]
         self.assertTrue("test1" in names)

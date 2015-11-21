@@ -11,7 +11,6 @@ class ViewRow(object):
         self.test = test
 
         # \todo consider removing this.
-        print "MARK: value", hdr
         testkeys = [self.testsuite.value_get(item.value, "?") for item in hdr]
         self.keys = testkeys
 
@@ -37,7 +36,7 @@ def view(request, pid):
 
     testplan = models.Testplan.objects.get(context=testplan_context)
 
-    keys = [item.key for item in testplan.keys.all()]
+    keys = testplan.keys.all()
 
     testplans = testplan.testplanorder_set.order_by("order")
 

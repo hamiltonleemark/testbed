@@ -76,7 +76,7 @@ class Migration(migrations.Migration):
             name='TestplanKeySet',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('testkey', models.ForeignKey(to='testdb.KVP')),
+                ('key', models.ForeignKey(to='testdb.Key')),
                 ('testplan', models.ForeignKey(to='testdb.Testplan')),
             ],
         ),
@@ -175,7 +175,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='testplan',
             name='keys',
-            field=models.ManyToManyField(to='testdb.KVP', through='testdb.TestplanKeySet'),
+            field=models.ManyToManyField(to='testdb.Key', through='testdb.TestplanKeySet'),
         ),
         migrations.AddField(
             model_name='test',

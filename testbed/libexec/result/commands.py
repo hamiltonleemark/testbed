@@ -26,11 +26,17 @@ from testbed.core import config
 LOGGER = logging.getLogger(__name__)
 
 
+def valid_testkey(value):
+    """ Make sure order is either a positive number of special value of all."""
+
+    return value.split("=")
+
+
 def do_set(args):
     """ Add a test. """
 
     api.set_result(args.context, args.product, args.branch, args.build,
-                   args.testsuite, args.test, args.result, args.keys)
+                   args.testsuite, args.test, args.result, args.testkeys)
 
 
 def do_list_result(args):
@@ -90,8 +96,8 @@ def add_subparser(subparser):
     parser.add_argument("test", type=str, help="test name")
     parser.add_argument("result", default=None, choices=["pass", "fail"],
                         help="Specify result for a test.")
-    parser.add_argument("keys", default=[], nargs=argparse.REMAINDER,
-                        help="Specify result for a test.")
+    parser.add_argument("testkeys", default=[], nargs=argparse.REMAINDER,
+                        type=valid_testkey, help="Specify result for a test.")
 
     parser = subparser.add_parser("list",
                                   description="List tests in their testsuit.",

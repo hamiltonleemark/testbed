@@ -18,11 +18,11 @@
 CLI for testsuites.
 """
 import logging
-from testbed.libexec import testplan
 from testbed.libexec import planorder
 
 
-def add_testsuite(context, testsuite_name, build, testkeys):
+# \todo change order testplan_name after context
+def add_testsuite(testplan_name, context, testsuite_name, build, testkeys):
     """ Add a testsuite to the database. """
 
     from testdb import models
@@ -33,8 +33,9 @@ def add_testsuite(context, testsuite_name, build, testkeys):
 
     ##
     # \todo Keep only testkeys that are associated to a testplan
-    testplanorder = planorder.api.get(testplan.api.CONTEXT, testsuite_name,
-                                      testkeys)
+    print "    MARK: add_testsuite", testplan_name, testsuite_name, testkeys
+    testplanorder = planorder.api.get(testplan_name, testsuite_name, testkeys)
+    print "    MARK: add_testsuite testplanorder", testplanorder
     buildkey = models.KVP.get_or_create("build", build)[0]
     return models.Testsuite.get_or_create(context, testsuite_name,
                                           testplanorder, buildkey, [])

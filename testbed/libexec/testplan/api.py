@@ -6,6 +6,7 @@ import logging
 ROOT = "testplan"
 CONTEXT = "default"
 ORDER_NEXT = -1
+ORDER_FIRST = 0
 
 
 # pylint: disable=R0914
@@ -23,7 +24,6 @@ def get_or_create(testplan_name, testsuite_name, order=ORDER_NEXT):
     @param order the location of testsuite in the testplan. To change the
                  order of an existing testplan pass in a different number.
     """
-
     from testdb.models import Testplan
     from testdb.models import TestplanOrder
     from testdb.models import TestsuiteName
@@ -34,26 +34,40 @@ def get_or_create(testplan_name, testsuite_name, order=ORDER_NEXT):
     if order == ORDER_NEXT:
         find = testplan.testplanorder_set.all()
         try:
+            ##
+            # find the last item.
             order = find.order_by("-order")[0].order + 1
         except IndexError:
-            order = 1
+            order = ORDER_FIRST
         logging.info("using order %d", order)
 
     ##
     # Assert order is not -1.
     # Order is specified so now we have to move something.
     planorders = testplan.testplanorder_set.filter(order__gte=order)
+    new_order = order 
     for item in planorders.order_by("order"):
-        item.order += 1
-        item.save()
+        if new_order == item.order:
+            item.order += 1
+            item.save()
+            new_order += 1
 
     (name, _) = TestsuiteName.objects.get_or_create(name=testsuite_name)
     (_, testsuite, created) = TestplanOrder.get_or_create(testplan, name,
                                                           order)
+    return (testplan, testsuite, created)
+
+
+def pack(testplan_name):
+    """ Pack testplan sequentially with no gaps."""
+    from testdb.models import Testplan
+
+    testplan_name = Testplan.context_get(testplan_name)
+    testplan = Testplan.objects.get(context=testplan_name)
 
     ##
     # Make sure test plan order entries are sequential with no gaps.
-    order = 1
+    order = ORDER_FIRST
     for planorder in testplan.testplanorder_set.all().order_by("order"):
         if int(order) != int(planorder.order):
             planorder.order = order
@@ -61,7 +75,7 @@ def get_or_create(testplan_name, testsuite_name, order=ORDER_NEXT):
         order += 1
     ##
 
-    return (testplan, testsuite, created)
+    return True
 
 
 def remove(context, order):
@@ -184,7 +198,6 @@ def add_key(context, order, key, value):
     context = Testplan.context_get(context)
     testplan = Testplan.objects.get(context=context)
     planorder = testplan.testplanorder_set.get(order=order)
-
     testsuite = Testsuite.objects.get(context=context, testplanorder=planorder)
     (testkey, _) = KVP.get_or_create(key=key, value=value)
     testsuite.key_change(testkey)

@@ -50,9 +50,9 @@ class TestTestCase(TestCase):
         from testdb import models
 
         # MARK
-        # build_count = 10
-        # testsuite_count = 100
-        # test_count = 5
+        #build_count = 10
+        #testsuite_count = 100
+        #test_count = 5
 
         build_count = 2
         testsuite_count = 2
@@ -61,6 +61,8 @@ class TestTestCase(TestCase):
         testkeys = [
             ("key1", "value1"),
             ("key2", "value2"),
+            ("key3", "value3"),
+            ("key4", "value4"),
         ]
 
         ##
@@ -72,27 +74,29 @@ class TestTestCase(TestCase):
             print "MARK: testplan", testsuite1, testsuite1.id
             self.assertTrue(created, "created testsuite%d" % item)
 
-            # for testkey in testkeys:
-            #    print "  MARK: adding keys", item+1, testkey
-            #    (_, critem) = testplan.api.add_key("default", item+1,
-            #                                       testkey[0], testkey[1])
-            #    self.assertTrue(critem, "testsuite%d key not created" % item)
+            for testkey in testkeys:
+                print "  MARK: adding keys", item+1, testkey
+                (testplan.api.add_key("default", item+1, testkey[0], testkey[1])
 
-            # for testitem in range(0, test_count):
-            #    test_name = "test%d" % testitem
-            #    models.Test.get_or_create(testsuite1, test_name, "pass", [])
+            for testitem in range(0, test_count):
+                test_name = "test%d" % testitem
+                models.Test.get_or_create(testsuite1, test_name, "pass", [])
 
         context = models.Testplan.context_get("default")
         testplan1 = models.Testplan.objects.get(context=context)
         self.assertTrue(testplan1 is not None, "testplan not created")
 
-        find = testplan1.testplanorder_set.all().order_by("order")
+        find = testplan1.testplanorder_set.all()
         self.assertEqual(find.count(), testsuite_count)
         # MARK
+        print "MARK: listing schedule"
         for item in find:
+            print "MARK: plan orders", item
             context = models.Testplan.context_get("default")
-            testsuite1 = models.Testsuite.objects.get(context=context,
-                                                      testplanorder=item)
+            testsuite = models.Testsuite.objects.get(context=context,
+                                              testplanorder=item)
+            print "  MARK: add_key to", item.id, testsuite.id, testsuite.testsuitekeyset_set.all()
+        print "MARK: listing schedule"
         # MARK
 
         for testkey in testkeys:
@@ -123,8 +127,8 @@ class TestTestCase(TestCase):
             for titem in range(0, testsuite_count):
                 testsuite_name = "testsuite%d" % titem
                 print "MARK: adding testsuite result", testsuite_name
-                (testsuite1, rtc) = testsuite.api.add_testsuite(
-                    "default", "default", testsuite_name, buildid, testkeys)
+                (testsuite1, rtc) = testsuite.api.add_testsuite("default",
+                    "default", testsuite_name, buildid, testkeys)
                 self.assertTrue(rtc, "new test not created")
                 for testitem in range(0, test_count):
                     test_name = "test%d" % testitem

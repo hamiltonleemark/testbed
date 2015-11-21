@@ -10,13 +10,14 @@ from testbed.libexec import testplan
 # pylint: disable=R0913
 # pylint: disable=R0914
 def set_result(context, product_name, branch_name, build, testsuite_name,
-               test_name, result, keys):
+               test_name, result, testkeys):
     """ Get or create a testplan in a certain order.
 
     @param product_name Is the name of the product
     @param order order is the location of the testplan in the list of
                  testplans. The order effects the location the testplan
                  appears on web pages.
+    @param testkeys list of tuples of the form (key,value)
     """
     from testdb import models
 
@@ -31,7 +32,7 @@ def set_result(context, product_name, branch_name, build, testsuite_name,
                                                              branch_name))
     ##
     # Make sure testsuite and test are part of the test plan.
-    order = planorder.api.get(testplan_name, testsuite_name, keys)
+    order = planorder.api.get(testplan_name, testsuite_name, testkeys)
     ##
 
     build_key = models.KVP.get_or_create("build", build)[0]

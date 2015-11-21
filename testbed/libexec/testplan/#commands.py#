@@ -170,7 +170,6 @@ def valid_order(value):
 
     if value == "all":
         return value
-
     ivalue = int(value)
     if ivalue < 0:
         raise argparse.ArgumentTypeError("%s is not all or positive integer",
@@ -200,6 +199,7 @@ def add_subparser(subparser):
                         "If not specified the next sequential value is "
                         "assumed")
 
+   
 
     ##
     # Remove
@@ -223,6 +223,9 @@ def add_subparser(subparser):
         "pack", description="Pack testplan into sequential list",
         help="Pack test plan.")
     parser.set_defaults(func=do_pack)
+    parser = subparser.add_parser("testplan",
+                                  help="Setup and modify test plans.",
+                                  description=__doc__)
 
     ##
     # Key
