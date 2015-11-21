@@ -200,7 +200,6 @@ def add_subparser(subparser):
                         "If not specified the next sequential value is "
                         "assumed")
 
-
     ##
     # Remove
     parser = rootparser.add_parser(

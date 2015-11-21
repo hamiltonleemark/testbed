@@ -49,14 +49,9 @@ class TestTestCase(TestCase):
         """
         from testdb import models
 
-        # MARK
-        # build_count = 10
-        # testsuite_count = 100
-        # test_count = 5
-
-        build_count = 2
-        testsuite_count = 2
-        test_count = 2
+        build_count = 10
+        testsuite_count = 100
+        test_count = 5
 
         testkeys = [
             ("key1", "value1"),
@@ -69,18 +64,16 @@ class TestTestCase(TestCase):
             testsuite_name = "testsuite%d" % item
             (_, testsuite1, created) = testplan.api.get_or_create(
                 "default", testsuite_name, item)
-            print "MARK: testplan", testsuite1, testsuite1.id
             self.assertTrue(created, "created testsuite%d" % item)
 
-            # for testkey in testkeys:
-            #    print "  MARK: adding keys", item+1, testkey
-            #    (_, critem) = testplan.api.add_key("default", item+1,
-            #                                       testkey[0], testkey[1])
-            #    self.assertTrue(critem, "testsuite%d key not created" % item)
+            for testkey in testkeys:
+                (_, critem) = testplan.api.add_key("default", item,
+                                                   testkey[0], testkey[1])
+                self.assertTrue(critem, "testsuite%d key not created" % item)
 
-            # for testitem in range(0, test_count):
-            #    test_name = "test%d" % testitem
-            #    models.Test.get_or_create(testsuite1, test_name, "pass", [])
+            for testitem in range(0, test_count):
+                test_name = "test%d" % testitem
+                models.Test.get_or_create(testsuite1, test_name, "pass", [])
 
         context = models.Testplan.context_get("default")
         testplan1 = models.Testplan.objects.get(context=context)
@@ -88,12 +81,6 @@ class TestTestCase(TestCase):
 
         find = testplan1.testplanorder_set.all().order_by("order")
         self.assertEqual(find.count(), testsuite_count)
-        # MARK
-        for item in find:
-            context = models.Testplan.context_get("default")
-            testsuite1 = models.Testsuite.objects.get(context=context,
-                                                      testplanorder=item)
-        # MARK
 
         for testkey in testkeys:
             (key, _) = models.Key.objects.get_or_create(value=testkey[0])
@@ -122,7 +109,6 @@ class TestTestCase(TestCase):
 
             for titem in range(0, testsuite_count):
                 testsuite_name = "testsuite%d" % titem
-                print "MARK: adding testsuite result", testsuite_name
                 (testsuite1, rtc) = testsuite.api.add_testsuite(
                     "default", "default", testsuite_name, buildid, testkeys)
                 self.assertTrue(rtc, "new test not created")
@@ -136,11 +122,6 @@ class TestTestCase(TestCase):
         duration = end - start
         print "\ncreated testsuite %d %s" % (testsuite_count, duration)
         results = [item for item in api.list_result("default", [])]
-        ##
-        # MARK
-        for result in results:
-            print "MARK: result", result
-        # MARK
         self.assertEqual(len(results), build_count*testsuite_count*test_count)
         #
         ##
@@ -177,13 +158,16 @@ class TestTestCase(TestCase):
         # Time retrieving all testsuites from multiple builds.
         start = datetime.datetime.now()
         results = []
-        for bitem in range(0, 5):
+        for bitem in range(0, build_count):
             buildid = "build%d" % bitem
             results += [item for item in testplan.api.list_testsuite(
                 "default", [], buildid)]
         end = datetime.datetime.now()
         duration = end - start
-        self.assertEqual(len(results), 5*testsuite_count, "5 build results")
+        self.assertEqual(len(results), build_count*testsuite_count,
+                         "%d build results %d expected %d" %
+                         (build_count, len(results),
+                          build_count*testsuite_count))
         self.assertTrue(duration.seconds <= 0.6,
                         "query is taking too long %f." % duration.seconds)
         print "search 5 builds %d duration %s" % (len(results), duration)

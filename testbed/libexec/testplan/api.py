@@ -45,7 +45,7 @@ def get_or_create(testplan_name, testsuite_name, order=ORDER_NEXT):
     # Assert order is not -1.
     # Order is specified so now we have to move something.
     planorders = testplan.testplanorder_set.filter(order__gte=order)
-    new_order = order 
+    new_order = order
     for item in planorders.order_by("order"):
         if new_order == item.order:
             item.order += 1

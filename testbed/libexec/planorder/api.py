@@ -11,18 +11,15 @@ def get(testplan_name, testsuite_name, testkeys):
 
     name = models.TestsuiteName.objects.get(name=testsuite_name)
     find = models.TestplanOrder.objects.filter(testsuite__name=name)
-    print "      MARK: planorder.get", find.count(), testsuite_name
 
     if testplan_name:
         testplan_name = models.Testplan.context_get(testplan_name)
         find = find.filter(testplan__context=testplan_name)
 
     # \todo deal with many test plan or zero.
-    print "      MARK: planorder.get testkeys", find.count(), testkeys
     for (key, value) in testkeys:
         testkey = models.KVP.get(key=key, value=value)
         find = find.filter(testsuite__keys=testkey)
-        print "      MARK: find.count()", find.count()
 
     if find.count() == 0:
         raise models.TestplanOrder.DoesNotExist(
