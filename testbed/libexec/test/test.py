@@ -64,6 +64,7 @@ class TestTestCase(TestCase):
 
     def test_context_add(self):
         """ Add a testsuite ignoring context.
+
         Testplan is created called testplan1. Adding a testsuite which is
         not part of the default testplan should still work.
         """

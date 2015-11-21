@@ -28,7 +28,6 @@ def do_add_test(args):
 
     from testdb import models
 
-    print "MARK: do_add_test", args.context
     LOGGER.info("adding test %s.%s", args.testsuite, args.name)
     (testsuite1, _) = testsuite.api.add_testsuite(args.testplan, args.context,
                                                   args.testsuite, args.build,
@@ -64,10 +63,9 @@ def add_subparser(subparser):
     parser.add_argument("name", type=str, help="test name")
     parser.add_argument("--status", default="pass", type=str,
                         help="Test status.")
-    parser.add_argument("--context", default="default", type=str,
+    parser.add_argument("--context", default="default",
                         help="Testsuite context.")
-    parser.add_argument("--testplan", default=None, type=str,
-                        help="Testsuite context.")
+    parser.add_argument("--testplan", default=None, help="Testsuite context.")
 
     parser = subparser.add_parser("list",
                                   description="List tests in their testsuit.",

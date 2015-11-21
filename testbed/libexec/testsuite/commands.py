@@ -45,6 +45,8 @@ def add_subparser(subparser):
     """ Create testsuite CLI commands. """
 
     parser = subparser.add_parser("testsuite", help=__doc__)
+    parser.add_argument("--testplan", default=None,
+                        help="identifies specific testplan.")
     parser.add_argument("--context", default=CONTEXT, type=str,
                         help="Testsuite context.")
     subparser = parser.add_subparsers()
