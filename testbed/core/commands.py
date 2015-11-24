@@ -34,7 +34,7 @@ def logger_create():
     console.setFormatter(formatter)
     logger = logging.getLogger("")
     logger.addHandler(console)
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.WARNING)
 
     return logger
 
