@@ -44,15 +44,8 @@ def do_list_result(args):
 
     LOGGER.info("listing tests")
 
-    testkeys = [
-        ("product", args.product),
-        ("branch", args.branch),
-    ]
-
-    if args.build:
-        testkeys += [("build", args.build)]
-
-    tests = api.list_result(args.context, testkeys)
+    tests = api.list_result(args.context, args.product, args.branch, [],
+                            args.build)
 
     data = config.DataTree()
     for test in tests:

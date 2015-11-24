@@ -121,7 +121,8 @@ class TestTestCase(TestCase):
 
         duration = end - start
         print "\ncreated testsuite %d %s" % (testsuite_count, duration)
-        results = [item for item in api.list_result("default", [])]
+        results = [item for item in api.list_result("default", "product1",
+                                                    "branch1", [], None)]
         self.assertEqual(len(results), build_count*testsuite_count*test_count)
         #
         ##
@@ -176,7 +177,8 @@ class TestTestCase(TestCase):
         ##
         # Time to retrieving all test results
         start = datetime.datetime.now()
-        results = [item for item in api.list_result("default", [])]
+        results = [item for item in api.list_result("default", "product1",
+                                                    "branch1", [], None)]
         end = datetime.datetime.now()
         duration = end - start
         print "search all results duration %s" % (duration)

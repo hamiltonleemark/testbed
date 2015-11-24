@@ -44,6 +44,6 @@ if __name__ == "__main__":
         testdb.init()
 
         sys.exit(parse())
-
     except Exception, arg:
         logging.exception(arg)
+        sys.exit(1)

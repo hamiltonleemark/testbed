@@ -48,10 +48,16 @@ def set_result(context, product_name, branch_name, build, testsuite_name,
 
 
 # pylint: disable=W0622
-def list_result(context, testkeys, build=None):
+def list_result(context, product_name, branch_name, testkeys, build=None):
     """ Retrieve the list of products based on product and or branch_name. """
+    from testdb import models
 
-    testsuites = testplan.api.list_testsuite(context, testkeys, build)
-    for testsuite_item in testsuites:
-        for test in testsuite_item.test_set.all():
-            yield (testsuite_item, test)
+    products1 = product.api.filter(product_name, branch_name)
+    context = models.Context.objects.get(name=context)
+    for product1 in products1:
+        testplan_name = product1.key_get("testplan")
+        testsuites = testplan.api.list_testsuite(testplan_name, testkeys,
+                                                 build)
+        for testsuite_item in testsuites:
+            for test in testsuite_item.test_set.all():
+                yield (testsuite_item, test)

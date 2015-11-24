@@ -482,7 +482,7 @@ class TestplanOrder(models.Model):
 
     @staticmethod
     def get_or_create(testplan, testsuite_name, order):
-        """ Get current or create new objects. """
+        """ Get current testplan or create new objects. """
 
         created = False
         try:
@@ -542,9 +542,10 @@ class TestProduct(models.Model):
 
     def __str__(self):
         """ User representation. """
-        return "%d: %s %s" % (self.order, self.context,
-                              self.key_get("product", "NA"))
+        return "%d: %s %s %s" % (self.order, self.context, self.product,
+                                 self.branch)
 
+    # \todo Rename this to value_get
     def key_get(self, key, default=None):
         """ Return value given key. """
 
