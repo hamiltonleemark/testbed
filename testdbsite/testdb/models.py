@@ -487,7 +487,8 @@ class TestplanOrder(models.Model):
         created = False
         try:
             testplanorder = TestplanOrder.objects.get(
-                testplan=testplan, testsuite__name=testsuite_name)
+                testplan=testplan, testsuite__context=testplan.context,
+                testsuite__name=testsuite_name)
             testplanorder.order = order
             testplanorder.save()
 

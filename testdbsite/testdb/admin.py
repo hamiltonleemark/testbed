@@ -79,10 +79,18 @@ class TestsuiteAdmin(admin.ModelAdmin):
                TestInlineAdmin]
 
 
+class TestsuiteInlineAdmin(admin.TabularInline):
+    """ Show files associated to testsuite inline. """
+    model = models.Testsuite
+    extra = 0
+
+
 class TestplanOrderAdmin(admin.ModelAdmin):
     """ Show testplan order. """
     model = models.TestplanOrder
     extra = 0
+
+    inlines = [TestsuiteInlineAdmin]
 
 
 class TestplanOrderInlineAdmin(admin.TabularInline):
