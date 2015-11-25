@@ -111,6 +111,10 @@ class TestName(models.Model):
 
 class Test(models.Model):
     """ A single test consisting of one or more results. """
+    PASS = 0
+    FAIL = 1
+    UNKNOWN = -1
+
     testsuite = models.ForeignKey("Testsuite", null=True, blank=True,
                                   default=None)
     name = models.ForeignKey(TestName)
@@ -131,12 +135,26 @@ class Test(models.Model):
         return "%s" % self.name
 
     @staticmethod
+    def status_to_str(status, short=False):
+        """ Return string form of the status code. """
+        if short:
+            if status == Test.PASS:
+                return "P"
+            elif status == Test.FAIL:
+                return "F"
+        else:
+            if status == Test.PASS:
+                return "pass"
+            elif status == Test.FAIL:
+                return "fail"
+
+    @staticmethod
     def status_map(status):
         """ Return status. """
         if status == "pass":
-            return 0
+            return Test.PASS
         elif status == "fail":
-            return 1
+            return Test.FAIL
 
     # \todo This should be named contains
     @staticmethod

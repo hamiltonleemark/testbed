@@ -26,7 +26,7 @@
    <td>{{planorder.testsuite.name}}</td>
    <td>{{planorder.test.name}}</td>
   {% for build in builds %}
-    <td>{{result}} {% view_cell build.value planorder.testsuite.name.name planorder.test.name.name %}</td>
+    {% view_td_cell build.value planorder.testsuite.name.name planorder.test.name.name %}
   {% endfor %}
   </tr>
  {% endfor %}

@@ -4,6 +4,10 @@ tr.section {
     text-decoration: none;
 }
 
-pass { 
-  color: green;
+.pass { 
+  background-color: #98FB98;
+}
+
+.fail { 
+  background-color: #DB7093;
 }
