@@ -24,7 +24,8 @@ def set_result(context, product_name, branch_name, build, testsuite_name,
     logging.debug("%s %s %s %s", product_name, branch_name, build,
                   testsuite_name)
 
-    (product1, created) = product.api.get_or_create(product_name, branch_name)
+    product1 = models.TestProduct.get(product.api.CONTEXT,
+                                      product_name, branch_name)
 
     testplan_name = product1.key_get("testplan", None)
     if testplan_name is None:
@@ -36,7 +37,7 @@ def set_result(context, product_name, branch_name, build, testsuite_name,
     ##
 
     build_key = models.KVP.get_or_create("build", build)[0]
-    (context, _) = models.Context.objects.get_or_create(name=context)
+    (context, created) = models.Context.objects.get_or_create(name=context)
     (testsuite1, critem) = models.Testsuite.get_or_create(
         context, testsuite_name, order, build_key, [])
     created = created or critem

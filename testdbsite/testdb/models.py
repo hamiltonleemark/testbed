@@ -609,3 +609,33 @@ class TestProduct(models.Model):
                                models.Q(branch__value__contains=contains) |
                                models.Q(keys__key__value__contains=contains))
         return find.order_by("context", "order")
+
+    @staticmethod
+    def get(context, product, branch, testkeys=None):
+        """ Get current or create new objects.
+
+        @param testkeys Must be an instance of KVP.
+        """
+        if not testkeys:
+            testkeys = []
+
+        context = Context.objects.get(name=context)
+        product = Key.objects.get(value=product)
+        branch = Key.objects.get(value=branch)
+
+        ##
+        # Look for testsuite.
+        find = TestProduct.objects.filter(context=context, product=product,
+                                          branch=branch)
+        for testkey in testkeys:
+            find = find.filter(keys=testkey)
+
+        if find.count() == 1:
+            return [item for item in find][0]
+        elif find.count() > 1:
+            raise TestProduct.MultipleObjectsReturned("%s %s %s" % (context,
+                                                                    product,
+                                                                    branch))
+        else:
+            raise TestProduct.DoesNotExist("%s %s %s" % (context, product,
+                                                         branch))
