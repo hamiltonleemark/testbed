@@ -638,8 +638,16 @@ class TestProduct(models.Model):
             testkeys = []
 
         context = Context.objects.get(name=context)
-        product = Key.objects.get(value=product)
-        branch = Key.objects.get(value=branch)
+        try:
+            product = Key.objects.get(value=product)
+        except Key.DoesNotExist:
+            raise Key.DoesNotExist("DoesNotExist: product %s does not exist" %
+                                  product)
+        try:
+            branch = Key.objects.get(value=branch)
+        except Key.DoesNotExist:
+            raise Key.DoesNotExist("DoesNotExist: branch %s does not exist" %
+                                   branch)
 
         ##
         # Look for testsuite.
