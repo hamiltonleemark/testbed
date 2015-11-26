@@ -5,4 +5,6 @@ Here are the required steps to setup the development environment.
 3. sudo apt-get install python-yaml
 4. sudo pip install pep8==1.6.2
 5. sudo pip install pylint==1.4.4
-5. sudo pip install pytz==2015.7
+6. sudo pip install pytz==2015.7
+7. sudo pip install pytest==2.8.3
+8. sudo pip install xunitparser==1.3.3
