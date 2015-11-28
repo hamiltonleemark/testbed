@@ -29,6 +29,12 @@ def do_add(args):
     return api.get_or_create(args.context, args.testsuite, args.order)
 
 
+def do_change(args):
+    """ Change the order of the testsuite in the testplan. """
+
+    return api.change(args.context, args.testsuite, args.order)
+
+
 def do_remove(args):
     """ Add a testsuite to the database. """
 
@@ -199,6 +205,16 @@ def add_subparser(subparser):
                         help="Order of testsuite as viewed on the website."
                         "If not specified the next sequential value is "
                         "assumed")
+
+    ##
+    # Change
+    parser = rootparser.add_parser(
+        "change", description="Change testplan",
+        help="Add a testsuite.")
+    parser.set_defaults(func=do_change)
+    parser.add_argument("testsuite", type=str, help="Name of the testsuite.")
+    parser.add_argument("order", type=int,
+                        help="Change the order of the testsuite.")
 
     ##
     # Remove

@@ -18,20 +18,19 @@
 Commands that handle xunit results.
 """
 
-import os
 import logging
 import xunitparser
-import testbed.core.serializers
 import argparse
 from testbed.libexec import result
+
 
 def xunit_result_get(testcase):
     """ Determine the results from the testcase. """
 
     if testcase.bad:
-        raise NotSupported("bad testcase not supported")
+        raise NotImplementedError("bad testcase not supported")
     elif testcase.errored:
-        raise NotSupported("erroed testcase not supported")
+        raise NotImplementedError("errored testcase not supported")
     elif testcase.failed:
         return "failed"
     elif testcase.good:
@@ -47,16 +46,14 @@ def xunit_result_get(testcase):
 def do_save(args):
     """ Save xunit results. """
 
-    from testdb import models
-
-    (testsuite, testresults) = xunitparser.parse(open(args.resultfile))
+    (testsuite, _) = xunitparser.parse(open(args.resultfile))
 
     for testcase in testsuite:
         testsuite_name = testcase.classname.split(".")[0]
         test_name = testcase.methodname
         test_result = xunit_result_get(testcase)
 
-        logging.info("test %s.%s %s" % (testsuite_name, test_name, result))
+        logging.info("test %s.%s %s", testsuite_name, test_name, result)
         result.api.set_result(args.context, args.product, args.branch,
                               args.build, testsuite_name, test_name,
                               test_result, args.testkeys)
@@ -85,4 +82,3 @@ def add_subparser(subparser):
                         help="Specify result for a test.")
 
     return subparser
-

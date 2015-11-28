@@ -494,6 +494,10 @@ class TestplanOrder(models.Model):
         self.testplan.serialize(serializer)
         serializer.add(self)
 
+    def testsuite_name(self):
+        """ Return the name of the testsuite. """
+        return self.testsuite_set.first()
+
     def __str__(self):
         """ User representation. """
         return "%d: %s:" % (self.order, self.testplan.context)
@@ -507,9 +511,6 @@ class TestplanOrder(models.Model):
             testplanorder = TestplanOrder.objects.get(
                 testplan=testplan, testsuite__context=testplan.context,
                 testsuite__name=testsuite_name)
-            testplanorder.order = order
-            testplanorder.save()
-
             testsuite = Testsuite.objects.get(context=testplan.context,
                                               testplanorder=testplanorder)
         except TestplanOrder.DoesNotExist:
@@ -527,10 +528,25 @@ class TestplanOrder(models.Model):
 
         testplanorder = TestplanOrder.objects.create(testplan=testplan,
                                                      order=order)
-        Testsuite.objects.create(context=testplan.context,
-                                 name=testsuite_name,
-                                 testplanorder=testplanorder)
-        return testplanorder
+        testsuite = Testsuite.objects.create(context=testplan.context,
+                                             name=testsuite_name,
+                                             testplanorder=testplanorder)
+        return (testplanorder, testsuite)
+
+    @staticmethod
+    def get(testplan, testsuite_name):
+        """ Get current testplan or create new objects. """
+
+        testplanorder = TestplanOrder.objects.get(
+            testplan=testplan, testsuite__context=testplan.context,
+            testsuite__name=testsuite_name)
+        try:
+            testsuite = Testsuite.objects.get(context=testplan.context,
+                                              testplanorder=testplanorder)
+        except Testsuite.DoesNotExist:
+            raise TestplanOrder.DoesNotExist("missing testsuite %s",
+                                             testsuite.name)
+        return (testplanorder, testsuite)
 
 
 class TestsuiteFile(models.Model):
@@ -642,7 +658,7 @@ class TestProduct(models.Model):
             product = Key.objects.get(value=product)
         except Key.DoesNotExist:
             raise Key.DoesNotExist("DoesNotExist: product %s does not exist" %
-                                  product)
+                                   product)
         try:
             branch = Key.objects.get(value=branch)
         except Key.DoesNotExist:
