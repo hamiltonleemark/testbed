@@ -11,3 +11,11 @@ tr.section {
 .fail { 
   background-color: #DB7093;
 }
+
+.vertical-text {
+  -webkit-transform: matrix(0.419,-0.908,0.913,0.407,0,0);
+  -moz-transform: matrix(0.419,-0.908,0.913,0.407,0px,0px);
+  -ms-transform: matrix(0.419,-0.908,0.913,0.407,0,0);
+  -o-transform: matrix(0.419,-0.908,0.913,0.407,0,0);
+  transform: matrix(0.419,-0.908,0.913,0.407,0,0);
+}

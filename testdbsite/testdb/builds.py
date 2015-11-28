@@ -7,6 +7,23 @@ from testdb import models
 CONTEXT = "build.default"
 
 
+# pylint: disable=C0103
+# pylint: disable=R0903
+class BuildView(object):
+    """ Used to biew build content on various pages.
+
+    @param build  Part of the testsuite kvp is cached early, because
+                  the assumbption is that it will be used several times.
+    """
+    def __init__(self, testsuite):
+        self.id = testsuite.key_get("build")
+        self.testsuite = testsuite
+
+    def label(self):
+        """ Label combining build and date. """
+        return "%s" % (self.testsuite.timestamp.strftime("%m-%d-%Y %H:%M %p"))
+
+
 # pylint: disable=W0622
 def filter(product_key, branch_key=None, history=10):
     """ Return the list builds given the parameters.
@@ -23,4 +40,4 @@ def filter(product_key, branch_key=None, history=10):
     if branch_key:
         find = find.filter(keys=branch_key)
 
-    return [item.key_get("build") for item in find[0:history]]
+    return [BuildView(item) for item in find[0:history]]

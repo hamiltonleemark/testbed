@@ -6,9 +6,20 @@
 
 <table>
  <tr>
-  <th colspan="100%">Product {{product.product}} {{product.branch}}</th>
- </tr>
- <tr>
+  <th colspan="100%">
+   <font size="+1">Branch {{product.product}} {{product.branch}}</font>
+  </th>
+ </tr><tr>
+  <th></th>
+  {% for header in headers %}
+   <th></th>
+  {% endfor %}
+  <th></th>
+  <th></th>
+  {% for build in builds %}
+   <th height="50" class="vertical-text">{{build.label}}</th>
+  {% endfor %}
+ </tr><tr>
   <th>#</th>
   {% for header in headers %}
   <th>{{header}}</th>
@@ -16,8 +27,9 @@
   <th>Testsuite</th>
   <th>Test</th>
   {% for build in builds %}
-   <th>{{build.value}}</th>
+   <th>{{build.id.value}}</th>
   {% endfor %}
+  <th>>></th>
  </tr>
  {% for planorder in planorders %}
   <tr>
@@ -26,7 +38,7 @@
    <td>{{planorder.testsuite.name}}</td>
    <td>{{planorder.test.name}}</td>
   {% for build in builds %}
-    {% view_td_cell build.value planorder.testsuite.name.name planorder.test.name.name %}
+    {% view_td_cell build.id.value planorder.testsuite.name.name planorder.test.name.name %}
   {% endfor %}
   </tr>
  {% endfor %}

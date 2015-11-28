@@ -48,5 +48,5 @@ def filter(product_name, branch_name=None):
 
     builds = builds.filter(product_name, branch_name)
 
-    return [item.value for item in builds]
+    return [item.id.value for item in builds]
 # pylint: enable=W0622
