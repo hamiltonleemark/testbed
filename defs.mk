@@ -42,12 +42,9 @@ python27:: $(addsuffix .python27,$(PYTHON_FILES))
 .PHONY: test
 test::
 
-# Check for debug statements written by mark
-%.debug_mark:
-	grep -Hn MARK $* && exit 1 || exit 0
-
 .PHONY: debug_mark
-debug_mark:: $(addsuffix .debug_mark,$(PYTHON_FILES))
+debug_mark:: 
+	grep --exclude=*~ -Hrn MARK */ && exit 1 || exit 0
 
 check:: pep8 pylint subdirs python27 test debug_mark
 clean::
