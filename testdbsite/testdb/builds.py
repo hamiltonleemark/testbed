@@ -25,7 +25,7 @@ class BuildView(object):
 
 
 # pylint: disable=W0622
-def filter(product_key, branch_key=None, history=10):
+def filter(product_key, branch_key=None):
     """ Return the list builds given the parameters.
 
     Build list is returned in newest to oldest.
@@ -40,4 +40,4 @@ def filter(product_key, branch_key=None, history=10):
     if branch_key:
         find = find.filter(keys=branch_key)
 
-    return [BuildView(item) for item in find[0:history]]
+    return find

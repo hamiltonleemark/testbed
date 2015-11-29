@@ -38,10 +38,16 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.core.management',
+    'pure_pagination',
     'testdb',
     'product',
     'branch',
 )
+
+PAGINATION_SETTINGS = {
+    'PAGE_RANGE_DISPLAYED': 10,
+    'MARGIN_PAGES_DISPLAYED': 2,
+}
 
 #TEMPLATE_LOADERS = (
     #"django.template.loaders.filesystem.Loader",

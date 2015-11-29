@@ -3,13 +3,16 @@
 
 {% block content %}
 
+<div class="breadcrumbs">
+<a href="/">Home</a>
+&rsaquo; {{product.product}} {{product.branch}}
+</div>
+
+
+<div class="section" width="100%" align="center" id="pagination">{{contacts.render }}</div>
 
 <table>
  <tr>
-  <th colspan="100%">
-   <font size="+1">Branch {{product.product}} {{product.branch}}</font>
-  </th>
- </tr><tr>
   <th></th>
   {% for header in headers %}
    <th></th>
@@ -17,19 +20,18 @@
   <th></th>
   <th></th>
   {% for build in builds %}
-   <th height="50" class="vertical-text">{{build.label}}</th>
+   <th height="70" class="vertical-text">{{build.label}}</th>
   {% endfor %}
  </tr><tr>
-  <th>#</th>
+  <th class="header">#</th>
   {% for header in headers %}
-  <th>{{header}}</th>
+  <th class="header">{{header}}</th>
   {% endfor %}
-  <th>Testsuite</th>
-  <th>Test</th>
+  <th class="header">Testsuite</th>
+  <th class="header">Test</th>
   {% for build in builds %}
-   <th>{{build.id.value}}</th>
+   <th class="header" >{{build.id.value}}</th>
   {% endfor %}
-  <th>>></th>
  </tr>
  {% for planorder in planorders %}
   <tr>
@@ -43,4 +45,6 @@
   </tr>
  {% endfor %}
 </table>
+ <div class="section" width="100%" align="center" id="pagination">{{contacts.render }}</div>
+
 {% endblock %}

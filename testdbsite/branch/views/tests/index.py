@@ -1,3 +1,4 @@
+from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render_to_response
 from testdb import models
 from testdb import builds
@@ -18,8 +19,7 @@ def view(request, pid):
     """ Summarize product information. """
 
     context = request.GET.get("context", "default")
-    # initial_build = request.GET.get("context", "default")
-
+    history = request.GET.get("history", 10)
 
     product = models.TestProduct.objects.get(id=pid)
     testplan_name = product.key_get("testplan", None)
@@ -57,8 +57,27 @@ def view(request, pid):
                                          value=str(product.product.value))
     branch_key = models.KVP.objects.get(key__value="branch",
                                         value=product.branch.value)
-    blist = builds.filter(product_key, branch_key)
+    all_builds = builds.filter(product_key, branch_key)
 
+    # Show history contacts per page
+    paginator = Paginator(all_builds, history, request=request)
+
+    ##
+    # Generate pagination. The page url parameter is generated from the
+    # code below. This is the standard django pagination functionality.
+    try:
+        page = request.GET.get('page', 1)
+        buildids = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        buildids = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        buildids = paginator.page(paginator.num_pages)
+    ##
+
+    blist = [builds.BuildView(item) for item in buildids.object_list]
+    
     results = {}
     try:
         context = models.Context.objects.get(name=context)
@@ -79,11 +98,11 @@ def view(request, pid):
         planorders = []
 
     html_data = {
-        # \todo retrieve this from the testplan.
         "results": results,
         "product": product,
         "headers": keys,
         "planorders": planorders,
-        "builds": blist
+        "builds": blist,
+        "contacts": buildids
         }
     return render_to_response("tests/index.html", html_data)

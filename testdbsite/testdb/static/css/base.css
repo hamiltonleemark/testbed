@@ -12,6 +12,12 @@ tr.section {
   background-color: #DB7093;
 }
 
+th.header {
+    color: white;
+    background-color: #417690;
+    text-decoration: none;
+}
+
 .vertical-text {
   -webkit-transform: matrix(0.419,-0.908,0.913,0.407,0,0);
   -moz-transform: matrix(0.419,-0.908,0.913,0.407,0px,0px);
