@@ -44,7 +44,7 @@ test::
 
 .PHONY: debug_mark
 debug_mark:: 
-	grep --exclude=*~ -Hrn MARK */ && exit 1 || exit 0
+	grep --exclude=*~ --exclude=*.pyc -Hrn MARK */ && exit 1 || exit 0
 
 check:: pep8 pylint subdirs python27 test debug_mark
 clean::

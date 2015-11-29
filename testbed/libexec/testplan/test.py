@@ -136,9 +136,6 @@ class TestsuiteTestCase(TestCase):
         orders = [item for item in testplan1.testsuites_all()]
         self.assertEqual(len(orders), 3)
 
-        print "MARK: test pack"
-        print "MARK: orders", orders
-
         self.assertEqual(orders[0][1].name.name, "testsuite_order1")
         self.assertEqual(orders[1][1].name.name, "testsuite_order2")
         self.assertEqual(orders[2][1].name.name, "testsuite_order3")
@@ -247,8 +244,6 @@ class TestsuiteTestCase(TestCase):
 
     def test_order_one(self):
         """ test_order_one Confirm order works. """
-        print "MARK:  test_order_one"
-
         parser = TestsuiteTestCase.parser_create()
 
         cmd = "testplan add testsuite_order_one"
