@@ -169,8 +169,9 @@ class TestTestCase(TestCase):
                          "%d build results %d expected %d" %
                          (build_count, len(results),
                           build_count*testsuite_count))
-        self.assertTrue(duration.seconds <= 0.6,
-                        "query is taking too long %f." % duration.seconds)
+        self.assertTrue(duration.seconds <= 1.0,
+                        "query for %d is taking too long %f." %
+                        (len(results), duration.seconds))
         print "search 5 builds %d duration %s" % (len(results), duration)
         ##
 

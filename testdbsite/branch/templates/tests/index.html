@@ -12,27 +12,20 @@
 <div class="section" width="100%" align="center" id="pagination">{{contacts.render }}</div>
 
 <table>
+ <thead>
  <tr>
-  <th></th>
+  <th class="rotate-45"><div><span>#</div></span></th>
   {% for header in headers %}
-   <th></th>
+  <th class="rotate-45"><div><span>{{header}}</div></span></th>
   {% endfor %}
-  <th></th>
-  <th></th>
+  <th class="rotate-45"><div><span>Testsuite</div></span></th>
+  <th class="rotate-45"><div><span>Test</div></span></th>
   {% for build in builds %}
-   <th height="70" class="vertical-text">{{build.label}}</th>
-  {% endfor %}
- </tr><tr>
-  <th class="header">#</th>
-  {% for header in headers %}
-  <th class="header">{{header}}</th>
-  {% endfor %}
-  <th class="header">Testsuite</th>
-  <th class="header">Test</th>
-  {% for build in builds %}
-   <th class="header" >{{build.id.value}}</th>
+   <th class="rotate-45"><div><span>{{build.id.value}} {{build.label}}</div></span></th>
   {% endfor %}
  </tr>
+ </thead>
+ <tbody>
  {% for planorder in planorders %}
   <tr>
    <td>{{planorder.order}}</td>
@@ -44,6 +37,7 @@
   {% endfor %}
   </tr>
  {% endfor %}
+ </tbody>
 </table>
  <div class="section" width="100%" align="center" id="pagination">{{contacts.render }}</div>
 
