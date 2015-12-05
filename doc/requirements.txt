@@ -1,0 +1,6 @@
+pep8==1.6.2
+pylint==1.4.4
+pytz==2015.7
+pytest==2.8.3
+xunitparser==1.3.3
+django-pure-pagination==0.2.1
