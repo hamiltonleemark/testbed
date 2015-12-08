@@ -98,7 +98,7 @@ class KVP(models.Model):
             models.Q(value__contains=contains))
 
 
-class TestResult(models.Model):
+class Result(models.Model):
     """ Define a single result. """
     context = models.ForeignKey(Key, related_name="test_context", null=True,
                                 blank=True, default=None)
@@ -108,7 +108,6 @@ class TestResult(models.Model):
     test = models.ForeignKey("Test", null=True, blank=True, default=None)
 
 
-# \todo Look at making testName a KVP.
 class TestName(models.Model):
     """ Name of testsuite."""
     name = models.CharField(max_length=128, unique=True)
@@ -220,6 +219,7 @@ class Test(models.Model):
 
 class TestFile(models.Model):
     """ Hold a single file related to a testsuite. """
+
     testsuite = models.ForeignKey(Test, null=True, blank=True, default=None)
     key = models.ForeignKey(KVP)
     path = models.CharField(max_length=256, unique=True)
@@ -228,7 +228,7 @@ class TestFile(models.Model):
 class TestKeySet(models.Model):
     """ Links a test to a set of keys. """
     test = models.ForeignKey(Test)
-    testkey = models.ForeignKey(KVP)
+    kvp = models.ForeignKey(KVP)
 
 
 class TestsuiteName(models.Model):
@@ -263,7 +263,7 @@ class Context(models.Model):
 class TestsuiteKeySet(models.Model):
     """ Testsuites are associated to a set of keys. """
     testsuite = models.ForeignKey("Testsuite")
-    testkey = models.ForeignKey(KVP)
+    kvp = models.ForeignKey(KVP)
 
     def __str__(self):
         """ User representation. """
