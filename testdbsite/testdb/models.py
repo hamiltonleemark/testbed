@@ -569,7 +569,7 @@ class TestsuiteFile(models.Model):
 class ProductKeySet(models.Model):
     """ Testsuites are associated to a set of keys. """
 
-    testproduct = models.ForeignKey("Product")
+    product = models.ForeignKey("Product")
     testkey = models.ForeignKey(KVP)
 
 
@@ -633,7 +633,7 @@ class Product(models.Model):
         product = Product.objects.create(context=context, product=product,
                                          branch=branch)
         for testkey in testkeys:
-            ProductKeySet.objects.create(testproduct=product, testkey=testkey)
+            ProductKeySet.objects.create(product=product, testkey=testkey)
         return (product, True)
 
     @staticmethod
