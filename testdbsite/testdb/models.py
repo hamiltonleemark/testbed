@@ -40,6 +40,14 @@ class Key(models.Model):
     value = models.CharField(max_length=128, unique=True)
     config_type = models.IntegerField(choices=CONFIG_TYPE, default=0)
 
+    @staticmethod
+    def str_to_config_type(value):
+        """ Return config_type given string. """
+        for (config_type, config_str) in Key.CONFIG_TYPE:
+            if value == config_str:
+                return config_type
+        raise ValueError("unknown: config_type %s", value)
+
     def __str__(self):
         """ Return testsuite name. """
         return str(self.value)
@@ -73,6 +81,7 @@ class KVP(models.Model):
                 return (testkey, False)
         except KVP.DoesNotExist:
             pass
+
         if key.config_type != Key.CONFIG_TYPE_ANY:
             raise KVP.DoesNotExist("key %s is strict" % key)
         return KVP.objects.get_or_create(key=key, value=value)
