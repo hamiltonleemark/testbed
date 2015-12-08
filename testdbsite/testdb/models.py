@@ -54,7 +54,7 @@ class Key(models.Model):
 
 
 class KVP(models.Model):
-    """ Key-Value Pair associate a key to a single value. """
+    """ Key-Value Pair associate a key with a set of values. """
 
     key = models.ForeignKey(Key)
     value = models.CharField(max_length=128)
@@ -566,14 +566,14 @@ class TestsuiteFile(models.Model):
     path = models.CharField(max_length=256, unique=True)
 
 
-class TestProductKeySet(models.Model):
+class ProductKeySet(models.Model):
     """ Testsuites are associated to a set of keys. """
 
-    testproduct = models.ForeignKey("TestProduct")
+    testproduct = models.ForeignKey("Product")
     testkey = models.ForeignKey(KVP)
 
 
-class TestProduct(models.Model):
+class Product(models.Model):
     """ A test plan consists of a set of testsuites, tests.
     A test plan governs which testsuites should be run.
     """
@@ -581,7 +581,7 @@ class TestProduct(models.Model):
     context = models.ForeignKey(Context)
     product = models.ForeignKey(Key, related_name="product")
     branch = models.ForeignKey(Key, related_name="branch")
-    keys = models.ManyToManyField(KVP, through="TestProductKeySet")
+    keys = models.ManyToManyField(KVP, through="ProductKeySet")
     order = models.IntegerField(default=0)
 
     def __str__(self):
@@ -602,7 +602,7 @@ class TestProduct(models.Model):
         """ Add key to product. """
 
         (kvp, _) = KVP.get_or_create(key, value)
-        return self.testproductkeyset_set.get_or_create(testkey=kvp)
+        return self.productkeyset_set.get_or_create(testkey=kvp)
 
     @staticmethod
     def get_or_create(context, product, branch, testkeys=None):
@@ -618,8 +618,8 @@ class TestProduct(models.Model):
 
         ##
         # Look for testsuite.
-        find = TestProduct.objects.filter(context=context, product=product,
-                                          branch=branch)
+        find = Product.objects.filter(context=context, product=product,
+                                      branch=branch)
         for testkey in testkeys:
             find = find.filter(keys=testkey)
 
@@ -630,11 +630,10 @@ class TestProduct(models.Model):
                                                                   product,
                                                                   branch))
 
-        product = TestProduct.objects.create(context=context, product=product,
-                                             branch=branch)
+        product = Product.objects.create(context=context, product=product,
+                                         branch=branch)
         for testkey in testkeys:
-            TestProductKeySet.objects.create(testproduct=product,
-                                             testkey=testkey)
+            ProductKeySet.objects.create(testproduct=product, testkey=testkey)
         return (product, True)
 
     @staticmethod
@@ -643,9 +642,9 @@ class TestProduct(models.Model):
 
         if context:
             (context, _) = Context.objects.get_or_create(name=context)
-            find = TestProduct.objects.filter(context=context)
+            find = Product.objects.filter(context=context)
         else:
-            find = TestProduct.objects.all()
+            find = Product.objects.all()
 
         if contains:
             find = find.filter(models.Q(product__value__contains=contains) |
@@ -676,17 +675,16 @@ class TestProduct(models.Model):
 
         ##
         # Look for testsuite.
-        find = TestProduct.objects.filter(context=context, product=product,
-                                          branch=branch)
+        find = Product.objects.filter(context=context, product=product,
+                                      branch=branch)
         for testkey in testkeys:
             find = find.filter(keys=testkey)
 
         if find.count() == 1:
             return [item for item in find][0]
         elif find.count() > 1:
-            raise TestProduct.MultipleObjectsReturned("%s %s %s" % (context,
-                                                                    product,
-                                                                    branch))
+            raise Product.MultipleObjectsReturned("%s %s %s" % (context,
+                                                                product,
+                                                                branch))
         else:
-            raise TestProduct.DoesNotExist("%s %s %s" % (context, product,
-                                                         branch))
+            raise Product.DoesNotExist("%s %s %s" % (context, product, branch))

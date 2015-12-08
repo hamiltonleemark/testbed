@@ -15,12 +15,12 @@ def filter(product_name, branch_name=None):
 
     from testdb.models import Context
     from testdb.models import Key
-    from testdb.models import TestProduct
+    from testdb.models import Product
 
     (context, _) = Context.objects.get_or_create(name=CONTEXT)
     product = Key.objects.get(value=product_name)
 
-    find = TestProduct.objects.filter(context=context, product=product)
+    find = Product.objects.filter(context=context, product=product)
     if branch_name:
         branch = Key.objects.get(value=branch_name)
         find = find.filter(branch=branch)
@@ -36,7 +36,7 @@ def get_or_create(productname, branchname, order=-1):
                  testplans. The order effects the location the testplan
                  appears on web pages.
     """
-    from testdb.models import TestProduct
+    from testdb.models import Product
     from testdb.models import KVP
 
     logging.info("adding product %s %s", productname, branchname)
@@ -48,7 +48,7 @@ def get_or_create(productname, branchname, order=-1):
     KVP.get_or_create("product", productname)
 
     if order == -1:
-        find = TestProduct.objects.filter(context__name=CONTEXT)
+        find = Product.objects.filter(context__name=CONTEXT)
         try:
             order = find.order_by("-order")[0].order
         except IndexError:
@@ -59,8 +59,8 @@ def get_or_create(productname, branchname, order=-1):
 
     ##
     # Order is specified so now we have to move something.
-    products = TestProduct.objects.filter(context__name=CONTEXT,
-                                          order__gte=order).order_by("order")
+    products = Product.objects.filter(context__name=CONTEXT,
+                                      order__gte=order).order_by("order")
     current_order = order
     for product in products:
         if product.order == current_order:
@@ -70,8 +70,8 @@ def get_or_create(productname, branchname, order=-1):
             product.save()
             current_order = product.order
 
-    (product, created) = TestProduct.get_or_create(CONTEXT, productname,
-                                                   branchname)
+    (product, created) = Product.get_or_create(CONTEXT, productname,
+                                               branchname)
     product.order = order
     product.save()
 
@@ -82,11 +82,11 @@ def get_or_create(productname, branchname, order=-1):
 def contains(value=None):
     """ Retrieve the list of products based on product and or branch_name. """
 
-    from testdb.models import TestProduct
+    from testdb.models import Product
     from testdb.models import Context
 
     (context, _) = Context.objects.get_or_create(name=CONTEXT)
-    find = TestProduct.objects.filter(context=context)
+    find = Product.objects.filter(context=context)
     if value:
         find = find.filter(
             models.Q(product__value__contains=value) |

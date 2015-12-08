@@ -19,7 +19,7 @@ Test testsuite functionality.
 """
 import argparse
 from django.test import TestCase
-from testdb.models import TestProduct
+from testdb.models import Product
 from . import commands
 from . import api
 
@@ -72,7 +72,7 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        testsuites = TestProduct.filter(api.CONTEXT, "product3")
+        testsuites = Product.filter(api.CONTEXT, "product3")
         branches = [str(item.branch) for item in testsuites]
         self.assertTrue(len(branches) == 2)
         self.assertTrue("branch2" in branches)
@@ -95,7 +95,7 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        products = TestProduct.filter(None, None)
+        products = Product.filter(None, None)
         self.assertEqual(products.count(), 3)
         self.assertEqual(products[0].product.value, "product4")
         self.assertEqual(products[1].product.value, "product4")
@@ -118,7 +118,7 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        products = TestProduct.filter(api.CONTEXT, "product_order")
+        products = Product.filter(api.CONTEXT, "product_order")
         self.assertEqual(products.count(), 3)
         self.assertEqual(str(products[0].product), "product_order1")
         self.assertEqual(str(products[1].product), "product_order2")
@@ -141,7 +141,7 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        products = TestProduct.filter(api.CONTEXT, "product_order")
+        products = Product.filter(api.CONTEXT, "product_order")
         self.assertEqual(products.count(), 3)
         self.assertEqual(str(products[0].product), "product_order1")
         self.assertEqual(str(products[1].product), "product_order2")
@@ -160,8 +160,8 @@ class TestsuiteTestCase(TestCase):
         args = parser.parse_args(cmd.split())
         args.func(args)
 
-        (product1, critem) = TestProduct.get_or_create("product.default",
-                                                       "product1", "branch1")
+        (product1, critem) = Product.get_or_create("product.default",
+                                                   "product1", "branch1")
         self.assertFalse(critem)
         self.assertTrue(product1)
 

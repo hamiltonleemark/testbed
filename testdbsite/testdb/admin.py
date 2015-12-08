@@ -113,17 +113,17 @@ class TestplanAdmin(admin.ModelAdmin):
         return testplan.testsuite.context
 
 
-class TestProductKeySetAdmin(admin.TabularInline):
+class ProductKeySetAdmin(admin.TabularInline):
     """ Show set of keys that associate a testsuite. """
-    model = models.TestProductKeySet
+    model = models.ProductKeySet
     extra = 0
 
 
 class ProductAdmin(admin.ModelAdmin):
     """ Administrate testplan content. """
-    model = models.TestProduct
+    model = models.Product
 
-    inlines = [TestProductKeySetAdmin]
+    inlines = [ProductKeySetAdmin]
 
 
 admin.site.register(models.Context, ContextAdmin)
@@ -131,7 +131,7 @@ admin.site.register(models.Key, KeyAdmin)
 admin.site.register(models.Test, TestAdmin)
 admin.site.register(models.KVP, KVPAdmin)
 admin.site.register(models.TestsuiteName, TestsuiteNameAdmin)
-admin.site.register(models.TestProduct, ProductAdmin)
+admin.site.register(models.Product, ProductAdmin)
 admin.site.register(models.Testsuite, TestsuiteAdmin)
 admin.site.register(models.Testplan, TestplanAdmin)
 admin.site.register(models.TestplanOrder, TestplanOrderAdmin)

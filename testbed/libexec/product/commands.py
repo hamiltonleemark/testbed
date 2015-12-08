@@ -53,8 +53,8 @@ def product_list(args):
     from testdb import models
     logging.info("listing products")
 
-    products = models.TestProduct.filter(api.CONTEXT,
-                                         args.filter).order_by("order")
+    products = models.Product.filter(api.CONTEXT,
+                                     args.filter).order_by("order")
     root = {}
     for product in products:
         level = {
