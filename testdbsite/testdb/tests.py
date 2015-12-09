@@ -22,7 +22,7 @@ from django.test import TestCase
 from .models import Test
 from .models import Testsuite
 from .models import TestsuiteName
-from .models import TestsuiteKeySet
+from .models import TestsuiteKVP
 from .models import Key
 from .models import KVP
 from .models import Context
@@ -47,7 +47,7 @@ class TestsuiteTestCase(TestCase):
         name = TestsuiteName.objects.create(name="testsuite_name")
         testsuite = Testsuite.objects.create(name=name, context=context)
         for key in keys:
-            TestsuiteKeySet.objects.create(testsuite=testsuite, kvp=key)
+            TestsuiteKVP.objects.create(testsuite=testsuite, kvp=key)
         testsuite.save()
 
         ##

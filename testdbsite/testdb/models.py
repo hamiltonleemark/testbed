@@ -126,7 +126,7 @@ class Test(models.Model):
     testsuite = models.ForeignKey("Testsuite", null=True, blank=True,
                                   default=None)
     name = models.ForeignKey(TestName)
-    keys = models.ManyToManyField(KVP, through="TestKeySet")
+    keys = models.ManyToManyField(KVP, through="TestKVP")
     status = models.IntegerField(default=-1, blank=True, null=True)
 
     # \todo key_get should return only Testkey to make effecient.
@@ -205,7 +205,7 @@ class Test(models.Model):
                                    status=status)
 
         for key in keys:
-            TestKeySet.objects.create(test=test, testkey=key)
+            TestKVP.objects.create(test=test, testkey=key)
 
         return (test, True)
 
@@ -225,7 +225,7 @@ class TestFile(models.Model):
     path = models.CharField(max_length=256, unique=True)
 
 
-class TestKeySet(models.Model):
+class TestKVP(models.Model):
     """ Links a test to a set of keys. """
     test = models.ForeignKey(Test)
     kvp = models.ForeignKey(KVP)
@@ -260,7 +260,7 @@ class Context(models.Model):
         return self.name
 
 
-class TestsuiteKeySet(models.Model):
+class TestsuiteKVP(models.Model):
     """ Testsuites are associated to a set of keys. """
     testsuite = models.ForeignKey("Testsuite")
     kvp = models.ForeignKey(KVP)
@@ -277,7 +277,7 @@ class Testsuite(models.Model):
     context = models.ForeignKey(Context, null=True, blank=True, default=None)
     name = models.ForeignKey(TestsuiteName)
     timestamp = models.DateTimeField(default=timezone.now)
-    kvps = models.ManyToManyField(KVP, through="TestsuiteKeySet")
+    kvps = models.ManyToManyField(KVP, through="TestsuiteKVP")
     testplanorder = models.ForeignKey("TestplanOrder", null=True, blank=True,
                                       default=None)
 
@@ -288,7 +288,7 @@ class Testsuite(models.Model):
         self.name.serialize(serializer)
         self.testplanorder.serialize(serializer)
 
-        for item in self.testsuitekeyset_set.all():
+        for item in self.testsuitekvp_set.all():
             serializer.add(item)
 
         serializer.add(self)
@@ -328,16 +328,16 @@ class Testsuite(models.Model):
             if current_key.value != testkey.value:
                 current_key.delete()
                 current_key.save()
-                self.testsuitekeyset_set.create(testkey=testkey)
+                self.testsuitekvp_set.create(testkey=testkey)
         except KVP.DoesNotExist:
-            self.testsuitekeyset_set.create(kvp=testkey)
+            self.testsuitekvp_set.create(kvp=testkey)
 
     def value_get(self, key, default=None):
         """ Return value given key. """
         try:
-            testkeyset = self.testsuitekeyset_set.get(kvp__key__value=key)
-            return testkeyset.testkey.value
-        except TestsuiteKeySet.DoesNotExist:
+            testkvp = self.testsuitekvp_set.get(kvp__key__value=key)
+            return testkvp.testkey.value
+        except TestsuiteKVP.DoesNotExist:
             return default
 
     @staticmethod
@@ -388,8 +388,7 @@ class Testsuite(models.Model):
                                              testplanorder=testplanorder)
         testkeys.append(buildkey)
         for testkey in testkeys:
-            TestsuiteKeySet.objects.create(testsuite=testsuite,
-                                           kvp=testkey)
+            TestsuiteKVP.objects.create(testsuite=testsuite, kvp=testkey)
         return (testsuite, True)
 
     ##
@@ -437,7 +436,7 @@ class Testsuite(models.Model):
         return find
 
 
-class TestplanKeySet(models.Model):
+class TestplanKVP(models.Model):
     """ Testsuites are associated to a set of keys. """
 
     testplan = models.ForeignKey("Testplan")
@@ -449,7 +448,7 @@ class Testplan(models.Model):
     A test plan governs which testsuites should be run their results shown.
     """
     context = models.ForeignKey(Context)
-    keys = models.ManyToManyField(Key, through="TestplanKeySet")
+    keys = models.ManyToManyField(Key, through="TestplanKVP")
 
     def serialize(self, serializer):
         """ Serialize and instance of this model. """
@@ -487,7 +486,7 @@ class Testplan(models.Model):
             return (testplan, critem)
 
         for key in keys:
-            testplan.testplankeyset_set.create(key=key)
+            testplan.testplankvp_set.create(key=key)
         return (testplan, critem)
 
 
@@ -566,7 +565,7 @@ class TestsuiteFile(models.Model):
     path = models.CharField(max_length=256, unique=True)
 
 
-class ProductKeySet(models.Model):
+class ProductKVP(models.Model):
     """ Testsuites are associated to a set of keys. """
 
     product = models.ForeignKey("Product")
@@ -581,7 +580,7 @@ class Product(models.Model):
     context = models.ForeignKey(Context)
     product = models.ForeignKey(Key, related_name="product")
     branch = models.ForeignKey(Key, related_name="branch")
-    kvps = models.ManyToManyField(KVP, through="ProductKeySet")
+    kvps = models.ManyToManyField(KVP, through="ProductKVP")
     order = models.IntegerField(default=0)
 
     def __str__(self):
@@ -602,7 +601,7 @@ class Product(models.Model):
         """ Add key to product. """
 
         (kvp, _) = KVP.get_or_create(key, value)
-        return self.productkeyset_set.get_or_create(kvp=kvp)
+        return self.productkvp_set.get_or_create(kvp=kvp)
 
     @staticmethod
     def get_or_create(context, product, branch, testkeys=None):
@@ -633,7 +632,7 @@ class Product(models.Model):
         product = Product.objects.create(context=context, product=product,
                                          branch=branch)
         for testkey in testkeys:
-            ProductKeySet.objects.create(product=product, testkey=testkey)
+            ProductKVP.objects.create(product=product, testkey=testkey)
         return (product, True)
 
     @staticmethod

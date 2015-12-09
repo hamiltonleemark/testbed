@@ -21,7 +21,7 @@ def view(request, pid):
     context = request.GET.get("context", "default")
     history = request.GET.get("history", 10)
 
-    product = models.TestProduct.objects.get(id=pid)
+    product = models.Product.objects.get(id=pid)
     testplan_name = product.key_get("testplan", None)
     if not testplan_name:
         return render_to_response("tests/index.html", {})

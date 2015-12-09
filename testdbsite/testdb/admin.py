@@ -62,9 +62,9 @@ class TestsuiteFileInlineAdmin(admin.TabularInline):
     extra = 0
 
 
-class TestsuiteKeySetInlineAdmin(admin.TabularInline):
+class TestsuiteKVPInlineAdmin(admin.TabularInline):
     """ Show set of keys that associate a testsuite. """
-    model = models.TestsuiteKeySet
+    model = models.TestsuiteKVP
     extra = 0
 
 
@@ -75,7 +75,7 @@ class TestsuiteAdmin(admin.ModelAdmin):
     date_hierarchy = "timestamp"
     search_fields = ("context", "name", "timestamp")
 
-    inlines = [TestsuiteKeySetInlineAdmin, TestsuiteFileInlineAdmin,
+    inlines = [TestsuiteKVPInlineAdmin, TestsuiteFileInlineAdmin,
                TestInlineAdmin]
 
 
@@ -113,9 +113,9 @@ class TestplanAdmin(admin.ModelAdmin):
         return testplan.testsuite.context
 
 
-class ProductKeySetAdmin(admin.TabularInline):
+class ProductKVPAdmin(admin.TabularInline):
     """ Show set of keys that associate a testsuite. """
-    model = models.ProductKeySet
+    model = models.ProductKVP
     extra = 0
 
 
@@ -123,7 +123,7 @@ class ProductAdmin(admin.ModelAdmin):
     """ Administrate testplan content. """
     model = models.Product
 
-    inlines = [ProductKeySetAdmin]
+    inlines = [ProductKVPAdmin]
 
 
 admin.site.register(models.Context, ContextAdmin)

@@ -24,7 +24,7 @@ class ProductView(object):
 
 def index(_):
     """ Summarize product information. """
-    testplans = models.TestProduct.filter(None, None)
+    testplans = models.Product.filter(None, None)
 
     products = [ProductView(item) for item in testplans]
     html_data = {"products": products}
@@ -33,7 +33,7 @@ def index(_):
 def index_product(_, pid):
     """ Summarize product information. """
 
-    product = models.TestProduct.objects.get(id=pid)
+    product = models.Product.objects.get(id=pid)
 
     testplan = product.key_get("testplan", None)
 
