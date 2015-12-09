@@ -221,7 +221,7 @@ class TestFile(models.Model):
     """ Hold a single file related to a testsuite. """
 
     test = models.ForeignKey(Test, null=True, blank=True, default=None)
-    key = models.ForeignKey(KVP)
+    kvp = models.ForeignKey(KVP)
     path = models.CharField(max_length=256, unique=True)
 
 
@@ -562,7 +562,7 @@ class TestsuiteFile(models.Model):
     """ Hold a single file related to a testsuite. """
     testsuite = models.ForeignKey(Testsuite, null=True, blank=True,
                                   default=None)
-    key = models.ForeignKey(KVP)
+    kvp = models.ForeignKey(KVP)
     path = models.CharField(max_length=256, unique=True)
 
 
