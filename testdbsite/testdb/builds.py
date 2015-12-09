@@ -34,10 +34,10 @@ def filter(product_key, branch_key=None):
     logging.info("list build %s %s", product_key.value,
                  branch_key.value if branch_key else "*")
     (context, _) = models.Context.objects.get_or_create(name=CONTEXT)
-    find = models.Testsuite.objects.filter(context=context, keys=product_key)
+    find = models.Testsuite.objects.filter(context=context, kvps=product_key)
     find = find.order_by("-timestamp")
 
     if branch_key:
-        find = find.filter(keys=branch_key)
+        find = find.filter(kvps=branch_key)
 
     return find

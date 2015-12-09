@@ -19,7 +19,7 @@ def get(testplan_name, testsuite_name, testkeys):
     # \todo deal with many test plan or zero.
     for (key, value) in testkeys:
         testkey = models.KVP.get(key=key, value=value)
-        find = find.filter(testsuite__keys=testkey)
+        find = find.filter(testsuite__kvps=testkey)
 
     if find.count() == 0:
         raise models.TestplanOrder.DoesNotExist(

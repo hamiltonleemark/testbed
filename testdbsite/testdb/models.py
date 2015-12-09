@@ -220,7 +220,7 @@ class Test(models.Model):
 class TestFile(models.Model):
     """ Hold a single file related to a testsuite. """
 
-    testsuite = models.ForeignKey(Test, null=True, blank=True, default=None)
+    test = models.ForeignKey(Test, null=True, blank=True, default=None)
     key = models.ForeignKey(KVP)
     path = models.CharField(max_length=256, unique=True)
 
@@ -277,7 +277,7 @@ class Testsuite(models.Model):
     context = models.ForeignKey(Context, null=True, blank=True, default=None)
     name = models.ForeignKey(TestsuiteName)
     timestamp = models.DateTimeField(default=timezone.now)
-    keys = models.ManyToManyField(KVP, through="TestsuiteKeySet")
+    kvps = models.ManyToManyField(KVP, through="TestsuiteKeySet")
     testplanorder = models.ForeignKey("TestplanOrder", null=True, blank=True,
                                       default=None)
 
@@ -303,7 +303,7 @@ class Testsuite(models.Model):
 
     def key_get(self, key):
         """ Return value given key. """
-        return self.keys.get(key__value=key)
+        return self.kvps.get(key__value=key)
 
     def key_remove(self, key):
         """ Remove key and return True if key exists and is removed. """
@@ -330,12 +330,12 @@ class Testsuite(models.Model):
                 current_key.save()
                 self.testsuitekeyset_set.create(testkey=testkey)
         except KVP.DoesNotExist:
-            self.testsuitekeyset_set.create(testkey=testkey)
+            self.testsuitekeyset_set.create(kvp=testkey)
 
     def value_get(self, key, default=None):
         """ Return value given key. """
         try:
-            testkeyset = self.testsuitekeyset_set.get(testkey__key__value=key)
+            testkeyset = self.testsuitekeyset_set.get(kvp__key__value=key)
             return testkeyset.testkey.value
         except TestsuiteKeySet.DoesNotExist:
             return default
@@ -373,9 +373,9 @@ class Testsuite(models.Model):
         # Look for testsuite
         find = Testsuite.objects.filter(context=context, name=name,
                                         testplanorder=testplanorder,
-                                        keys=buildkey)
+                                        kvps=buildkey)
         for testkey in testkeys:
-            find = find.filter(keys=testkey)
+            find = find.filter(kvps=testkey)
 
         if find.count() == 1:
             testsuite = find[0]
@@ -389,7 +389,7 @@ class Testsuite(models.Model):
         testkeys.append(buildkey)
         for testkey in testkeys:
             TestsuiteKeySet.objects.create(testsuite=testsuite,
-                                           testkey=testkey)
+                                           kvp=testkey)
         return (testsuite, True)
 
     ##
@@ -433,7 +433,7 @@ class Testsuite(models.Model):
         ##
         # Look for testsuite.
         for key in keys:
-            find = find.filter(keys=key)
+            find = find.filter(kvps=key)
         return find
 
 
@@ -570,7 +570,7 @@ class ProductKeySet(models.Model):
     """ Testsuites are associated to a set of keys. """
 
     product = models.ForeignKey("Product")
-    testkey = models.ForeignKey(KVP)
+    kvp = models.ForeignKey(KVP)
 
 
 class Product(models.Model):
@@ -581,7 +581,7 @@ class Product(models.Model):
     context = models.ForeignKey(Context)
     product = models.ForeignKey(Key, related_name="product")
     branch = models.ForeignKey(Key, related_name="branch")
-    keys = models.ManyToManyField(KVP, through="ProductKeySet")
+    kvps = models.ManyToManyField(KVP, through="ProductKeySet")
     order = models.IntegerField(default=0)
 
     def __str__(self):
@@ -594,7 +594,7 @@ class Product(models.Model):
         """ Return value given key. """
 
         try:
-            return self.keys.get(key__value=key).value
+            return self.kvps.get(key__value=key).value
         except KVP.DoesNotExist:
             return default
 
@@ -602,7 +602,7 @@ class Product(models.Model):
         """ Add key to product. """
 
         (kvp, _) = KVP.get_or_create(key, value)
-        return self.productkeyset_set.get_or_create(testkey=kvp)
+        return self.productkeyset_set.get_or_create(kvp=kvp)
 
     @staticmethod
     def get_or_create(context, product, branch, testkeys=None):
@@ -649,7 +649,7 @@ class Product(models.Model):
         if contains:
             find = find.filter(models.Q(product__value__contains=contains) |
                                models.Q(branch__value__contains=contains) |
-                               models.Q(keys__key__value__contains=contains))
+                               models.Q(kvps__key__value__contains=contains))
         return find.order_by("context", "order")
 
     @staticmethod

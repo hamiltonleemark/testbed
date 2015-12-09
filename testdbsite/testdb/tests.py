@@ -47,7 +47,7 @@ class TestsuiteTestCase(TestCase):
         name = TestsuiteName.objects.create(name="testsuite_name")
         testsuite = Testsuite.objects.create(name=name, context=context)
         for key in keys:
-            TestsuiteKeySet.objects.create(testsuite=testsuite, testkey=key)
+            TestsuiteKeySet.objects.create(testsuite=testsuite, kvp=key)
         testsuite.save()
 
         ##
