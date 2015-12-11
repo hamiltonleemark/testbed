@@ -209,7 +209,7 @@ def add_key(context, order, key, value):
     #
 
     (key, _) = Key.objects.get_or_create(value=key)
-    testplan.testplankeyset_set.get_or_create(key=key)
+    testplan.testplankvp_set.get_or_create(key=key)
 
     #
     ##

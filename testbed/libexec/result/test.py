@@ -84,8 +84,8 @@ class TestTestCase(TestCase):
 
         for testkey in testkeys:
             (key, _) = models.Key.objects.get_or_create(value=testkey[0])
-            testplan1.testplankeyset_set.get_or_create(testplan=testplan1,
-                                                       key=key)
+            testplan1.testplankvp_set.get_or_create(testplan=testplan1,
+                                                    key=key)
 
         orders = testplan1.testplanorder_set.all().order_by("order")
         self.assertEqual(len(orders), testsuite_count)
