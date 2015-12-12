@@ -140,7 +140,7 @@ class TestTestCase(TestCase):
         ##
         # Time retrieving all testsuites for a build1.
         start = datetime.datetime.now()
-        testkeys = [item.key for item in testplan1.testplankeyset_set.all()]
+        testkeys = [item.key for item in testplan1.testplankvp_set.all()]
         (buildkey, _) = models.KVP.get_or_create("build", "build1")
 
         testkeys.append(buildkey)
