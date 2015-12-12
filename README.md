@@ -1,3 +1,3 @@
-Database for tracking test results.
+Test tracking database
 
-Command line interface is easily extensible .
+Command line interface is easily extensible.

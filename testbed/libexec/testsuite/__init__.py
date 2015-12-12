@@ -1,4 +1,4 @@
-# (c) 2015 Mark Hamilton, <mark_lee_hamilton@att.net>
+# (c) 2015 Mark Hamilton, <mark.lee.hamilton@gmail.com>
 #
 # This file is part of testbed
 #

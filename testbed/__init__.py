@@ -1,4 +1,4 @@
-# (c) 2015 Mark Hamilton, <mark_lee_hamilton@att.net>
+# (c) 2015 Mark Hamilton, <mark.lee.hamilton@gmail.com>
 #
 # This file is part of testbed
 #
@@ -14,3 +14,5 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Testdb.  If not, see <http://www.gnu.org/licenses/>.
+__version__ = '0.0.1'
+__author__ = 'Mark Hamilton'
