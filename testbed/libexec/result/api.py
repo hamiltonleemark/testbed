@@ -40,8 +40,8 @@ def set_result(context, product_name, branch_name, build, testsuite_name,
     logging.debug("%s %s %s %s", product_name, branch_name, build,
                   testsuite_name)
 
-    product1 = models.TestProduct.get(product.api.CONTEXT,
-                                      product_name, branch_name)
+    product1 = models.Product.get(product.api.CONTEXT,
+                                  product_name, branch_name)
 
     testplan_name = product1.key_get("testplan", None)
     if testplan_name is None:

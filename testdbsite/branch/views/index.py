@@ -26,7 +26,7 @@ class ProductView(object):
 def view(_):
     """ Summarize product information. """
 
-    testplans = models.TestProduct.filter(None, None)
+    testplans = models.Product.filter(None, None)
 
     products = [ProductView(item) for item in testplans]
 
@@ -38,7 +38,7 @@ def view(_):
 def view(_, pid):
     """ Summarize product information. """
 
-    product = models.TestProduct.objects.get(id=pid)
+    product = models.Product.objects.get(id=pid)
 
     plans = product.key_get("testplan", None)
     

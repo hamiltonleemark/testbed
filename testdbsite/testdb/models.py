@@ -336,7 +336,7 @@ class Testsuite(models.Model):
         """ Return value given key. """
         try:
             testkvp = self.testsuitekvp_set.get(kvp__key__value=key)
-            return testkvp.testkey.value
+            return testkvp.kvp.value
         except TestsuiteKVP.DoesNotExist:
             return default
 

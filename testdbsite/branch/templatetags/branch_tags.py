@@ -19,5 +19,6 @@ def view_td_cell(context, build, testsuite, test):
     status = results.get(key, models.Test.UNKNOWN)
 
     status_code = models.Test.status_to_str(status, True)
+    status_code = "" if status_code is None else status_code
     style = models.Test.status_to_str(status)
     return '<td class="%s">%s</td>' % (style, status_code)

@@ -84,7 +84,7 @@ def view(request, pid):
         for testplan in testplans:
             for buildid in blist:
                 testsuites = testplan.testsuite_set.filter(context=context,
-                                                           keys=buildid.id)
+                                                           kvps=buildid.id)
                 for testsuite1 in testsuites:
                     for test1 in testsuite1.test_set.all():
                         key = (buildid.id.value, testsuite1.name.name,
