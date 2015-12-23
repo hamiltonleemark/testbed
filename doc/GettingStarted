@@ -1,6 +1,5 @@
 Here are the required steps to setup the development environment.
 
 1. sudo apt-get install pip
-2. sudo pip install django==1.8.4
 3. sudo apt-get install python-yaml
-4. sudo pip install -r requirements.txt
+4. sudo pip install -r doc/requirements.txt

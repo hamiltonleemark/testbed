@@ -99,7 +99,15 @@ WSGI_APPLICATION = 'dbsite.wsgi.application'
 sqllite_path = os.path.abspath(os.path.join(BASE_DIR, 'db.sqlite3'))
 
 DATABASES = {
-    'default': {
+    'bob': {
+        'ENGINE': 'django.db.backends.mysql',
+        'USER': 'root',
+        'PASSWORD': 'password',
+        'HOST': 'localhost',
+        'NAME': 'testbed',
+        'init_command': 'Set storage_engine=INNODB',
+    },
+    'local': {
         'ENGINE': 'django.db.backends.sqlite3',
         ##
         # This must point to the sqllite database built from

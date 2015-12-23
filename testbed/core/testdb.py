@@ -14,6 +14,11 @@ def init():
     """
 
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dbsite.settings")
+    ##
+    sys.argv.append("--database")
+    sys.argv.append("local")
+    ##
+
     sys.path.append(testbed.settings.TEST_DBSITE_DIR)
     # pylint: disable=W0612
     import dbsite.settings
