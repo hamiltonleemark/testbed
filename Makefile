@@ -6,3 +6,6 @@ test::
 debug_mark::
 
 check::
+
+clean::
+	rm -rf build dist testbed.egg-info
