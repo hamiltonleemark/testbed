@@ -9,3 +9,6 @@ check::
 
 clean::
 	rm -rf build dist testbed.egg-info
+
+sdist:
+	python ./setup.py sdist
