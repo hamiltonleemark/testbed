@@ -26,7 +26,7 @@ def env_setup():
         ##
         # This script is also a template. When this script is installed
         # {{TESTBED }} is set to a path.
-        installation = "{{TESTBED}}"
+        installation = "~/ws/testbed/testdbsite/dbsite/"
         if installation[0] == "{":
             cur_dir = os.path.abspath(os.path.join(__file__, ".."))
             testbed_dir = os.path.dirname(cur_dir)
