@@ -1,5 +1,7 @@
 include LICENSE
 include README.rst
-recursive-include docs *.rst
-recursive-include testbed *
-recursive-include testdbsite *
+include CHANGES.rst
+recursive-include doc *.rst
+recursive-include testbed *.py
+recursive-include testdbsite *.py
+recursive-include testsuite *.py
