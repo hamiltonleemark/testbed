@@ -11,5 +11,5 @@ clean::
 	rm -rf build dist testbed.egg-info
 
 .PHONY:
-build: MANIFEST.in
+build: MANIFEST.in ./setup.py
 	python ./setup.py sdist bdist_wheel

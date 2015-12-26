@@ -1,6 +1,7 @@
 include LICENSE
 include README.rst
 include CHANGES.rst
+include bin/tbd bin/tbd.py
 recursive-include doc *.rst
 recursive-include testbed *.py
 recursive-include testsuite *.py
