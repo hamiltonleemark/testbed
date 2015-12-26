@@ -17,4 +17,3 @@
 """
 Load result API.
 """
-from . import api

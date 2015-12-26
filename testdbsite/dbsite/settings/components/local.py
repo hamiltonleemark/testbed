@@ -1,2 +1,2 @@
-if "default" not in DATABASE:
-    DATABASE["default"] = DATABASE["local"]
+if "default" not in DATABASES:
+    DATABASES["default"] = DATABASES["local"]

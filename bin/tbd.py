@@ -17,24 +17,24 @@ def parse():
 
 
 def env_setup():
-    """ Main entry point. """
+    """ Main entry point.
 
-    # \todo figure out how this works when we install tbd.
-    try:
-        testbed_dir = os.environ["TESTBED"]
-    except KeyError:
-        ##
-        # This script is also a template. When this script is installed
-        # {{TESTBED }} is set to a path.
-        installation = "~/ws/testbed/testdbsite/dbsite/"
-        if installation[0] == "{":
-            cur_dir = os.path.abspath(os.path.join(__file__, ".."))
-            testbed_dir = os.path.dirname(cur_dir)
-        else:
-            testbed_dir = installation
+    If calling tbd from within a .git clone append the appropriate
+    testbed directory clone otherwise python content is stored
+    under the normal site-packages.
+    """
 
-    # This path is necessary to load anything under testbed.
-    sys.path.append(testbed_dir)
+    ##
+    # If the git directory exists, at this location then this script
+    # is part of a git clone.
+    git_dir = os.path.abspath(os.path.join(__file__, "..", "..", ".git"))
+    if os.path.exists(git_dir):
+        logging.info("append clone content to PYTHONPATH")
+        # This path is necessary to load anything under testbed clone.
+        cur_dir = os.path.abspath(os.path.join(__file__, ".."))
+        testbed_dir = os.path.dirname(cur_dir)
+        sys.path.append(testbed_dir)
+
 
 # pylint: disable=W0703
 if __name__ == "__main__":
