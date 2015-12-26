@@ -14,11 +14,11 @@ with open(fpath) as hdl:
 # allow setup.py to be run from any path
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
-#scripts=['bin/tbd'],
 setup(
     name='testbed',
     version=__version__,
     packages=['testbed'],
+    scripts=["bin/tbd"],
     include_package_data=True,
     license='GPLv3',
     description='Comprehensive web-based test tracking software.',
