@@ -5,4 +5,3 @@ include bin/tbd bin/tbd.py
 recursive-include doc *.rst
 recursive-include testbed *.py
 recursive-include testsuite *.py
-recursive-include testdbsite *.py

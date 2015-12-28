@@ -16,15 +16,11 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '2)_mx$*994pc!^dyc*0b3*n^=h3#b32g6j0v6$evq49^l4m^^3'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -44,11 +40,6 @@ INSTALLED_APPS = (
     'product',
     'branch',
 )
-
-PAGINATION_SETTINGS = {
-    'PAGE_RANGE_DISPLAYED': 10,
-    'MARGIN_PAGES_DISPLAYED': 2,
-}
 
 #TEMPLATE_LOADERS = (
     #"django.template.loaders.filesystem.Loader",
@@ -99,6 +90,8 @@ WSGI_APPLICATION = 'dbsite.wsgi.application'
 
 sqllite_path = os.path.abspath(os.path.join(BASE_DIR, 'db.sqlite3'))
 
+##
+# Values are provided by the settings/__init__.py content.
 DATABASES = {
 #    'default': {
 #        'ENGINE': 'django.db.backends.mysql',
@@ -108,13 +101,6 @@ DATABASES = {
 #        'NAME': 'testbed',
 #        'init_command': 'Set storage_engine=INNODB',
 #    },
-    'local': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        ##
-        # This must point to the sqllite database built from
-        # python ./manage.py init
-        'NAME': sqllite_path,
-    }
 }
 
 # Internationalization
