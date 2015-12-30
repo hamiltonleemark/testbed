@@ -59,7 +59,7 @@ def do_list(args):
     for testplan in testplans:
         level = {}
         testkeys = [str(item.key)
-                    for item in testplan.testplankeyset_set.all()]
+                    for item in testplan.keys.all()]
         orders = []
         for plan in testplan.testplanorder_set.order_by("order"):
             testsuites = plan.testsuite_set.filter(context=testplan.context)
@@ -67,7 +67,7 @@ def do_list(args):
                 testsuites = testsuites.filter(name__name=args.testsuite)
 
             for testsuite in testsuites:
-                testsuitekeys = testsuite.testsuitekeyset_set.all()
+                testsuitekeys = testsuite.kvps.all()
                 testsuitekeys = [str(item.testkey) for item in testsuitekeys]
 
                 orders.append({
@@ -109,7 +109,7 @@ def do_testplan_key_list(args):
     logging.info("list testplan keys")
     context = models.Testplan.context_get(args.context)
     (testplan, _) = models.Testplan.get(context=context)
-    testkeys = testplan.testplankeyset_set.filter(args.filter).order_by("key")
+    testkeys = testplan.keys.filter(args.filter).order_by("key")
     for testkey in testkeys:
         print testkey
 

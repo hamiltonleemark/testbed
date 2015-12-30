@@ -291,3 +291,33 @@ class TestsuiteTestCase(TestCase):
             expected_name = "testsuite%d" % order
             self.assertEqual(expected_name, testsuite.name.name,
                              "testsuite names do not match")
+
+    # pylint: disable=R0201
+    def test_testplan_simple(self):
+        """ Add testsuite and tests to the testsuites. """
+
+        parser = TestsuiteTestCase.parser_create()
+
+        cmd = "testplan add testsuite1"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+
+        cmd = "testplan add testsuite2"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+
+        cmd = "testplan test add 0 test1"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+
+        cmd = "testplan test add 0 test2"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+
+        cmd = "testplan test add 1 test2"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
+
+        cmd = "testplan test add 1 test3"
+        args = parser.parse_args(cmd.split())
+        args.func(args)
