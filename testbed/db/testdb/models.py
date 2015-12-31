@@ -222,7 +222,7 @@ class TestFile(models.Model):
 
     test = models.ForeignKey(Test, null=True, blank=True, default=None)
     kvp = models.ForeignKey(KVP)
-    path = models.CharField(max_length=256, unique=True)
+    path = models.CharField(max_length=255, unique=True)
 
 
 class TestKVP(models.Model):
@@ -562,7 +562,7 @@ class TestsuiteFile(models.Model):
     testsuite = models.ForeignKey(Testsuite, null=True, blank=True,
                                   default=None)
     kvp = models.ForeignKey(KVP)
-    path = models.CharField(max_length=256, unique=True)
+    path = models.CharField(max_length=255, unique=True)
 
 
 class ProductKVP(models.Model):
