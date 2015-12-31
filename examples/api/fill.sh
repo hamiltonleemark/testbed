@@ -37,7 +37,7 @@ for suite_item in range(0, SUITE_COUNT):
     args["testsuite"] = "testsuite%d" % suite_item
 
     run("%(tbd)s testplan add %(testsuite)s" % args)
-run("%(tbd)s testplan pack")
+run("%(tbd)s testplan pack" % args)
 
 for suite_item in range(0, SUITE_COUNT):
     args["order"] = str(suite_item)

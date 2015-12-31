@@ -4,3 +4,4 @@ include CHANGES.rst
 include bin/tbd bin/tbd.py
 recursive-include doc *.rst
 recursive-include testbed *.py
+prune testbed/db/dbhighcharts
