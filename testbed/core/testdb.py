@@ -13,9 +13,9 @@ def init():
     @param logical name of database to setup.
     """
 
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dbsite.settings")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djconfig.settings")
     sys.path.append(testbed.settings.TEST_DBSITE_DIR)
     # pylint: disable=W0612
-    import dbsite.settings
+    import djconfig.settings
     from django.conf import settings
     django.setup()
