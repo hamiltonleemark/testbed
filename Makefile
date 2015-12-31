@@ -1,8 +1,8 @@
 include defs.mk
 
 test::
-	./testdbsite/manage.py test -v 2
-	make -C testdbsite test
+	make -C testbed test
+
 debug_mark::
 
 check::

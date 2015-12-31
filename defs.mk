@@ -1,7 +1,7 @@
 SUBDEFS:=$(wildcard */defs.mk)
 SUBMODULES:=$(foreach module,$(SUBDEFS),$(dir $(module)))
 ROOT=$(shell git rev-parse --show-toplevel)
-PYTHONPATH:=$(ROOT):$(ROOT)/testdbsite
+PYTHONPATH:=$(ROOT):$(ROOT)/testbed/testdbsite
 
 .PHONY: help
 help::

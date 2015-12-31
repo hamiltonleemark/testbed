@@ -30,6 +30,8 @@ def env_setup():
     git_dir = os.path.abspath(os.path.join(__file__, "..", "..", ".git"))
     if os.path.exists(git_dir):
         logging.info("append clone content to PYTHONPATH")
+
+        ##
         # This path is necessary to load anything under testbed clone.
         cur_dir = os.path.abspath(os.path.join(__file__, ".."))
         testbed_dir = os.path.dirname(cur_dir)
