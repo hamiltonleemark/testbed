@@ -8,8 +8,14 @@ debug_mark::
 check::
 
 clean::
-	rm -rf build dist testbed.egg-info
+	python ./setup.py clean
 
 .PHONY:
 build: MANIFEST.in ./setup.py
 	python ./setup.py sdist bdist_wheel
+
+install:
+	sudo python ./setup.py install
+
+uninstall:
+	sudo pip uninstall testbed
