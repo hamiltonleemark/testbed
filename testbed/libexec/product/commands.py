@@ -63,7 +63,7 @@ def product_list(args):
             }
 
         testkeys = {str(item.testkey.key): str(item.testkey.value)
-                    for item in product.testproductkeyset_set.all()}
+                    for item in product.kvps.all()}
         if testkeys:
             level["keys"] = testkeys
 
