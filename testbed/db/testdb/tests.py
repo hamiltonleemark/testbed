@@ -17,6 +17,7 @@
 """
   Create your tests here.
 """
+import time
 from django.utils import timezone
 from django.test import TestCase
 from .models import Test
@@ -59,12 +60,18 @@ class TestsuiteTestCase(TestCase):
         """ testsuite_create Test creating a testsuite. """
 
         start_time = timezone.now()
+        ##
+        # Some databases do not store resolution less than 1 second.
+        # This means that the creation timestamp can be truncated to the
+        # second and looks like it happened in the past.
+        time.sleep(1.5)
 
         keys = [KVP.get_or_create("key1", "value1")[0],
                 KVP.get_or_create("key2", "value2")[0]]
         buildkey = KVP.get_or_create("build", "build1")[0]
         (testsuite, _) = Testsuite.get_or_create("default", "testsuite_name",
                                                  None, buildkey, keys)
+        time.sleep(1)
 
         ##
         # Making sure auto assignment of current time for the timestamp field
@@ -75,7 +82,9 @@ class TestsuiteTestCase(TestCase):
                                                   None, buildkey, keys)
         self.assertTrue(testsuite1.timestamp >= start_time)
 
-        self.assertTrue(testsuite.timestamp == testsuite1.timestamp)
+        difference = testsuite.timestamp - testsuite1.timestamp
+
+        self.assertTrue(difference.seconds < 1)
         self.assertTrue(testsuite == testsuite1)
 
     def test_create_method(self):

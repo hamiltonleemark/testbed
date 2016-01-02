@@ -58,11 +58,11 @@ def product_list(args):
     root = {}
     for product in products:
         level = {
-            product.order: "%s %s" % (str(product.product),
-                                      str(product.branch))
+            int(product.order): "%s %s" % (str(product.product),
+                                           str(product.branch))
             }
 
-        testkeys = {str(item.testkey.key): str(item.testkey.value)
+        testkeys = {str(item.key): str(item.value)
                     for item in product.kvps.all()}
         if testkeys:
             level["keys"] = testkeys
