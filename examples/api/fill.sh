@@ -20,9 +20,11 @@ def run(cmd):
 
 run("%(tbd)s product add %(product)s branch1" % args)
 run("%(tbd)s product add %(product)s branch2" % args)
+run("%(tbd)s product add %(product)s branch3" % args)
 
 run("%(tbd)s product testplan add %(product)s branch1 default" % args)
 run("%(tbd)s product testplan add %(product)s branch2 default" % args)
+run("%(tbd)s product testplan add %(product)s branch3 default" % args)
 
 
 for buildid in range(0, BUILD_COUNT):
