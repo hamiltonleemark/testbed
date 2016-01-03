@@ -29,6 +29,7 @@ setup(
     install_requires=REQUIREMENTS.split("\n"),
     data_files=[("/etc/testbed", [])],
     classifiers=[
+        'Development Status :: 1 - Pre-Alphe',
         'Environment :: Web Environment',
         'Framework :: Testbed',
         'Intended Audience :: Developers',

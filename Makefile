@@ -9,13 +9,14 @@ check::
 
 clean::
 	python ./setup.py clean
+	rm -rf dist build testbed.egg-info
 
 .PHONY:
-build: MANIFEST.in ./setup.py
-	python ./setup.py sdist bdist_wheel
+build: MANIFEST.in ./setup.py 
+	python ./setup.py build sdist bdist_wheel
 
-install:
-	sudo python ./setup.py install
+install: build
+	sudo pip install --upgrade dist/*.tar.gz
 
 uninstall:
 	sudo pip uninstall testbed
