@@ -14,6 +14,29 @@ with open(fpath) as hdl:
 # allow setup.py to be run from any path
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
+def walkdir(dirname):
+    """ Retrieve a list of files.
+
+    Since this is part of setup.py, files are pruned after passed to
+    data_files based on MANIFEST.IN. """
+    for cur, ddirs, ffiles in os.walk(dirname):
+        for ffile in ffiles:
+            fext = os.path.splitext(ffile)[1]
+            yield os.path.join(cur, ffile)
+
+        for ddir in ddirs:
+            walkdir(os.path.join(cur, ddir))
+
+##
+# place holder for system wide testbed configuration
+db_files = [("/etc/testbed", [])]
+
+##
+# store web server content.
+db_src = [item for item in walkdir("testbed/db/")]
+db_files += [(os.path.join("/usr/local/", os.path.dirname(item)), [item])
+             for item in db_src]
+
 setup(
     name='testbed',
     version=__version__,
@@ -27,7 +50,7 @@ setup(
     author=__author__,
     author_email='mark.lee.hamilton@gmail.com',
     install_requires=REQUIREMENTS.split("\n"),
-    data_files=[("/etc/testbed", [])],
+    data_files=db_files,
     classifiers=[
         'Development Status :: 1 - Pre-Alphe',
         'Environment :: Web Environment',
@@ -37,7 +60,6 @@ setup(
         'Intended Audience :: Information Technology',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Operating System :: OS Independent',
-        'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',

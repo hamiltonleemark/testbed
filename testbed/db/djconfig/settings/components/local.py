@@ -16,8 +16,8 @@ DEFAULT = {
 if "default" in DATABASES:
     DATABASES["local"] = DEFAULT
 
-    DEBUG = False
-    TEMPLATE_DEBUG = False
+    DEBUG = True
+    TEMPLATE_DEBUG = True
 else:
     DATABASES["default"] = DEFAULT
 

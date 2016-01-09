@@ -45,5 +45,7 @@ def index_product(_, pid):
     except models.Testplan.DoesNotExist:
         testplans = []
 
+    print "MARK: testplan", testplan
+
     html_data = {}
     return render_to_response("product/index.html", html_data)

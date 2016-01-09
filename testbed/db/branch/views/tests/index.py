@@ -18,6 +18,8 @@ class ViewRow(object):
 def view(request, pid):
     """ Summarize product information. """
 
+    print "MARK: view 1"
+
     context = request.GET.get("context", "default")
     history = request.GET.get("history", 10)
 
@@ -40,6 +42,7 @@ def view(request, pid):
     keys = testplan.keys.all()
 
     testplans = testplan.testplanorder_set.order_by("order")
+    print "MARK: testplans", testplans
 
     order = 1
     for plan in testplans:

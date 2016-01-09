@@ -18,10 +18,11 @@ from django.contrib import admin
 from django.views.generic import RedirectView
 
 urlpatterns = patterns("",
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^testbed/admin/', include(admin.site.urls)),
     ##
     # Currently product view is the default entry point into our website.
-    url(r'^$', RedirectView.as_view(permanent=False, url="/product")),
-    url(r'^product/', include("product.urls")),
-    url(r'^branch/', include("branch.urls")),
+    url(r'^testbed/$',
+	RedirectView.as_view(permanent=False, url="/testbed/product")),
+    url(r'^testbed/product/', include("product.urls")),
+    url(r'^testbed/branch/', include("branch.urls")),
 )

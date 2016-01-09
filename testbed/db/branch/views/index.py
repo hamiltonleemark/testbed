@@ -40,9 +40,14 @@ def view(_, pid):
 
     product = models.Product.objects.get(id=pid)
 
+    print "MARK: branch 1"
+
     plans = product.key_get("testplan", None)
+
+    print "MARK: branch 2"
     
     plans = [item for item in plans.testsuites_all()] if plans else []
+    print "MARK: branch 3"
 
     html_data = {"plans" : plans}
     return render_to_response("products/index.html", html_data)
