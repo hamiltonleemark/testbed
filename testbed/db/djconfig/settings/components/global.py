@@ -6,7 +6,7 @@
 MYSQL_CNF="/etc/testbed/mysql.cnf"
 
 if os.path.exists(MYSQL_CNF):
-    DATABASES["default"] = {
+    DATABASES["global"] = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'testbed',
         'init_command': 'Set storage_engine=INNODB',
@@ -14,3 +14,4 @@ if os.path.exists(MYSQL_CNF):
             'read_default_file': MYSQL_CNF
         }
     }
+    DATABASES["default"] = DATABASES["global"]

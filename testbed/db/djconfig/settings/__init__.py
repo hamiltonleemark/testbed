@@ -3,7 +3,7 @@ from split_settings.tools import optional, include
 include(
     'components/base.py',
     'components/pagination.py',
-    optional('components/mysql.py'),
+    optional('components/global.py'),
 
     ##
     # Local should be after product.py because if default value has not 
