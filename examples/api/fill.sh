@@ -27,11 +27,6 @@ run("%(tbd)s product testplan add %(product)s branch2 default" % args)
 run("%(tbd)s product testplan add %(product)s branch3 default" % args)
 
 
-for buildid in range(0, BUILD_COUNT):
-    args["build"] = "build%d" % buildid
-    run("%(tbd)s build add %(product)s branch1 %(build)s" % args)
-    run("%(tbd)s build add %(product)s branch2 %(build)s" % args)
-
 ##
 # Create testplan
 for suite_item in range(0, SUITE_COUNT):
@@ -52,6 +47,10 @@ for suite_item in range(0, SUITE_COUNT):
 #
 
 for buildid in range(0, BUILD_COUNT):
+    args["build"] = "build%d" % buildid
+    run("%(tbd)s build add %(product)s branch1 %(build)s" % args)
+    run("%(tbd)s build add %(product)s branch2 %(build)s" % args)
+
     for suite_item in range(0, SUITE_COUNT):
         args["order"] = str(suite_item)
         args["testsuite"] = "testsuite%d" % suite_item
