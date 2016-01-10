@@ -58,7 +58,7 @@ def do_list(args):
     root = {}
     for testplan in testplans:
         level = {}
-        testkeys = [str(item.key)
+        testkeys = [str(item.value)
                     for item in testplan.keys.all()]
         orders = []
         for plan in testplan.testplanorder_set.order_by("order"):
@@ -68,11 +68,11 @@ def do_list(args):
 
             for testsuite in testsuites:
                 testsuitekeys = testsuite.kvps.all()
-                testsuitekeys = [str(item.testkey) for item in testsuitekeys]
+                testsuitekeys = [str(item.value) for item in testsuitekeys]
 
                 orders.append({
                     "name": str(testsuite.name_get()),
-                    "order": plan.order,
+                    "order": int(plan.order),
                     "tests": [str(item.name_get())
                               for item in testsuite.test_set.all()],
                     "keys": testsuitekeys
