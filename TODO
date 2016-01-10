@@ -31,3 +31,4 @@
 15. Testplan api should return TestPlanOrder and provide interface to testsuite
 16. testplan key add 0 adds the key to all entries.
 17. Look at mysqltuner
+18. Change ls-db to db and add db ls and db default <db>
