@@ -41,7 +41,7 @@ setup(
     name='testbed',
     version=__version__,
     packages=['testbed'],
-    scripts=["bin/tbd"],
+    scripts=["bin/tbd", "bin/tbd-manage"],
     include_package_data=True,
     license='GPLv3',
     description='Comprehensive web-based test tracking software.',
