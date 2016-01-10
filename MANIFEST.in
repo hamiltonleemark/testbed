@@ -2,6 +2,7 @@ include LICENSE
 include README.rst
 include CHANGES.rst
 include bin/tbd bin/tbd.py
+include bin/tbd-manage bin/tbdmanage.py
 recursive-include doc *.rst
 recursive-include testbed *.py *.html *.css
 prune testbed/db/dbhighcharts
