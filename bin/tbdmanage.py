@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+Administrative management operations.
+"""
 import os
 import sys
 import testbed.settings

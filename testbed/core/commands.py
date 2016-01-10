@@ -52,6 +52,12 @@ def args_process(args):
         LOGGER.setLevel(level=logging.DEBUG)
         LOGGER.info("verbosity level set to DEBUG")
 
+    if args.database:
+        ##
+        # Database has been set.
+        import testdb.router
+        testdb.router.DefaultRouter.set_db(args.database)
+
     LOGGER.debug(args)
     args.func(args)
 
@@ -64,6 +70,9 @@ def argparser():
                             version="%(prog)s 0.0.1")
     arg_parser.add_argument('--verbose', '-v', required=False, action="count",
                             help="enable debug verbosity.")
+    arg_parser.add_argument('--database', '-d', default=None,
+                            required=False,
+                            help="specify database.")
     return arg_parser
 
 

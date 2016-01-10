@@ -29,22 +29,21 @@ def env_setup():
     # is part of a git clone.
     git_dir = os.path.abspath(os.path.join(__file__, "..", "..", ".git"))
     if os.path.exists(git_dir):
-        logging.info("append clone content to PYTHONPATH")
+        logging.info("add working directory content to PYTHONPATH.")
 
         ##
         # This path is necessary to load anything under testbed clone.
-        cur_dir = os.path.abspath(os.path.join(__file__, ".."))
-        testbed_dir = os.path.dirname(cur_dir)
-        sys.path.append(testbed_dir)
+        testbed_dir = os.path.abspath(os.path.join(__file__, "..", ".."))
+        sys.path.insert(0, testbed_dir)
 
 
 # pylint: disable=W0703
 if __name__ == "__main__":
     try:
         env_setup()
-        from testbed.core import testdb
-        testdb.init()
+        from testbed.core import database
 
+        database.init()
         sys.exit(parse())
     except Exception, arg:
         logging.exception(arg)
