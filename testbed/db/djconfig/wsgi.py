@@ -11,7 +11,12 @@ import os
 import sys
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
+##
+# Uncomment this in order to see debug content while Apache2 serves
+# content. 
+#
+#logging.basicConfig(level=logging.DEBUG)
+##
 
 ##
 # Assume the django database is in the same directory as this file.

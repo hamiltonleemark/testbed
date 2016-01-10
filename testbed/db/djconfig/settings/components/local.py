@@ -1,5 +1,5 @@
 
-sqllite_path = os.path.abspath(os.path.join(BASE_DIR, 'db.sqlite3'))
+sqllite_path = os.path.join("/var", "tmp", 'db.sqlite3')
 
 ##
 # Defines default SQL database
@@ -17,11 +17,9 @@ if "default" in DATABASES:
     DATABASES["local"] = DEFAULT
 
     DEBUG = True
-    TEMPLATE_DEBUG = True
 else:
     DATABASES["default"] = DEFAULT
 
     # SECURITY WARNING: don't run with debug turned on in production!
     DEBUG = True
-    TEMPLATE_DEBUG = True
 

@@ -16,6 +16,7 @@ Including another URLconf
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.views.generic import RedirectView
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = patterns("",
     url(r'^testbed/admin/', include(admin.site.urls)),
@@ -26,3 +27,6 @@ urlpatterns = patterns("",
     url(r'^testbed/product/', include("product.urls")),
     url(r'^testbed/branch/', include("branch.urls")),
 )
+
+urlpatterns += staticfiles_urlpatterns()
+
