@@ -8,11 +8,13 @@ debug_mark::
 check::
 
 clean::
+	make -C testbed/db clean
 	python ./setup.py clean
 	rm -rf dist build testbed.egg-info
 
 .PHONY:
 build: MANIFEST.in ./setup.py 
+	make -C testbed/db build
 	python ./setup.py build sdist bdist_wheel
 
 install: build

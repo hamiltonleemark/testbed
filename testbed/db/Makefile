@@ -3,3 +3,11 @@ include defs.mk
 include $(ROOT)/defs.mk
 test::
 	./manage.py test -v 2
+
+build::
+	./manage.py collectstatic --noinput
+
+##
+# Static directory is created by the build rule
+clean::
+	rm -rf static
