@@ -4,6 +4,7 @@
 # information. The existance of the mysql configuration file implies that
 # it will become default database.
 MYSQL_CNF="/etc/testbed/mysql.cnf"
+WSGI_APPLICATION = 'cgi-bin.wsgi.application'
 
 if os.path.exists(MYSQL_CNF):
     DATABASES["global"] = {

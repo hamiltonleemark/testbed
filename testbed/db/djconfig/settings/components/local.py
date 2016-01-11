@@ -15,8 +15,7 @@ DEFAULT = {
 # and so is a release.
 if "default" in DATABASES:
     DATABASES["local"] = DEFAULT
-
-    DEBUG = True
+    DEBUG = False
 else:
     DATABASES["default"] = DEFAULT
 
