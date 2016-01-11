@@ -23,11 +23,8 @@ import logging
 # If not then change dbsite.
 dbsite=os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 logging.debug("testbed database directory %s ", dbsite)
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.append(dbsite)
 
 from django.core.wsgi import get_wsgi_application
-
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djconfig.settings")
-
 application = get_wsgi_application()
