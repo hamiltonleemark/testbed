@@ -7,6 +7,8 @@ MYSQL_CNF="/etc/testbed/mysql.cnf"
 WSGI_APPLICATION = 'cgi-bin.wsgi.application'
 
 if os.path.exists(MYSQL_CNF):
+    logging.debug("loading mysql %s" % MYSQL_CNF)
+    DEBUG = False
     DATABASES["global"] = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'testbed',
