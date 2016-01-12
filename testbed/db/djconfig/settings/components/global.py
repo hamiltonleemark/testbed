@@ -1,3 +1,4 @@
+import logging
 
 ##
 # Provides location of plain text file that defines the mysql connection
