@@ -11,6 +11,8 @@ DEFAULT = {
     'NAME': sqllite_path,
 }
 
+import sys
+
 # Assume if default is defined that this application has been installed
 # and so is a release.
 if "default" in DATABASES:
