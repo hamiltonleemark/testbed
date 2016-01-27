@@ -6,3 +6,5 @@ pytest==2.8.3
 xunitparser==1.3.3
 django-pure-pagination==0.2.1
 django-split-settings==0.1.3
+sphinx-autobuild==0.5.2
+sphinx==1.3.5
