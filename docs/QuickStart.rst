@@ -1,4 +1,4 @@
-.. _GettingStartedAnchor:
+.. _QuickStartAnchor:
 
 Getting Started
 ===============
