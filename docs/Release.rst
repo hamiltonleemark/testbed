@@ -1,3 +1,7 @@
+*******
+Release
+*******
+
 These are the steps for releasing testbed.
 
   1. make sdist

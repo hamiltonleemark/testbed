@@ -9,11 +9,13 @@ Welcome to Testbed's documentation!
 Contents:
 
 .. toctree::
+   GettingStarted.rst
+   Release.rst
+   Architecture.rst
    :maxdepth: 2
 
 Welcome to testbed an extensible test tracking database. Review the getting 
-stated section to get started :ref:`_getting_started_label`.
-
+stated section to get started :doc:`/GettingStarted.rst`.
 
 
 Indices and tables

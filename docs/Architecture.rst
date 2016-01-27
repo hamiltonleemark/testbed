@@ -1,25 +1,13 @@
+************
+Architecture
+************
+
+Key insights to architecture are discussed in this chapter.
+
+======
 Django
+======
 
-Changes from default configuration
-Time zone support is enabled. To learn more
-https://docs.djangoproject.com/en/1.8/topics/i18n/timezones/
-
-
-
-View Structure
-testplan attribute -> branch -> master
-
-                                               Date -> 02Feb     01Feb
-                     testplan attribute ->     build-> 10001     10000
-                                               rel-2.1.0 
- Test metrics        passed
-                     failed
-                     skipped
-                     Total
-| --------- testplan attribute ------------- | |----- Test failure Summary --|
-testsuite.name, testsuite.key, testsuite.key     0
-                OS             Configuration
-testsuite1      Ubuntu14.04    simple
-testsuite1      Redhat7.0      complex
-testsuite2      Ubuntu14.04    complex
-
+Django provides significant functionality. Several changes have been applied 
+to the default django settings. Time zone support is enabled. To learn more
+https://docs.djangoproject.com/en/1.9/topics/i18n/timezones/
