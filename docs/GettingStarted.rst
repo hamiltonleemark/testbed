@@ -1,3 +1,4 @@
+.. _getting_started_label:
 Here are the required steps to setup the development environment.
 
 1. sudo apt-get install pip
