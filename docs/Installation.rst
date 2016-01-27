@@ -1,7 +1,7 @@
-.. _GettingStartedAnchor:
+.. _InstallationAnchor:
 
-Getting Started
-===============
+Installation
+============
 
 Here are the required steps to setup the development environment.
 
