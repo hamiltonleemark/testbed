@@ -1,6 +1,6 @@
 .. _QuickStartAnchor:
 
-Getting Started
+Quick Start
 ===============
 
 Here are the required steps to setup the development environment.

@@ -21,4 +21,3 @@ if os.path.exists(MYSQL_CNF):
     DATABASES["default"] = DATABASES["global"]
 
     STATIC_ROOT = os.path.join("/usr", "local", "testbed", "static")
-    logging.debug("MARK: static files %s" % STATIC_ROOT)
