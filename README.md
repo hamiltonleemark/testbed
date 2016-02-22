@@ -38,4 +38,4 @@ Branch Info
 Authors
 =======
 
-Testbed was created by [Mark Hamilton](https://github.com/markleehamilton) (mark.lee.hamilton/gmail/com).
+Testbed was created by [Mark Hamilton](https://github.com/markleehamilton) (mark.lee.hamilton@gmail.com).
