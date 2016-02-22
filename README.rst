@@ -1,4 +1,3 @@
-[![PyPI downloads](https://img.shields.io/pypi/dm/testbed.svg)](https://pypi.python.org/pypi/testbed)
 [![Build Status](https://travis-ci.org/testbed/testbed.svg?branch=devel)](https://travis-ci.org/testbed/testbed)
 
 
