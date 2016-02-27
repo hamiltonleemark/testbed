@@ -9,7 +9,7 @@ Testbed is a simple but comprehensive and extensible test tracking database. It 
 Read the documentation at http://testbed.readthedocs.org
 
 Currently users run straight from development branches which can be cloned from 
-https://github.com/markleehamilton/testbed.
+https://github.com/testbed/testbed.
 
 
 You can find instructions [here](http://testbed.readthedocs.com/intro_getting_started.html).
@@ -30,7 +30,6 @@ Get Involved
 Branch Info
 ===========
 
-   * Releases are named after Van Halen songs.
    * The devel branch corresponds to the release actively under development.
    * release-X.Y branches exist for previous releases.
    * We'd love to have your contributions, read [Community Information](http://testbed.readthedocs.org/community.html) for notes on how to get started.

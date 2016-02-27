@@ -12,22 +12,24 @@ What is Installed
 =================
 
 Testbed is fundamentally a client server application which relies on a 
-database for **normal** operation. A database and testbed software is 
-installed on a single machine. All clients install testbed then configured 
-with the location of the database.
+database for **normal** operation. The database requires a testbed 
+installation as well as configuring the database. Client only need to install 
+the testbed software. For evaluation purposes a single system can be used.
 
-Ubuntu 14.04
-------------
+Client Installation on Ubuntu 14.04
+-----------------------------------
 
 Here are the required steps to setup testbed on both client and server for
 Ubuntu 14.04.
 
 #. sudo apt-get install python-pip python-yaml
-#. git 
+#. git clone git@github.com:testbed/testbed.git
+#. cd testbed
 #. sudo pip install -r requirements.txt
 
-On the server, the following additional steps are required:
- Apache2 configuration on Ubuntu14.04
-sudo apt-get install apache2 libapache2-mod-wsgi
-
+Server Installation on Ubuntu 14.04
+-----------------------------------
+On the server, folow these steps:
+#.  sudo apt-get install apache2 libapache2-mod-wsgi
+cd  testbed
 sudo ln -s /etc/apache2/sites-available/testbed.conf /etc/apache2/sites-enabled/testbed.conf
