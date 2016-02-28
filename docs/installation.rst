@@ -19,7 +19,7 @@ the testbed software. For evaluation purposes a single system can be used.
 Client Installation on Ubuntu 14.04
 -----------------------------------
 
-Here are the required steps to setup testbed on both client and server for
+Here are the required steps to setup testbed on both a client and a server for
 Ubuntu 14.04.
 
 #. sudo apt-get install python-pip python-yaml
@@ -29,7 +29,9 @@ Ubuntu 14.04.
 
 Server Installation on Ubuntu 14.04
 -----------------------------------
-On the server, folow these steps:
-#.  sudo apt-get install apache2 libapache2-mod-wsgi
-cd  testbed
-sudo ln -s /etc/apache2/sites-available/testbed.conf /etc/apache2/sites-enabled/testbed.conf
+Additionally on the server, a mysql database must be setup by following these
+steps:
+
+#. sudo apt-get install apache2 libapache2-mod-wsgi
+#. cp examples/etc/apache2/sites-available/testbed.conf /etc/apache2/sites-available/testbed.conf
+#. sudo ln -s /etc/apache2/sites-available/testbed.conf /etc/apache2/sites-enabled/testbed.conf

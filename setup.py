@@ -3,10 +3,10 @@ from setuptools import setup
 
 from testbed import __version__, __author__
 
-with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as readme:
+with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
     README = readme.read()
 
-fpath = os.path.join(os.path.dirname(__file__), 'doc/Requirements.rst')
+fpath = os.path.join(os.path.dirname(__file__), 'requirements.txt')
 
 with open(fpath) as hdl:
     REQUIREMENTS = hdl.read()
