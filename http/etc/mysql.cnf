@@ -1,4 +1,10 @@
 [client]
+##
+# Host refers to the server holding the testbed database.
+##
 host = localhost
+##
+# The following values are the default values.
+##
 user = root
 password = password

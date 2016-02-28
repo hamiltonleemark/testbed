@@ -20,16 +20,19 @@ Client Installation on Ubuntu 14.04
 -----------------------------------
 
 Here are the required steps to setup testbed on both a client and a server for
-Ubuntu 14.04.
+Ubuntu 14.04. Versions are currently available through github.com on
+https://github.com/testbed/testbed/releases. The instructions below use 
+v0.1-alpha.1 as example.
 
 #. sudo apt-get install python-pip python-yaml
-#. git clone git@github.com:testbed/testbed.git
-#. cd testbed
-#. sudo pip install -r requirements.txt
+#. sudo pip install --upgrade https://github.com/testbed/testbed/archive/v0.1-alpha.1.tar.gz
+#. Create or edit the file **/usr/local/testbed/etc/mysql.cnf** with the 
+   location of the testbed server.  
 
 Server Installation on Ubuntu 14.04
 -----------------------------------
-Additionally on the server, a mysql database must be setup by following these
+
+Additionally on a server, a mysql database must be setup by following these
 steps:
 
 #. sudo apt-get install apache2 libapache2-mod-wsgi
