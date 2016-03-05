@@ -4,6 +4,6 @@ include CHANGES.rst
 include requirements.txt
 include bin/tbd bin/tbd.py
 include bin/tbd-manage bin/tbdmanage.py
-recursive-include doc *.rst
+recursive-include docs *.rst
 recursive-include testbed *.py *.html *.css
 prune testbed/db/dbhighcharts
