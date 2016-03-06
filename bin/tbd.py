@@ -41,6 +41,7 @@ def env_setup():
 if __name__ == "__main__":
     try:
         env_setup()
+        # pylint: disable=C0413
         from testbed.core import database
 
         database.init()
