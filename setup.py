@@ -40,7 +40,10 @@ setup(
     author=__author__,
     author_email='mark.lee.hamilton@gmail.com',
     install_requires=REQUIREMENTS.split("\n"),
-    data_files=[],
+    data_files=[
+        ("testbed/etc", ["etc/mysql.cnf"]),
+        ("testbed/etc/cgi-bin", ["etc/cgi-bin/wsgi.py"])
+    ],
     classifiers=[
         'Development Status :: 1 - Pre-Alphe',
         'Environment :: Web Environment',
