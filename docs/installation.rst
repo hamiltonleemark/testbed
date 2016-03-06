@@ -19,22 +19,26 @@ the testbed software. For evaluation purposes a single system can be used.
 Client Installation on Ubuntu 14.04
 -----------------------------------
 
-Here are the required steps to setup testbed on both a client and a server for
-Ubuntu 14.04. Versions are currently available through github.com on
-https://github.com/testbed/testbed/releases. The instructions below use 
-v0.1-alpha.1 as example.
+Here are the steps to setup testbed on both a client running Ubuntu 14.04.
+Versions are currently available through github.com on
+https://github.com/testbed/testbed/releases. Please look through the 
+release site to find the latest version. The example below uses an older
+version:
 
 #. sudo apt-get install python-pip python-yaml
-#. sudo pip install --upgrade https://github.com/testbed/testbed/archive/v0.1-alpha.1.tar.gz
+#. sudo pip install https://github.com/testbed/testbed/archive/v0.1-alpha.3.tar.gz
 #. Create or edit the file **/usr/local/testbed/etc/mysql.cnf** with the 
    location of the testbed server.  
 
 Server Installation on Ubuntu 14.04
 -----------------------------------
 
-Additionally on a server, a mysql database must be setup by following these
-steps:
+Here are the steps for installing testbed on a server, a mysql database must be setup by following these steps:
 
+#. sudo apt-get install python-pip python-yaml
+#. sudo pip install https://github.com/testbed/testbed/archive/v0.1-alpha.3.tar.gz
+#. Create or edit the file **/usr/local/testbed/etc/mysql.cnf** with the 
+   location of the testbed server.  
 #. sudo apt-get install apache2 libapache2-mod-wsgi
 #. cp examples/etc/apache2/sites-available/testbed.conf /etc/apache2/sites-available/testbed.conf
 #. sudo ln -s /etc/apache2/sites-available/testbed.conf /etc/apache2/sites-enabled/testbed.conf

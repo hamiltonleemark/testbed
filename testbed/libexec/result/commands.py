@@ -18,8 +18,8 @@
 CLI for tests.
 """
 import logging
-import yaml
 import argparse
+import yaml
 from . import api
 from testbed.core import config
 

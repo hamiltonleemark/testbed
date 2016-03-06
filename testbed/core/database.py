@@ -3,8 +3,8 @@ Common content for database setup.
 """
 import sys
 import os
-import testbed.settings
 import django
+import testbed.settings
 
 
 def init():

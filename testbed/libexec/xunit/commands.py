@@ -19,8 +19,8 @@ Commands that handle xunit results.
 """
 
 import logging
-import xunitparser
 import argparse
+import xunitparser
 from testbed.libexec import result
 
 
