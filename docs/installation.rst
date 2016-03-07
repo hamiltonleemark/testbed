@@ -40,5 +40,7 @@ Here are the steps for installing testbed on a server, a mysql database must be 
 #. Install mysql server, **sudo apt-get install mysql-server-5.5.**. During thie step you'll be asked to set the root password. Remember thie value for later.
 #. sudo pip install https://github.com/testbed/testbed/archive/v0.1-alpha.3.tar.gz
 #. Edit **/usr/local/testbed/etc/mysql.cnf** change the password which was set in step 4.
+#. Add testbed configuration 
+   cp /usr/local/testbed/etc/apache2/sites-available/testbed.conf  /etc/apache2/sites-available/testbed.conf
 #. Enable testbed apache configuration,
    sudo ln -s /etc/apache2/sites-available/testbed.conf /etc/apache2/sites-enabled/testbed.conf

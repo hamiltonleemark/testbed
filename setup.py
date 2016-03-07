@@ -43,7 +43,8 @@ setup(
     data_files=[
         ("testbed/etc", ["etc/mysql.cnf"]),
         ("testbed/etc/cgi-bin", ["etc/cgi-bin/wsgi.py"]),
-        ("apache2/etc/cgi-bin", ["etc/apache2/sites-available/testbed.conf"])
+        ("testbed/etc/apache2/sites-available",
+         ["etc/apache2/sites-available/testbed.conf"])
     ],
     classifiers=[
         'Development Status :: 1 - Pre-Alphe',
