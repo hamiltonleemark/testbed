@@ -25,7 +25,7 @@ https://github.com/testbed/testbed/releases. Please look through the
 release site to find the latest version. The example below uses an older
 version:
 
-#. sudo apt-get install python-pip python-yaml
+#. sudo apt-get install python-pip python-yaml libmysqlclient-dev python-dev
 #. sudo pip install https://github.com/testbed/testbed/archive/v0.1-alpha.3.tar.gz
 #. Create or edit the file **/usr/local/testbed/etc/mysql.cnf** with the 
    location of the testbed server.  
@@ -35,7 +35,7 @@ Server Installation on Ubuntu 14.04
 
 Here are the steps for installing testbed on a server, a mysql database must be setup by following these steps:
 
-#. sudo apt-get install python-pip python-yaml
+#. sudo apt-get install python-pip python-yaml libmysqlclient-dev python-dev
 #. sudo pip install https://github.com/testbed/testbed/archive/v0.1-alpha.3.tar.gz
 #. Create or edit the file **/usr/local/testbed/etc/mysql.cnf** with the 
    location of the testbed server.  

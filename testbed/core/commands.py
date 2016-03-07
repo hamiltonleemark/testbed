@@ -67,7 +67,7 @@ def argparser():
 
     arg_parser = argparse.ArgumentParser(prog="tbd")
     arg_parser.add_argument('--version', action="version",
-                            version="%(prog)s 0.0.1")
+                            version=testbed.__version__)
     arg_parser.add_argument('--verbose', '-v', required=False, action="count",
                             help="enable debug verbosity.")
     arg_parser.add_argument('--database', '-d', default=None,
