@@ -42,7 +42,8 @@ setup(
     install_requires=REQUIREMENTS.split("\n"),
     data_files=[
         ("testbed/etc", ["etc/mysql.cnf"]),
-        ("testbed/etc/cgi-bin", ["etc/cgi-bin/wsgi.py"])
+        ("testbed/etc/cgi-bin", ["etc/cgi-bin/wsgi.py"]),
+        ("apache2/etc/cgi-bin", ["etc/apache2/sites-available/testbed.conf"])
     ],
     classifiers=[
         'Development Status :: 1 - Pre-Alphe',

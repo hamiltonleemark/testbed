@@ -36,9 +36,9 @@ Server Installation on Ubuntu 14.04
 Here are the steps for installing testbed on a server, a mysql database must be setup by following these steps:
 
 #. sudo apt-get install python-pip python-yaml libmysqlclient-dev python-dev
-#. sudo pip install https://github.com/testbed/testbed/archive/v0.1-alpha.3.tar.gz
-#. Create or edit the file **/usr/local/testbed/etc/mysql.cnf** with the 
-   location of the testbed server.  
 #. sudo apt-get install apache2 libapache2-mod-wsgi
-#. cp examples/etc/apache2/sites-available/testbed.conf /etc/apache2/sites-available/testbed.conf
-#. sudo ln -s /etc/apache2/sites-available/testbed.conf /etc/apache2/sites-enabled/testbed.conf
+#. Install mysql server, **sudo apt-get install mysql-server-5.5.**. During thie step you'll be asked to set the root password. Remember thie value for later.
+#. sudo pip install https://github.com/testbed/testbed/archive/v0.1-alpha.3.tar.gz
+#. Edit **/usr/local/testbed/etc/mysql.cnf** change the password which was set in step 4.
+#. Enable testbed apache configuration,
+   sudo ln -s /etc/apache2/sites-available/testbed.conf /etc/apache2/sites-enabled/testbed.conf

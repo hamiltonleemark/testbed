@@ -6,6 +6,7 @@ include bin/tbd bin/tbd.py
 include bin/tbd-manage bin/tbdmanage.py
 include etc/mysql.cnf
 include etc/cgi-bin/wsgi.py
+include etc/apache2/sites-available/testbed.conf
 recursive-include docs *.rst
 recursive-include testbed *.py *.html *.css
 prune testbed/db/dbhighcharts
