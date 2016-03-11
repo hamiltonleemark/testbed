@@ -6,5 +6,5 @@ host = localhost
 ##
 # The following values are the default values.
 ##
-user = root
+user = testbed
 password = password
