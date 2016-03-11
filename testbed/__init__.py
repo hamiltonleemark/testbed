@@ -17,5 +17,5 @@
 """
 Hold general testbed content.
 """
-__version__ = '0.1-alpha.4'
+__version__ = '0.1-alpha.8'
 __author__ = 'Mark Hamilton'

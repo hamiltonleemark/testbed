@@ -41,6 +41,15 @@ Here are the steps for installing testbed on a server, a mysql database must be 
 #. sudo pip install https://github.com/testbed/testbed/archive/v0.1-alpha.3.tar.gz
 #. Edit **/usr/local/testbed/etc/mysql.cnf** change the password which was set in step 4.
 #. Add testbed configuration 
-   cp /usr/local/testbed/etc/apache2/sites-available/testbed.conf  /etc/apache2/sites-available/testbed.conf
+   sudo cp /usr/local/testbed/etc/apache2/sites-available/testbed.conf  /etc/apache2/sites-available/testbed.conf
 #. Enable testbed apache configuration,
    sudo ln -s /etc/apache2/sites-available/testbed.conf /etc/apache2/sites-enabled/testbed.conf
+#. On the server, create the testbed database. Usually this is done with
+   the root account:
+   mysql -u root -p -e "create database testbed;"
+#. Assuming the default user "testbed", create this user in mysql:
+   CREATE USER 'testbed'@'%' IDENTIFIED BY 'password';
+   GRANT ALL PRIVILEGES ON * . * TO "testbed"@"%";
+   FLUSH PRIVILEGES;
+#. Restart apache2
+   sudo service apache2 restart

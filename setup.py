@@ -27,6 +27,11 @@ def walkdir(dirname):
         for ddir in ddirs:
             walkdir(os.path.join(cur, ddir))
 
+##
+# strip http
+STATIC_FILES = [("testbed" + item[4:], [item])
+                 for item in walkdir("http/static")]
+
 setup(
     name='testbed',
     version=__version__,
@@ -42,10 +47,9 @@ setup(
     install_requires=REQUIREMENTS.split("\n"),
     data_files=[
         ("testbed/etc", ["etc/mysql.cnf"]),
-        ("testbed/etc/cgi-bin", ["etc/cgi-bin/wsgi.py"]),
-        ("testbed/etc/apache2/sites-available",
-         ["etc/apache2/sites-available/testbed.conf"])
-    ],
+        ("testbed/cgi-bin", ["http/cgi-bin/wsgi.py"]),
+        ("testbed/apache2/sites-available", ["http/apache2/sites-available/testbed.conf"]),
+    ] + STATIC_FILES[0:64],
     classifiers=[
         'Development Status :: 1 - Pre-Alphe',
         'Environment :: Web Environment',
