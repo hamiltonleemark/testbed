@@ -6,8 +6,3 @@ test::
 
 build::
 	./manage.py collectstatic --noinput
-
-##
-# Static directory is created by the build rule
-clean::
-	rm -rf static
