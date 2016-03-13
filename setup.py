@@ -29,7 +29,7 @@ def walkdir(dirname):
 
 ##
 # strip http
-STATIC_FILES = [("testbed" + item[4:], [item])
+STATIC_FILES = [(os.path.split("testbed" + item[4:])[0], [item])
                  for item in walkdir("http/static")]
 
 setup(
@@ -49,7 +49,7 @@ setup(
         ("testbed/etc", ["etc/mysql.cnf"]),
         ("testbed/cgi-bin", ["http/cgi-bin/wsgi.py"]),
         ("testbed/apache2/sites-available", ["http/apache2/sites-available/testbed.conf"]),
-    ] + STATIC_FILES[0:64],
+    ] + STATIC_FILES,
     classifiers=[
         'Development Status :: 1 - Pre-Alphe',
         'Environment :: Web Environment',
