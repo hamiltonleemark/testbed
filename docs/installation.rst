@@ -16,6 +16,41 @@ database for **normal** operation. The database requires a testbed
 installation as well as configuring the database. Client only need to install 
 the testbed software. For evaluation purposes a single system can be used.
 
+Server Installation on Ubuntu 14.04
+-----------------------------------
+
+Here are the steps for installing testbed on a server, a mysql database must be setup by following these steps:
+
+#. Install several packages 
+   **sudo apt-get install python-pip python-yaml libmysqlclient-dev python-dev**
+   **sudo apt-get install apache2 libapache2-mod-wsgi**
+#. Install mysql server, **sudo apt-get install mysql-server-5.5**. During thie step you'll be asked to set the mysql root password. Remember this value for 
+later. Normally this account is not used for general access to the mysql
+server. Later a mysql account called **testbed** will be created to 
+provide access to the testbed specific content.
+#. Install latest testbed
+   **sudo pip install https://github.com/testbed/testbed/archive/v0.1-alpha.8.tar.gz**
+#. Add testbed configuration 
+   **sudo cp /usr/local/testbed/apache2/sites-available/testbed.conf  /etc/apache2/sites-available/testbed.conf**
+#. Enable testbed apache configuration,
+   sudo ln -s /etc/apache2/sites-available/testbed.conf /etc/apache2/sites-enabled/testbed.conf
+#. Restart the apache server, **sudo service apache2 restart**
+#. Assuming the default user "testbed", create this user in mysql:
+   mysql -u root -p -e "CREATE USER 'testbed'@'%' IDENTIFIED BY 'password';"
+   mysql -u root -p -e "GRANT ALL PRIVILEGES ON * . * TO 'testbed'@'%';"
+   mysql -u root -p -e "FLUSH PRIVILEGES;"
+   Any user name and password can be used. This information simply needs to 
+   be provided in the final step when mysql.cnf is created. By default, **testbed** and **password** credentials are assumed.
+#. On the server, create the testbed database. Usually this is done with
+   the root account:
+   mysql -u root -p -e "create database testbed;"
+#. Create database and admin account. During this step provide a username 
+   and password. This is an account that will be used to log into the website
+   with administrative priveleges.
+   /usr/local/bin/tbd-manage syncdb
+#. Edit **/usr/local/testbed/etc/mysql.cnf** and change the password which was 
+   set in the previous step.
+
 Client Installation on Ubuntu 14.04
 -----------------------------------
 
@@ -26,30 +61,6 @@ release site to find the latest version. The example below uses an older
 version:
 
 #. sudo apt-get install python-pip python-yaml libmysqlclient-dev python-dev
-#. sudo pip install https://github.com/testbed/testbed/archive/v0.1-alpha.3.tar.gz
+#. sudo pip install https://github.com/testbed/testbed/archive/v0.1-alpha.8.tar.gz
 #. Create or edit the file **/usr/local/testbed/etc/mysql.cnf** with the 
    location of the testbed server.  
-
-Server Installation on Ubuntu 14.04
------------------------------------
-
-Here are the steps for installing testbed on a server, a mysql database must be setup by following these steps:
-
-#. sudo apt-get install python-pip python-yaml libmysqlclient-dev python-dev
-#. sudo apt-get install apache2 libapache2-mod-wsgi
-#. Install mysql server, **sudo apt-get install mysql-server-5.5.**. During thie step you'll be asked to set the root password. Remember thie value for later.
-#. sudo pip install https://github.com/testbed/testbed/archive/v0.1-alpha.3.tar.gz
-#. Edit **/usr/local/testbed/etc/mysql.cnf** change the password which was set in step 4.
-#. Add testbed configuration 
-   sudo cp /usr/local/testbed/etc/apache2/sites-available/testbed.conf  /etc/apache2/sites-available/testbed.conf
-#. Enable testbed apache configuration,
-   sudo ln -s /etc/apache2/sites-available/testbed.conf /etc/apache2/sites-enabled/testbed.conf
-#. On the server, create the testbed database. Usually this is done with
-   the root account:
-   mysql -u root -p -e "create database testbed;"
-#. Assuming the default user "testbed", create this user in mysql:
-   CREATE USER 'testbed'@'%' IDENTIFIED BY 'password';
-   GRANT ALL PRIVILEGES ON * . * TO "testbed"@"%";
-   FLUSH PRIVILEGES;
-#. Restart apache2
-   sudo service apache2 restart

@@ -15,6 +15,7 @@ clean::
 .PHONY:
 build: MANIFEST.in ./setup.py 
 	make -C testbed/db build
+	cp -r /usr/local/testbed/static http/static
 	python ./setup.py build sdist bdist_wheel
 
 install: build

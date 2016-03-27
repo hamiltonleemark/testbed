@@ -41,7 +41,7 @@ def default_file_fill(ddict, default_file):
     return ddict
 
 
-def do_lsdb(_):
+def do_dbls(_):
     """ Add a test. """
     import djconfig
 
@@ -64,6 +64,36 @@ def do_lsdb(_):
         print "  %s: %s%s:%s" % (db_name, hostname, engine, name)
 
 
+def do_dbcheck(_):
+    """ Check that the installation is good. """
+
+    import djconfig
+    if "default" in djconfig.settings.DATABASES:
+        print "default database found ... pass"
+    else:
+        print "default database found ... fail"
+        return 1
+
+    ##
+    # It does not matter if there are any products. Mostly like this is
+    # called just after installation. This is just a way to confirm
+    # installation is correct because the model can connect to the database
+    try:
+        from testdb import models
+        print "load models ... pass"
+    except Exception:
+        print "load models ... fail"
+        return 1
+
+    try:
+        [item for item in models.Product.objects.all()]
+        print "connect to database ... pass"
+    except Exception:
+        print "connect to database ... fail"
+        return 1
+    return 0
+
+
 def add_subparser(subparser):
     """ Status CLI commands. """
 
@@ -71,6 +101,16 @@ def add_subparser(subparser):
     # Adding a test requires a testsuite.
     #
     # test add <testsuite> <name>
-    parser = subparser.add_parser("ls-db", help=__doc__)
-    parser.set_defaults(func=do_lsdb)
+    parser = subparser.add_parser("db", help=__doc__)
+    subparser = parser.add_subparsers()
+
+    parser = subparser.add_parser("list",
+                                  description="list databases",
+                                  help="List all databases.")
+    parser.set_defaults(func=do_dbls)
+
+    parser = subparser.add_parser("check",
+                                  description="list databases",
+                                  help="List all databases.")
+    parser.set_defaults(func=do_dbcheck)
     return subparser
