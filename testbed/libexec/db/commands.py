@@ -78,6 +78,7 @@ def do_dbcheck(_):
     # It does not matter if there are any products. Mostly like this is
     # called just after installation. This is just a way to confirm
     # installation is correct because the model can connect to the database
+    # pylint: disable=W0703
     try:
         from testdb import models
         print "load models ... pass"
@@ -85,12 +86,15 @@ def do_dbcheck(_):
         print "load models ... fail"
         return 1
 
+    # pylint: disable=W0106
     try:
         [item for item in models.Product.objects.all()]
         print "connect to database ... pass"
     except Exception:
         print "connect to database ... fail"
         return 1
+    # pylint: enable=W0106
+    # pylint: enable=W0703
     return 0
 
 

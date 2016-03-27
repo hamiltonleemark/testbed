@@ -11,7 +11,6 @@ functionaly rich and useful for evaluating testbed.
 
 .. toctree::
    installation.rst
-   gettingstarted.rst
    quickstart.rst
    release.rst
    architecture.rst

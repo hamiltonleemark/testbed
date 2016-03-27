@@ -14,7 +14,6 @@ Useful Topics:
 
 .. toctree::
    installation.rst
-   gettingstarted.rst
    quickstart.rst
    release.rst
    architecture.rst
