@@ -15,9 +15,7 @@ Useful Topics:
 .. toctree::
    installation.rst
    quickstart.rst
-   release.rst
-   architecture.rst
-   :maxdepth: 2
+   :maxdepth: 3
 
 
 

@@ -23,14 +23,14 @@ subdirs: $(SUBMODULES)
           --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" \
 	  --generated-members=objects,MultipleObjectsReturned,get_or_create $*
 
-pylint:: $(addsuffix .pylint,$(PYTHON_FILES))
+pylint:: $(addsuffix .pylint,$(PYTHON_FILES)) subdirs
 
 
 %.pep8:
 	pep8 $*
 
 .PHONY: pep8
-pep8:: $(addsuffix .pep8,$(PYTHON_FILES))
+pep8:: $(addsuffix .pep8,$(PYTHON_FILES)) subdirs
 
 
 %.python27:

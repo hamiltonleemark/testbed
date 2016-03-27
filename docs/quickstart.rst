@@ -3,13 +3,22 @@
 Quick Start
 ===============
 
+Testbed can be installed in a standalone manner in order to demonstrate several key concepts. Standalone mode is functionaly rich and useful for evaluating testbed.
+
 Here are the required steps to setup the development environment.
 
-1. sudo apt-get install pip
-3. sudo apt-get install python-yaml
-4. sudo pip install -r requirements.txt
+#. Install several packages:
 
-Apache2 configuration on Ubuntu14.04
-sudo apt-get install apache2 libapache2-mod-wsgi
+  **sudo apt-get install python-pip python-yaml libmysqlclient-dev python-dev**
+#. Install testbed from the github release area:
 
-sudo ln -s /etc/apache2/sites-available/testbed.conf /etc/apache2/sites-enabled/testbed.conf
+  **sudo pip install https://github.com/testbed/testbed/archive/v0.1-alpha.8.tar.gz**
+#. Edit the file testbed configuration file:
+
+  **/usr/local/testbed/etc/mysql.cnf**
+
+  Set host to the IP address of the testbed server. The user and passowrd 
+  properties should also be changed appropriately.
+#. Validate proper configuration. confirm all checks pass.
+
+   **tbd db check**
