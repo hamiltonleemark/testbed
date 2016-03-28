@@ -4,7 +4,7 @@ include CHANGES.rst
 include requirements.txt
 include bin/tbd bin/tbd.py
 include bin/tbd-manage bin/tbdmanage.py
-include etc/mysql.cnf
+include examples/etc/mysql.cnf
 include http/cgi-bin/wsgi.py
 include http/apache2/sites-available/testbed.conf
 recursive-include http/static *.txt *.css *.png *.js

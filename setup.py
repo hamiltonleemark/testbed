@@ -46,7 +46,8 @@ setup(
     author_email='mark.lee.hamilton@gmail.com',
     install_requires=REQUIREMENTS.split("\n"),
     data_files=[
-        ("testbed/etc", ["etc/mysql.cnf"]),
+        ("testbed/etc", []),
+        ("testbed/examples/etc", ["examples/etc/mysql.cnf"]),
         ("testbed/cgi-bin", ["http/cgi-bin/wsgi.py"]),
         ("testbed/apache2/sites-available", ["http/apache2/sites-available/testbed.conf"]),
     ] + STATIC_FILES,

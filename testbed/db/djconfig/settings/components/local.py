@@ -13,10 +13,10 @@ DEFAULT = {
 
 import sys
 
+DATABASES["local"] = DEFAULT
 # Assume if default is defined that this application has been installed
 # and so is a release.
 if "default" in DATABASES:
-    DATABASES["local"] = DEFAULT
     DEBUG = False
 else:
     DATABASES["default"] = DEFAULT

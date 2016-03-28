@@ -59,22 +59,29 @@ for installing testbed's server:
    the root account:
 
    **mysql -u root -p -e "create database testbed;"**
-#. Create testbed and admin account. During this step provide a username 
-   and password. This is the testbed administative account.
-
-   **/usr/local/bin/tbd-manage syncdb**
 #. To allow testbed clients access to the database, edit /etc/mysql/my.cnf. 
    Comment out both lines:
 
    **#bind-address   = 127.0.0.1**
 
    **#skip-networking**
-
-#. Edit testbed configuration **/usr/local/testbed/etc/mysql.cnf** and change
-   the password which was set in the previous step.
 #. Restart mysql:
 
    **sudo service mysql restart**
+#. Copy example testbed configuration 
+
+  **cd /usr/local/testbed**
+  **cp examples/etc/mysql.cnf etc/mysql.cnf**
+#. Edit testbed configuration **/usr/local/testbed/etc/mysql.cnf** and change
+   the password which was set in step 7.
+#. Populate testbed database.
+
+   **/usr/local/bin/tbd-manage migrate**
+#. Create admin account for testbed database not to be confused with the 
+   mysql admin account. This is a user that had full edit access in the 
+   testbed database. Run the following command and answer the promps
+
+   **/usr/local/bin/tbd-manage migrate**
 #. Validate proper configuration **tbd db check** to confirm all checks pass.
 
 Client Installation on Ubuntu 14.04
