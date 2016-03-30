@@ -50,8 +50,8 @@ for suite_item in range(0, SUITE_COUNT):
 # Add testplan keys
 #
 
-for buildid in range(0, BUILD_COUNT):
-    args["build"] = "build%d" % buildid
+for buildid in range(100, BUILD_COUNT):
+    args["build"] = buildid
     run("%(tbd)s -d %(db)s build add %(product)s branch1 %(build)s" % args)
     run("%(tbd)s -d %(db)s build add %(product)s branch2 %(build)s" % args)
 
