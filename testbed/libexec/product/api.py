@@ -96,30 +96,40 @@ def contains(value=None):
 
 
 def remove(product, branch):
-    """ Get or create a testplan in a certain order.
-    Order is just that the location of the testplan in the list of testplans.
-    The order effects the location the testplan appears on web pages.
-    """
+    """ Remove a product given name and branch. """
 
-    from testdb.models import Testplan
+    from testdb.models import Product
     from testdb.models import Context
+    from testdb.models import Key
     from testdb.models import KVP
-
-    try:
-        branch_key = KVP.objects.get(key__value="branch", value=branch)
-    except KVP.DoesNotExist, arg:
-        raise Testplan.DoesNotExist(arg)
+    from testdb.models import Testplan
+    from testdb import builds
 
     try:
         context = Context.objects.get(name=CONTEXT)
-    except Context.DoesNotExist, arg:
-        raise Testplan.DoesNotExist(arg)
+        (product_key, _) = Key.objects.get_or_create(value=product)
+        (branch_key, _) = Key.objects.get_or_create(value=branch)
+    except (Context.DoesNotExist, Key.DoesNotExist), arg:
+        raise Product.DoesNotExist(arg)
+    product1 = Product.objects.get(context=context, product=product_key,
+                                   branch=branch_key)
 
-    find = Testplan.objects.filter(testsuite__context=context,
-                                   testsuite__name__name=product,
-                                   testsuite__keys=branch_key)
-    for item in find:
-        item.delete()
+    try:
+        product_kvp = KVP.objects.get(key__value="product", value=product)
+        branch_kvp = KVP.objects.get(key__value="branch", value=branch)
+        buildids = builds.filter(product_kvp, branch_kvp)
+    except KVP.DoesNotExist, arg:
+        raise Product.DoesNotExist(arg)
+
+    testplan_name = product1.key_get("testplan", None)
+    testplan_name = Testplan.context_get(testplan_name)
+    testplan_context = Context.objects.get(name=testplan_name)
+    testplan = Testplan.objects.get(context=testplan_context)
+    for testplan in testplan.testplanorder_set.all():
+        for buildid in buildids:
+            for testsuite1 in testplan.testsuite_set.filter(kvps=buildid.id):
+                for test1 in testsuite1.test_set.all():
+                    print "MARK: ", buildid, testsuite1, test1, test1.status
 
 
 def add_testplan(product, branch, testplan_name):
