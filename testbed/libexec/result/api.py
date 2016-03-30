@@ -30,9 +30,6 @@ def set_result(context, product_name, branch_name, build, testsuite_name,
     """ Get or create a testplan in a certain order.
 
     @param product_name Is the name of the product
-    @param order order is the location of the testplan in the list of
-                 testplans. The order effects the location the testplan
-                 appears on web pages.
     @param testkeys list of tuples of the form (key,value)
     """
     from testdb import models
@@ -40,8 +37,8 @@ def set_result(context, product_name, branch_name, build, testsuite_name,
     logging.debug("%s %s %s %s", product_name, branch_name, build,
                   testsuite_name)
 
-    product1 = models.Product.get(product.api.CONTEXT,
-                                  product_name, branch_name)
+    product1 = models.Product.get(product.api.CONTEXT, product_name,
+                                  branch_name)
 
     testplan_name = product1.key_get("testplan", None)
     if testplan_name is None:
