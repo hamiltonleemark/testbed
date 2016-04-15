@@ -203,6 +203,8 @@ def add_key(context, order, key, value):
     planorder = testplan.testplanorder_set.get(order=order)
     testsuite = Testsuite.objects.get(context=context, testplanorder=planorder)
     (testkey, _) = KVP.get_or_create(key=key, value=value)
+
+    print "MARK: testkey", testkey
     testsuite.key_change(testkey)
 
     ##

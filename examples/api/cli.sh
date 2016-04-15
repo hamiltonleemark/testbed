@@ -1,11 +1,14 @@
 #!/usr/bin/python
 
+##
+# Example of how to store results using the tbd CLI.
+
 import os
 import sys
 
-BUILD_COUNT=2000
-SUITE_COUNT=5
-TEST_COUNT=2
+BUILD_COUNT=101
+SUITE_COUNT=1
+TEST_COUNT=1
 
 ##
 # db is usually default but can be set to local.
@@ -23,12 +26,12 @@ def run(cmd):
         raise ValueError('"%s failed %d"' % (cmd, rtc))
 
 run("%(tbd)s -d %(db)s product add %(product)s branch1" % args)
-run("%(tbd)s -d %(db)s product add %(product)s branch2" % args)
-run("%(tbd)s -d %(db)s product add %(product)s branch3" % args)
+#run("%(tbd)s -d %(db)s product add %(product)s branch2" % args)
+#run("%(tbd)s -d %(db)s product add %(product)s branch3" % args)
 
 run("%(tbd)s -d %(db)s product testplan add %(product)s branch1 default" % args)
-run("%(tbd)s -d %(db)s product testplan add %(product)s branch2 default" % args)
-run("%(tbd)s -d %(db)s product testplan add %(product)s branch3 default" % args)
+#run("%(tbd)s -d %(db)s product testplan add %(product)s branch2 default" % args)
+#run("%(tbd)s -d %(db)s product testplan add %(product)s branch3 default" % args)
 
 
 ##
@@ -58,7 +61,7 @@ for buildid in range(100, BUILD_COUNT):
     for suite_item in range(0, SUITE_COUNT):
         args["order"] = str(suite_item)
         args["testsuite"] = "testsuite%d" % suite_item
-        args["build"] = "build%d" % buildid
+        args["build"] = buildid
 
         for test_item in range(0, TEST_COUNT):
             args["test"] = "test%d.%d" % (suite_item, test_item)

@@ -13,7 +13,15 @@ def parse():
 
     arg_parser = commands.main()
     args = arg_parser.parse_args()
-    return commands.args_process(args)
+    try:
+        return commands.args_process(args)
+    except ValueError, arg:
+        print "MARK: verbose", args.verbose
+        if args.verbose > 0:
+            logging.exception(arg)
+        else:
+            print arg
+        sys.exit(1)
 
 
 def env_setup():

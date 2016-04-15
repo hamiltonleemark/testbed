@@ -65,8 +65,8 @@ def get_or_create(productname, branchname, order=-1):
     for product in products:
         if product.order == current_order:
             product.order += 1
-            logging.debug("updating order %s to %d", productname,
-                          product.order)
+            logging.info("updating order %s to %d", productname,
+                         product.order)
             product.save()
             current_order = product.order
 
@@ -103,16 +103,17 @@ def remove(product, branch):
     from testdb.models import Key
     from testdb.models import KVP
     from testdb.models import Testplan
+    from testdb.models import TestsuiteKVP
     from testdb import builds
 
+    logging.info("removing %s %s", product, branch)
     try:
         context = Context.objects.get(name=CONTEXT)
-        (product_key, _) = Key.objects.get_or_create(value=product)
-        (branch_key, _) = Key.objects.get_or_create(value=branch)
+        product1 = Product.objects.get(context=context, product__value=product,
+                                       branch__value=branch)
     except (Context.DoesNotExist, Key.DoesNotExist), arg:
+        logging.info("product  %s %s not found", product, branch)
         raise Product.DoesNotExist(arg)
-    product1 = Product.objects.get(context=context, product=product_key,
-                                   branch=branch_key)
 
     try:
         product_kvp = KVP.objects.get(key__value="product", value=product)
@@ -122,14 +123,22 @@ def remove(product, branch):
         raise Product.DoesNotExist(arg)
 
     testplan_name = product1.key_get("testplan", None)
-    testplan_name = Testplan.context_get(testplan_name)
-    testplan_context = Context.objects.get(name=testplan_name)
+    testplan_context = Testplan.context_get(testplan_name)
     testplan = Testplan.objects.get(context=testplan_context)
     for testplan in testplan.testplanorder_set.all():
         for buildid in buildids:
-            for testsuite1 in testplan.testsuite_set.filter(kvps=buildid.id):
-                for test1 in testsuite1.test_set.all():
-                    print "MARK: ", buildid, testsuite1, test1, test1.status
+            try:
+                build = buildid.key_get("build")
+                logging.info("removing %s %s %s", product, branch, build)
+                for testsuite1 in testplan.testsuite_set.filter(kvps=build):
+                    logging.info("removing %s %s %s %s", product, branch,
+                                 buildid, testsuite1)
+                    testsuite1.delete()
+                buildid.delete()
+            except TestsuiteKVP.DoesNotExist:
+                continue
+    testplan.delete()
+    product1.delete()
 
 
 def add_testplan(product, branch, testplan_name):

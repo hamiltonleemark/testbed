@@ -21,11 +21,12 @@ import logging
 from testbed.libexec import product
 from testbed.libexec import planorder
 from testbed.libexec import testplan
+from testbed.libexec import build
 
 
 # pylint: disable=R0913
 # pylint: disable=R0914
-def set_result(context, product_name, branch_name, build, testsuite_name,
+def set_result(context, product_name, branch_name, build_name, testsuite_name,
                test_name, result, testkeys):
     """ Get or create a testplan in a certain order.
 
@@ -34,7 +35,7 @@ def set_result(context, product_name, branch_name, build, testsuite_name,
     """
     from testdb import models
 
-    logging.debug("%s %s %s %s", product_name, branch_name, build,
+    logging.debug("%s %s %s %s", product_name, branch_name, build_name,
                   testsuite_name)
 
     product1 = models.Product.get(product.api.CONTEXT, product_name,
@@ -49,7 +50,18 @@ def set_result(context, product_name, branch_name, build, testsuite_name,
     order = planorder.api.get(testplan_name, testsuite_name, testkeys)
     ##
 
-    build_key = models.KVP.get_or_create("build", build)[0]
+    ##
+    # Check to see if the build is defined.
+    try:
+        buildid = build.api.get(product_name, branch_name, build_name)
+        build_key = buildid.key_get("build")
+        print "MARK: build key", build_key
+    except models.KVP.DoesNotExist:
+        raise ValueError("build %s for %s %s missing" % (build_name,
+                                                         product_name,
+                                                         branch_name))
+    ##
+
     (context, created) = models.Context.objects.get_or_create(name=context)
     (testsuite1, critem) = models.Testsuite.get_or_create(
         context, testsuite_name, order, build_key, [])

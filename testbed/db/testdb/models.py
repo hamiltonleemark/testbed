@@ -84,6 +84,7 @@ class KVP(models.Model):
 
         if key.config_type != Key.CONFIG_TYPE_ANY:
             raise KVP.DoesNotExist("key %s is strict" % key)
+
         return KVP.objects.get_or_create(key=key, value=value)
 
     @staticmethod
@@ -267,8 +268,7 @@ class TestsuiteKVP(models.Model):
 
     def __str__(self):
         """ User representation. """
-
-        return "%s %s" % (str(self.testsuite.context), str(self.testkey))
+        return "%s %s" % (str(self.testsuite.context), str(self.kvp))
 
 
 class Testsuite(models.Model):
@@ -303,7 +303,8 @@ class Testsuite(models.Model):
 
     def key_get(self, key):
         """ Return value given key. """
-        return self.kvps.get(key__value=key)
+        testkvp = self.testsuitekvp_set.get(kvp__key__value=key)
+        return testkvp.kvp
 
     def key_remove(self, key):
         """ Remove key and return True if key exists and is removed. """
@@ -318,18 +319,22 @@ class Testsuite(models.Model):
 
     def key_change(self, testkey):
         """ Get/create/change KVP associated with this testsuite.
+
          Using the key either return the existing KVP if value matches,
          create a new KVP if one does not exist or change the existing key
          to the new value.
          """
 
+        print "MARK: key change", testkey
         try:
             current_key = self.key_get(testkey.key.value)
+            print "MARK: current key", current_key
+
             if current_key.value != testkey.value:
                 current_key.delete()
                 current_key.save()
-                self.testsuitekvp_set.create(testkey=testkey)
-        except KVP.DoesNotExist:
+                self.testsuitekvp_set.create(kvp=testkey)
+        except TestsuiteKVP.DoesNotExist:
             self.testsuitekvp_set.create(kvp=testkey)
 
     def value_get(self, key, default=None):
@@ -395,12 +400,16 @@ class Testsuite(models.Model):
     # \todo This is not making a lot of sense. Why is this filter
     # this should be a get maybe.
     @staticmethod
-    def get(context, testplanorder, testkeys):
+    def get(context, testsuite_name, testplanorder, testkeys):
         """ List of testsuites based on testplan.
         @return Return a single Testsuite object.
         """
 
+        if testsuite_name:
+            testsuite_name = TestsuiteName.objects.get(name=testsuite_name)
+
         find = Testsuite.objects.filter(context=context,
+                                        name=testsuite_name,
                                         testplanorder=testplanorder)
 
         if not testkeys:
@@ -408,9 +417,9 @@ class Testsuite(models.Model):
         ##
         # Look for testsuite.
         for testkey in testkeys[:-1]:
-            find = find.filter(keys=testkey)
-        results = [item for item in find.get(keys=testkeys[-1])]
-        return results[0]
+            find = find.filter(kvps=testkey)
+
+        return find.get(kvps=testkeys[-1])
 
     ##
     # \todo This is not making a lot of sense. Why is this filter

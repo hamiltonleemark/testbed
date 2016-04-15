@@ -80,14 +80,19 @@ def view(request, pid):
     results = {}
     try:
         context = models.Context.objects.get(name=context)
+        print "MARK: result", context
         for testplan in testplans:
             for buildid in blist:
+                print "MARK: result buildid", buildid
                 testsuites = testplan.testsuite_set.filter(context=context,
                                                            kvps=buildid.id)
                 for testsuite1 in testsuites:
+                    print "MARK: result buildid testsuite", testsuite1
                     for test1 in testsuite1.test_set.all():
+                        print "MARK: result buildid testsuite test1", test1
                         key = (buildid.id.value, testsuite1.name.name,
                                test1.name.name)
+                        print "MARK: key", key
                         results[key] = test1.status
     
         planorders = [(item.order, item) for item in planorders.values()]
