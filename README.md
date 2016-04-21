@@ -24,7 +24,8 @@ Design Principles
 Get Involved
 ============
 
-   * Read [Community Information](http://testbed.readthedocs.org/community.html) for all kinds of ways to contribute to and interact with the project.
+   * Read [Community Information](http://testbed.readthedocs.org/community.html)
+     for all kinds of ways to contribute to and interact with the project.
    * Code submissions are done through pull requests.
 
 Branch Info
